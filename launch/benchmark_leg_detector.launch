@@ -1,0 +1,40 @@
+<launch>
+<arg name="robot" value="fake_robot"/>
+<arg name="viewer" default="true"/>
+
+<group ns="$(arg robot)">
+  <!-- file reader -->
+  <node pkg="people_detection_vision" type="scan_and_leg_publisher.exe"
+        name="scan_and_leg_publisher" output="screen" required="true"
+        args="_csv_filename:=$(find people_detection_vision)/data/LaserSurveillanceLogger_2014-09-12_12-53-58-676.csv
+              _scan_unit2meters:=0.001" />
+<!--
+        launch-prefix="valgrind"
+-->
+
+  <!-- leg detector -->
+  <node pkg="people_detection_vision" type="leg_pplp.exe"
+        name="leg_pplp" output="screen" args="_laser_src_topic:=scan" />
+  <node pkg="rostopic" type="rostopic" name="artoolkit_pplp_starter" output="screen"
+        args="pub LEG_PPLP_START std_msgs/Int16 '{data: 0}' -l  -1"/>
+
+  <!-- PPL benchmarker -->
+  <node pkg="people_detection_vision" type="pplp_benchmarker.exe"
+    name="pplp_benchmarker"  output="screen"
+    args="_ground_truth_ppl_topic:=scan_and_leg_publisher/ppl
+          _ppl_topics:=leg_pplp/ppl
+          _errors_display_timeout:=15
+          _results_filename:=$(find people_detection_vision)/leg_benchmarker_results.txt" />
+
+  <!-- PPL viewer -->
+  <node if="$(arg viewer)" pkg="people_utils" type="ppl_viewer.exe"
+    name="ppl_viewer"  output="screen"
+    args="_ppl_topics:='scan_and_leg_publisher/ppl;leg_pplp/ppl'
+          _scan_topic:=scan
+          _reprojection_mode:=xy
+          _draw_tracks:=false
+          _width:=600 _height:=600
+          _xmin:=-4 _xmax:=4 _ymin:=-4 _ymax:=4" />
+</group>
+</launch>
+

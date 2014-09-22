@@ -1,0 +1,17 @@
+#the number of patterns to be recognized
+2
+
+# pattern name
+4x4_2
+# pattern file - paths are relative to the folder `rospack find ar_pose`
+data/4x4/4x4_2.patt
+# marker_width
+150.0
+# marker_center
+0.0 0.0
+
+4x4_1
+data/4x4/4x4_1.patt
+150.0
+0.0 0.0
+

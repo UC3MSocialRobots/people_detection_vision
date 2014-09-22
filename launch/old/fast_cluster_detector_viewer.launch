@@ -1,0 +1,8 @@
+<launch>
+<arg name="robot" />
+<group ns="$(arg robot)">
+  <node pkg="image_view" type="image_view" name="image_view_components_illus" output="screen"
+        args="image:=/mopi/fast_cluster_detector_components_illus compressed"/>
+</group>
+</launch>
+

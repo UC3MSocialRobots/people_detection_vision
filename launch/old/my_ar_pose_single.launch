@@ -1,0 +1,36 @@
+<launch>
+  <remap from="/camera/camera_info" to="/camera/rgb/camera_info"/>
+  <remap from="/camera/image_raw" to="/camera/rgb/image_raw"/>
+  <remap from="/camera/image_rect" to="/camera/rgb/image_rect"/>
+  <remap from="/camera/image_mono" to="/camera/rgb/image_mono"/>
+
+  <node pkg="rviz" type="rviz" name="rviz"
+    args="-d $(find ar_pose)/launch/live_multi.rviz"/>
+
+  <node pkg="tf" type="static_transform_publisher" name="world_to_cam"
+    args="0 0 0.5 -1.57 0 -1.57 world camera_link 1" />
+
+<!--
+  <node ns="camera" pkg="image_proc" type="image_proc" name="image_proc"/>
+-->
+
+  <!--
+  rostopic echo -n 1 /camera/depth_registered/camera_info > A00365A82054035A_manual_depth.yaml
+  rostopic echo -n 1 /camera/rgb/camera_info > A00365A82054035A_manual_rgb.yaml
+  roslaunch openni_launch openni.launch
+  rosrun image_view image_view image:=/camera/rgb/image_raw
+  rostopic echo /ar_pose_marker
+  -->
+
+  <node name="ar_pose" pkg="ar_pose" type="ar_single" respawn="false"
+    output="screen">
+
+    <param name="marker_pattern" type="string"
+      value="$(find ar_pose)/data/4x4/4x4_1.patt"/>
+    <param name="marker_width" type="double" value="152.4"/>
+    <param name="marker_center_x" type="double" value="0.0"/>
+    <param name="marker_center_y" type="double" value="0.0"/>
+    <param name="threshold" type="int" value="100"/>
+    <param name="use_history" type="bool" value="true"/>
+  </node>
+</launch>

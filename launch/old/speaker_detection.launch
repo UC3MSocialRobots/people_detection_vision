@@ -1,0 +1,27 @@
+<launch>
+<arg name="robot"/>
+<group ns="$(arg robot)">
+  <!-- the face detector -->
+  <node pkg="people_detection_vision" type="face_detector_pplp.exe" name="face_detector"
+        output="screen"
+        args="_data_acquisition_want_rgb:=true
+              _data_acquisition_want_depth:=false
+              _data_acquisition_by_wait_for_message:=false"
+        />
+
+  <node pkg="people_detection_vision" type="motion_based_speaker_detector.exe" name="motion_based_speaker_detector"
+        output="screen"
+        args="--activate
+              _ppl_input_topic:=face_detector/ppl"
+        />
+
+  <!-- the event interface skill -->
+  <!--
+  <node pkg="ad_core" type="launcher_qt_event_sender_interface.exe"
+        name="face_recognizer_event_gui"
+        output="screen"
+        args='event_keys="|FACE_DETECTOR_PPLP_START;face_detector_start (also by face_recognizer_start);0"'/>
+  -->
+</group>
+</launch>
+

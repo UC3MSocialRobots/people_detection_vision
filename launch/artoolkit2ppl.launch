@@ -1,0 +1,55 @@
+<launch>
+<arg name="robot"/>
+<arg name="eventgui" default="true"/>
+<arg name="marker" default="false"/>
+
+<!-- launch the driver -->
+<!--
+<include file="$(find main_control)/launch/$(arg robot)_start.launch"/>
+<include file="$(find main_control)/launch/viz.launch">
+  <arg name="robot" value="$(arg robot)" />
+</include>
+-->
+
+<group ns="$(arg robot)">
+  <arg name="marker_pattern_list" value="$(find people_detection_vision)/data/artoolkit/markers.dat"/>
+  <arg name="ar_pose_caminfo_launcher" value="/$(arg robot)/ar_pose/camera_info"/>
+
+  <!-- camera_info remap to launch ar_pose only when wanted and not at startup -->
+  <remap from="/camera/camera_info" to="$(arg ar_pose_caminfo_launcher)"/>
+  <remap from="/camera/image_raw"   to="/$(arg robot)/rgb"/>
+  <remap from="/camera/image_rect"  to="/$(arg robot)/rgb"/>
+  <remap from="/camera/image_mono"  to="/$(arg robot)/rgb"/>
+
+
+  <!-- the artoolkit node. Must be respawnable,
+       because it is killed when artoolkit_pplp is stopped. -->
+  <node pkg="ar_pose" type="ar_multi" name="ar_pose"
+        respawn="true" output="screen">
+    <param name="marker_pattern_list" type="string" value="$(arg marker_pattern_list)"/>
+    <param name="threshold" type="int" value="100"/>
+  </node>
+
+  <!-- the AD skill starting or stopping ar_pose -->
+ <node pkg="people_detection_vision" type="artoolkit_pplp.exe"
+      name="artoolkit_pplp"  output="screen" respawn="false">
+    <param name="input_caminfo_topic" value="/$(arg robot)/camera_info"/>
+    <param name="artoolkit_caminfo_topic" value="$(arg ar_pose_caminfo_launcher)"/>
+    <param name="artoolkit_markers_topic" value="ar_pose_marker"/>
+    <param name="marker_pattern_list" value="$(arg marker_pattern_list)"/>
+  </node>
+
+  <!-- conversion to ROS rviz marker -->
+  <node if="$(arg marker)" pkg="people_utils" type="ppl2marker.exe"
+        output="screen" name="ppl2marker_artoolkit"
+        args="_red:=0 _green:=1 _blue:=1 _input_topic:=artoolkit_pplp/ppl" />
+
+  <!-- event GUI -->
+  <node if="$(arg eventgui)" pkg="ad_core" type="launcher_qt_event_sender_interface.exe"
+        name="artoolkit_pplp_event_gui"
+        output="screen"
+        args='event_keys="|ARTOOLKIT_PPLP_START;ARTOOLKIT_PPLP_START;0
+                          |ARTOOLKIT_PPLP_STOP;ARTOOLKIT_PPLP_STOP;0"'/>
+</group>
+</launch>
+

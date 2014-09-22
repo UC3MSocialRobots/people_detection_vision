@@ -1,0 +1,22 @@
+<launch>
+<arg name="robot" />
+<group ns="$(arg robot)">
+  <!-- a node for tracking - followme laser -->
+  <node pkg="followme_laser" type="test_followme_laser_ros.exe"
+        name="goal_emitter"
+        output="screen" />
+
+  <!-- the goal tracker -->
+  <node pkg="people_detection_vision" type="robot_wanderer_with_moving_goal.exe"
+        name="robot_wanderer_with_moving_goal" output="screen"
+        args="_min_goal_distance:=0.1"/>
+
+  <!-- the trail marker -->
+  <node pkg="robots_2dnav" type="trail_marker.exe" name="trail_marker_moving_goal"
+        args="_input_pose_topic:=moving_goal  _static_frame_id:=/odom
+              _color_r:=0 _color_g:=0 _color_b:=1 _color_a:=0.7
+              _trail_scale:=0.03"
+        output="log"/>
+</group>
+</launch>
+

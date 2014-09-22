@@ -1,0 +1,57 @@
+################################################################################
+# File: "markers.dat"
+# The ARToolKit patterns used in AD.
+#
+# When u create a new pattern or modify an existing one,
+# ensure the ".patt" file is in the "long_term_memory/artoolkit" folder,
+# then copy the patterns to "ar_pose" package using "copy_patterns_to_ar_pose.bash".
+# Patterns can be created using "artoolkit_img2patt" and "artoolkit_patt2img",
+# both in package "hist_user_tracking"
+#
+################################################################################
+# the number of patterns to be recognized:
+2
+
+# pattern name:
+user:alice
+# pattern file - paths are relative to the folder `rospack find ar_pose`:
+data/alice.patt
+# marker_width (including border):
+80.0
+# marker_center:
+0.0 0.0
+
+4x4_1
+data/4x4/4x4_1.patt
+150.0
+0.0 0.0
+
+user:irene
+data/5.patt
+80.0
+0.0 0.0
+
+15
+data/15.patt
+80.0
+0.0 0.0
+
+25
+data/25.patt
+80.0
+0.0 0.0
+
+35
+data/35.patt
+80.0
+0.0 0.0
+
+45
+data/45.patt
+80.0
+0.0 0.0
+
+55
+data/55.patt
+80.0
+0.0 0.0

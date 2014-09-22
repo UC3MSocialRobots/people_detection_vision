@@ -1,0 +1,16 @@
+<launch>
+<arg name="robot"/>
+<group ns="$(arg robot)">
+  <node pkg="people_detection_vision" type="robot_info_grabber.exe" name="robot_info_grabber"
+        output="screen"
+        args="_rgb_topic:=rgb
+              _depth_topic:=depth
+              _odom_topic:=odom
+              _save_images_yaml:=false"
+        />
+<!--
+  <node pkg="rqt_plot" type="rqt_plot" name="plot"
+        args="/mopi/odom/pose/pose/position/x /mopi/odom/pose/pose/position/y" />
+-->
+</group>
+</launch>

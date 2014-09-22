@@ -1,0 +1,10 @@
+# generate text -> PNG images
+http://www.text2image.com/pit_t2i/saver?locale=en
+
+# then use online pattern maker to generate PDF - use 40mm for size
+http://www.roarmot.co.nz/ar/
+
+# print PDF
+
+# finally, use online converter
+http://flash.tarotaro.org/blog/2009/07/12/mgo2/

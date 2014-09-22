@@ -1,0 +1,41 @@
+<launch>
+<arg name="robot"/>
+<arg name="eventgui" default="true"/>
+<arg name="marker" default="false"/>
+<arg name="viewer" default="false"/>
+<arg name="rgb_topic" default="rgb"/>
+
+<!--
+<include file="$(find camera)/launch/camera_node_no_compression.launch"/>
+rosrun people_utils ppl_viewer.exe _ppl_topics:=/kinect_only/face_detector2d_pplp/ppl
+-->
+
+<group ns="$(arg robot)">
+
+  <!-- 2D face PPLP -->
+  <node pkg="people_detection_vision" type="face_detector2d_pplp.exe"
+    name="face_detector2d_pplp"  output="screen"
+    args="_rgb_topic:=$(arg rgb_topic)
+          _display:=false" />
+
+  <!-- conversion to ROS rviz marker -->
+  <node if="$(arg marker)" pkg="people_utils" type="ppl2marker.exe"
+        output="screen" name="ppl2marker_leg_pplp"
+        args="_red:=1 _green:=0 _blue:=0 _input_topic:=face_detector2d_pplp/ppl" />
+
+  <!-- event GUI -->
+  <node pkg="ad_core" type="launcher_qt_event_sender_interface.exe"
+        name="face_detector2d_pplp_event_gui"
+        output="screen"
+        args='event_keys="|FACE_DETECTOR2D_PPLP_START;FACE_DETECTOR2D_PPLP_START;0
+                          |FACE_DETECTOR2D_PPLP_STOP;FACE_DETECTOR2D_PPLP_STOP;0"'/>
+
+  <!-- PPL viewer -->
+  <node if="$(arg viewer)" pkg="people_utils" type="ppl_viewer.exe"
+    name="ppl_viewer"  output="screen"
+    args="_ppl_topics:='face_detector2d_pplp/ppl'
+          _reprojection_mode:=xz
+          _width:=480 _height:=800
+          _xmin:=-3 _xmax:=3 _ymin:=-1 _ymax:=8" />
+</group>
+</launch>

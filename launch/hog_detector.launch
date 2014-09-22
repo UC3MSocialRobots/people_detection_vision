@@ -1,0 +1,39 @@
+<launch>
+<arg name="robot"/>
+<arg name="eventgui" default="true"/>
+<arg name="marker" default="false"/>
+
+<!--
+<include file="$(find main_control)/launch/nite_only_start.launch"/>
+<include file="$(find main_control)/launch/kinect_only_start.launch"/>
+-->
+
+<group ns="$(arg robot)">
+  <!-- HOG people detector
+      ROS_NAMESPACE=alz rosrun people_detection_vision hog_pplp.exe -activate -display _data_acquisition_by_wait_for_message:=false
+    -->
+  <node pkg="people_detection_vision" type="hog_pplp.exe" name="hog_pplp"
+        output="screen" args="--display
+                              _resize_scale:=1
+                              _hog_hitThreshold:=0
+                              _data_acquisition_want_depth:=true
+                              _data_acquisition_by_wait_for_message:=true" />
+<!--
+                              _resize_scale:=0.4
+                              _hog_hitThreshold:=2.0
+-->
+
+  <!-- conversion to ROS rviz marker -->
+  <node if="$(arg marker)" pkg="people_utils" type="ppl2marker.exe"
+        output="screen" name="ppl2marker_people_hog_pplp"
+        args="_red:=0 _green:=0 _blue:=1 _input_topic:=hog_pplp/ppl" />
+
+  <!-- event GUI -->
+  <node pkg="ad_core" type="launcher_qt_event_sender_interface.exe"
+        name="hog_event_gui"
+        output="screen"
+        args='event_keys="|HOG_PPLP_START;HOG_PPLP_START;0
+                          |HOG_PPLP_STOP;HOG_PPLP_STOP;0"'/>
+</group>
+</launch>
+

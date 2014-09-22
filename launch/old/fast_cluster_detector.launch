@@ -1,0 +1,114 @@
+<launch>
+<!--
+A super nice drawing for the code of the buttons on the
+   Logitech RumblePad 2:
+   _______________
+  |  [6]     [7]  |     4, 6: stop tracking both with laser and clusters
+  |  [4]     [5]  |     5, 7: start tracking closest with laser
+   _______________      0, 1, 2, 3: clear markers
+  |   |      (3)  |
+  |  -+-   (0) (2)|
+  |   |      (1)  |
+  / /___________\ \
+ / /             \ \
+-->
+
+<arg name="robot"/>
+
+<include file="$(find people_detection_vision)/launch/fast_cluster_selector.launch">
+  <arg name="robot" value="$(arg robot)" />
+</include>
+
+<!--
+<include file="$(find people_detection_vision)/launch/fast_cluster_detector_viewer.launch">
+  <arg name="robot" value="$(arg robot)" />
+</include>
+-->
+
+<!-- decompress the kinect images -->
+<include file="$(find kinect)/launch/republish_kinect_depth.launch">
+  <arg name="robot" value="$(arg robot)" />
+</include>
+
+<group ns="$(arg robot)">
+  <!-- fast_cluster_detector -->
+  <node pkg="people_detection_vision" type="fast_cluster_detector.exe"
+        name="fast_cluster_detector" output="screen"
+        args="_image_transport:=raw
+              _tracking_timeout:=5.0
+              _max_mark_for_assoc:=.8
+              _mark_ratio_bbox_to_d22:=3
+              _camera_info_topic:=/$(arg robot)_camera/depth/camera_info"
+        required="true" />
+  <!-- compress the compnent illus with png -
+  cf http://www.ros.org/wiki/compressed_image_transport -->
+  <param name="/mopi/fast_cluster_detector_components_illus/compressed/format"
+         value="png" />
+
+
+  <!-- tracking with the laser -->
+  <node pkg="followme_laser" type="test_followme_laser_ros.exe"
+        name="followme_laser_ros" output="screen"
+        args="" />
+
+  <!-- the dialog between laser and kinect -->
+  <node pkg="people_detection_vision" type="fast_dialog.exe"
+        name="fast_dialog" output="screen"
+        args="_followme_laser_node_name:=followme_laser_ros
+              _fast_cluster_detector_node_name:=fast_cluster_detector" />
+
+
+  <!-- control with the joystick -->
+  <node pkg="people_detection_vision" type="fast_cluster_joy_control.exe"
+        name="fast_cluster_joy_control" output="screen"
+        args="" />
+
+  <!-- the goal tracker -->
+  <node pkg="people_detection_vision" type="robot_wanderer_with_moving_goal.exe"
+        name="robot_wanderer_with_moving_goal" output="screen"
+        args="_goal_pt_topic:=fast_dialog/moving_goal
+              _min_goal_distance:=0.9         _max_goal_angle:=0.05
+              _min_vel_lin:=.1                _max_vel_lin:=.5
+              _max_vel_ang:=.6
+              _min_rotate_on_place_speed:=.2  _max_rotate_on_place_speed:=.8
+              _no_goal_timeout:=4.0            _time_pred:=3.0
+              _speed_recomputation_timeout:=0.3"/>
+
+  <!-- rviz -->
+  <include file="$(find main_control)/launch/viz.launch">
+    <arg name="robot" value="$(arg robot)" />
+  </include>
+
+  <!-- the trail marker for the moving goal -->
+  <node pkg="robots_2dnav" type="trail_marker.exe" name="trail_marker_moving_goal"
+        args="_input_pose_topic:=fast_dialog/moving_goal  _static_frame_id:=/odom
+              _color_r:=0 _color_g:=1 _color_b:=0 _color_a:=0.7
+              _trail_scale:=0.03 _fixed_z:=0.0"
+        output="screen"/>
+
+  <!-- save the interface as a video - no compression because we are in local -->
+<!--
+  <node pkg="vision" type="image_topic_to_video"
+        name="input_image_topic_to_video"
+        args="_input_image_topic:=fast_cluster_detector_components_illus
+              _image_transport:=raw
+              _fps:=25"
+        output="screen"/>
+-->
+
+  <!-- plot for the goal distance -->
+<!--
+  <node pkg="rxtools" type="rxplot" name="moving_goal_distance_plot"
+        args="moving_goal_distance/data
+        -l 'Distance to goal' -p 30" />
+-->
+
+  <!-- plot for the number of objects -->
+<!--
+  <node pkg="rxtools" type="rxplot" name="fast_cluster_detector_objects_nb_plot"
+        args="fast_cluster_detector_objects_nb/data
+        -legend='Objects in detector history' -period=30" />
+-->
+</group>
+</launch>
+

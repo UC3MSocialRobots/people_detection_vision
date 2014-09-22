@@ -1,0 +1,31 @@
+<launch>
+<arg name="robot"/>
+<arg name="eventgui" default="true"/>
+<arg name="marker" default="false"/>
+<!--
+<include file="$(find main_control)/launch/nite_only_start.launch"/>
+-->
+
+<group ns="$(arg robot)">
+  <node pkg="people_detection_vision" type="nite_user_mask_pplp.exe"
+        name="nite_user_mask_pplp" output="screen" required="true"
+        args="_user_topic:=user
+              _depth_topic:=depth
+              _data_acquisition_by_wait_for_message:=false
+              --display" />
+
+  <!-- conversion to ROS rviz marker -->
+  <node if="$(arg marker)" pkg="people_utils" type="ppl2marker.exe"
+        output="screen" name="ppl2marker_nite_user_mask"
+        args="_red:=1 _green:=0 _blue:=1 _input_topic:=nite_user_mask_pplp/ppl" />
+
+  <!-- event GUI -->
+  <node if="$(arg eventgui)" pkg="ad_core" type="launcher_qt_event_sender_interface.exe"
+        name="nite_user_mask_pplp_event_gui"
+        output="screen"
+        args='event_keys="|NITE_USER_MASK_PPLP_START;NITE_USER_MASK_PPLP_START;0
+                          |NITE_USER_MASK_PPLP_STOP;NITE_USER_MASK_PPLP_STOP;0"'/>
+
+</group>
+</launch>
+

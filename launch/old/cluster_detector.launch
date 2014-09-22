@@ -1,0 +1,13 @@
+<launch>
+<arg name="robot" />
+<group ns="$(arg robot)">
+  <!-- the detector pipeline -->
+<!--
+  No cloud filter, use cloud_filter.launch from the robot
+-->
+  <node pkg="people_detection_vision" type="floor_removal.exe" name="floor_removal" output="screen" />
+  <node pkg="people_detection_vision" type="cluster_detector.exe" name="cluster_detector" output="screen" />
+
+</group>
+</launch>
+
