@@ -72,11 +72,11 @@ or another without odometry.
 
 // boost
 #include "boost/filesystem.hpp" // for creating folders
-#include <src/cv_conversion_float_uchar.h>
+#include <cv_conversion_float_uchar.h>
 // utils
-#include <vision_utils/image_utils/io.h>
-#include <src/ros_utils/pt_utils.h>
-#include <src/string/StringUtils.h>
+#include <image_utils/io.h>
+#include <ros_utils/pt_utils.h>
+#include <string/StringUtils.h>
 // ROS
 #include <ros/ros.h>
 #include <message_filters/subscriber.h>

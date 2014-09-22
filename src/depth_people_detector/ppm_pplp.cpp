@@ -27,7 +27,7 @@ ROS_NAMESPACE=kinect_only rosrun people_msgs ppm_pplp.exe --activate
  */
 #if 0
 #include "ppm_pplp.h"
-#include "vision_utils/skill_templates/ros_vision_skill.h"
+#include "skill_templates/ros_vision_skill.h"
 
 class PpmSkill: public VisionSkill {
 public:

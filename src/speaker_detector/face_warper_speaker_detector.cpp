@@ -44,13 +44,13 @@ ________________________________________________________________________________
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/legacy/legacy.hpp"
 
-#include "src/time/timer.h"
-#include "src/data_filters/ransac/ransac.h"
-#include "src/genetic/genetic.h"
-#include "src/geom/flann/affine_transforms.h"
-#include "src/ros_utils/pt_utils.h"
-#include "vision_utils/image_utils/opencv_face_detector.h"
-#include "vision_utils/image_utils/io.h"
+#include "time/timer.h"
+#include "data_filters/ransac/ransac.h"
+#include "genetic/genetic.h"
+#include "geom/flann/affine_transforms.h"
+#include "ros_utils/pt_utils.h"
+#include "image_utils/opencv_face_detector.h"
+#include "image_utils/io.h"
 // people_msgs
 #include "speaker_detector/motion_based_speaker_detector.h"
 

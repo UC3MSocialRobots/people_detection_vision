@@ -23,13 +23,13 @@ ________________________________________________________________________________
  */
 
 #include <vision_utils/img_path.h>
-#include "src/time/timer.h"
-#include "vision_utils/xml_images_interface/xml_images_interface.h"
-#include <src/cv_conversion_float_uchar.h>
+#include "time/timer.h"
+#include "xml_images_interface/xml_images_interface.h"
+#include <cv_conversion_float_uchar.h>
 // detectors
 #include "color_face_detector.h"
 #include "texture_sensor.h"
-#include "vision_utils/image_utils/opencv_face_detector.h"
+#include "image_utils/opencv_face_detector.h"
 // DAI
 #include <dai/alldai.h>
 

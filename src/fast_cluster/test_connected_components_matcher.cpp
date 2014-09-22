@@ -1,7 +1,7 @@
-#include "src/debug/debug.h"
+#include "debug/debug_utils.h"
 #include "connected_components_matcher.h"
-#include "vision_utils/image_utils/drawing_utils.h"
-#include "vision_utils/color/color_utils.h"
+#include "image_utils/drawing_utils.h"
+#include "color/color_utils.h"
 
 inline void test_given_patterns(ConnectedComponentsMatcher & matcher,
                                 cv::Mat1b & patterns,

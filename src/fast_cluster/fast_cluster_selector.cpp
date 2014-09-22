@@ -40,10 +40,10 @@
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <cv_bridge/cv_bridge.h>
-#include "vision_utils/image_utils/io.h"
+#include "image_utils/io.h"
 // AD
-#include <src/debug/debug.h>
-#include <src/time/timer.h>
+#include <debug/debug_utils.h>
+#include <time/timer.h>
 // people_msgs
 #include "fast_cluster_functions.h"
 

@@ -29,7 +29,7 @@ ________________________________________________________________________________
 
 #include <opencv2/imgproc/imgproc.hpp>
 #include "opencv2/highgui/highgui.hpp"
-#include "src/combinatorics/assignment_utils.h"
+#include "combinatorics/assignment_utils.h"
 
 typedef int NonVerbalActivity;
 static const NonVerbalActivity UNKNOWN_ACTIVITY = -1;

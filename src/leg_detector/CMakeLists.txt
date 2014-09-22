@@ -1,5 +1,5 @@
-rosbuild_add_executable(leg_pplp.exe
-                        leg_pplp.cpp)
-rosbuild_add_executable(scan_and_leg_publisher.exe
-                        scan_and_leg_publisher.cpp)
+add_executable(leg_pplp.exe leg_pplp.cpp)
+target_link_libraries(leg_pplp.exe ${catkin_LIBRARIES})
 
+add_executable(scan_and_leg_publisher.exe scan_and_leg_publisher.cpp)
+target_link_libraries(scan_and_leg_publisher.exe ${catkin_LIBRARIES})

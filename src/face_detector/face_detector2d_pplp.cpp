@@ -38,12 +38,12 @@ ________________________________________________________________________________
         The found people heads
  */
 // AD
-#include <src/time/timer.h>
-#include <src/ros_utils/pt_utils.h>
-#include <vision_utils/image_utils/opencv_face_detector.h>
-#include <vision_utils/skill_templates/rgb_skill.h>
+#include <time/timer.h>
+#include <ros_utils/pt_utils.h>
+#include <image_utils/opencv_face_detector.h>
+#include <skill_templates/rgb_skill.h>
 // people_msgs
-#include "src/ppl_utils/images2pp.h"
+#include "ppl_utils/images2pp.h"
 
 class FaceDetector2DPPLP : public RgbSkill {
 public:

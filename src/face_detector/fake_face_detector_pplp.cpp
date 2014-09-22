@@ -52,11 +52,11 @@ ________________________________________________________________________________
 #include <ros/ros.h>
 #include <tf/tf.h>
 #include <people_msgs/PeoplePoseList.h>
-#include <src/ros_utils/pt_utils.h>
-#include <src/time/timer.h>
-#include <src/geom/foo_point.h>
-#include <src/combinatorics/combinatorics_utils.h>
-#include <src/string/StringUtils.h>
+#include <ros_utils/pt_utils.h>
+#include <time/timer.h>
+#include <geom/foo_point.h>
+#include <combinatorics/combinatorics_utils.h>
+#include <string/StringUtils.h>
 
 typedef geometry_utils::FooPoint3f Point3;
 

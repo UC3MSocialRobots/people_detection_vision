@@ -24,11 +24,11 @@ Some tests for TabletopPPLP.
  */
 //#define DISPLAY
 
-#include <src/ros_utils/rosmaster_alive.h>
-#include "src/templates/pplp_testing.h"
+#include <ros_utils/rosmaster_alive.h>
+#include "templates/pplp_testing.h"
 // people_msgs
-#include <vision_utils/databases_io/test_person_histogram_set_variables.h>
-#include "src/depth_people_detector/tabletop_pplp.h"
+#include <databases_io/test_person_histogram_set_variables.h>
+#include "depth_people_detector/tabletop_pplp.h"
 // opencv
 #include <opencv2/highgui/highgui.hpp>
 

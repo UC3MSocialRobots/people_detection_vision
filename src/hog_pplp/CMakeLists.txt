@@ -1,4 +1,2 @@
-add_maggie_test(hog_pplp.exe
-    SOURCES     hog_pplp.cpp
-    LINK        disjoint_sets2
-)
+add_executable(hog_pplp.exe hog_pplp.cpp)
+target_link_libraries(hog_pplp.exe disjoint_sets2)

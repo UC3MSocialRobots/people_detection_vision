@@ -26,8 +26,8 @@ Some tests for motion_based_speaker_detector.h
 
 #include "opencv2/highgui/highgui.hpp"
 #include "motion_based_speaker_detector.h"
-#include "vision_utils/image_utils/opencv_face_detector.h"
-#include "src/time/timer.h"
+#include "image_utils/opencv_face_detector.h"
+#include "time/timer.h"
 
 void test_non_verbal_activity_2_images(const std::string & file1,
                                        const std::string & file2) {

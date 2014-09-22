@@ -1,13 +1,14 @@
-#add_maggie_test(cloud_filter.exe
-#    SOURCES     cloud_filter.cpp
-#)
-rosbuild_add_library(multi_modal  cloud_filter.cpp)
+add_library(multi_modal cloud_filter.cpp)
+target_link_libraries(multi_modal ${PCL_LIBRARIES} ${catkin_LIBRARIES})
 
-add_maggie_test(floor_removal.exe
-    SOURCES     floor_removal.cpp
-)
+add_executable(floor_removal.exe floor_removal.cpp)
+target_link_libraries(floor_removal.exe ${catkin_LIBRARIES})
 
-# does not compile with Fuerte
-add_maggie_test(cluster_detector.exe
-    SOURCES     cluster_detector.cpp
+add_executable(cluster_detector.exe cluster_detector.cpp)
+target_link_libraries(cluster_detector.exe ${catkin_LIBRARIES})
+
+install(TARGETS multi_modal
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

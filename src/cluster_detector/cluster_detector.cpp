@@ -1,4 +1,4 @@
-#include "src/debug/error.h"
+#include "debug/error.h"
 
 // ROS
 #include <ros/ros.h>
@@ -10,11 +10,11 @@
 // Need to include the pcl ros utilities
 #include <pcl_ros/point_cloud.h>
 // AD
-#include <src/debug/debug.h>
-#include <src/time/timer.h>
-#include <src/geom/Rect3.h>
+#include <debug/debug_utils.h>
+#include <time/timer.h>
+#include <geom/Rect3.h>
 #include <compressed_rounded_image_transport/CompressedRoundedImage.h>
-#include <vision_utils/color/color_utils.h>
+#include <color/color_utils.h>
 // C
 #include <map>
 

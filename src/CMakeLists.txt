@@ -13,23 +13,18 @@ INCLUDE_DIRECTORIES("third_parties/libdai/include")
 ### then add our folders
 ########################################################################
 
-add_maggie_test(twist_stamper.exe
-    SOURCES     twist_stamper.cpp
-)
+add_executable(twist_stamper.exe twist_stamper.cpp)
+target_link_libraries(twist_stamper.exe ${catkin_LIBRARIES})
 
-add_maggie_test(robot_wanderer.exe
-    SOURCES     robot_wanderer.cpp
-)
+add_executable(robot_wanderer.exe robot_wanderer.cpp)
+target_link_libraries(robot_wanderer.exe ${catkin_LIBRARIES})
 
-add_maggie_test(robot_info_grabber.exe
-    SOURCES     robot_info_grabber.cpp
-)
+add_executable(robot_info_grabber.exe robot_info_grabber.cpp)
+target_link_libraries(robot_info_grabber.exe ${catkin_LIBRARIES})
 
-
-add_maggie_test(robot_wanderer_with_moving_goal.exe
-    SOURCES     robot_wanderer_with_moving_goal.cpp
-    LINK
-)
+add_executable(robot_wanderer_with_moving_goal.exe 
+			   robot_wanderer_with_moving_goal.cpp)
+target_link_libraries(robot_wanderer_with_moving_goal.exe ${catkin_LIBRARIES})
 
 ################################################################################
 

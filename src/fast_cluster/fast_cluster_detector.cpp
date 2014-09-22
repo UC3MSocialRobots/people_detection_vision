@@ -79,7 +79,7 @@
 
 */
 
-#include "src/debug/error.h"
+#include "debug/error.h"
 
 // ROS
 #include <ros/ros.h>
@@ -98,20 +98,20 @@
 #endif // CV_MAJOR_VERSION == 2 && CV_MINOR_VERSION >= 4
 #include <cv_bridge/cv_bridge.h>
 // AD
-#include <src/debug/debug.h>
-#include <src/time/timer.h>
-#include <vision_utils/connected_comp/disjoint_sets2.h>
-#include <vision_utils/image_utils/border_remover.h>
-#include <vision_utils/color/color_utils.h>
-#include <vision_utils/image_utils/drawing_utils.h>
-#include <vision_utils/image_utils/value_remover.h>
+#include <debug/debug_utils.h>
+#include <time/timer.h>
+#include <connected_comp/disjoint_sets2.h>
+#include <image_utils/border_remover.h>
+#include <color/color_utils.h>
+#include <image_utils/drawing_utils.h>
+#include <image_utils/value_remover.h>
 #include <followme_laser/TrackingStatus.h>
 #include <followme_laser/SetTrackingSeed.h>
 // people_msgs
-#include <src/cv_conversion_float_uchar.h>
+#include <cv_conversion_float_uchar.h>
 #include "connected_components_matcher.h"
 #include "fast_cluster_functions.h"
-#include "src/ros_utils/marker_utils.h"
+#include "ros_utils/marker_utils.h"
 
 //#define TIMER_ON
 

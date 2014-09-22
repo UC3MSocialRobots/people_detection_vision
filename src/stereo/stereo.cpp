@@ -30,12 +30,12 @@ http://www.neuroforge.co.uk/index.php/77-tutorials/79-stereo-vision-tutorial
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <src/system/system_utils.h>
-#include <src/ros_utils/pt_utils.h>
-#include <src/string/StringUtils.h>
-#include <src/time/timer.h>
+#include <system/system_utils.h>
+#include <ros_utils/pt_utils.h>
+#include <string/StringUtils.h>
+#include <time/timer.h>
 
-#include <vision_utils/point_clouds/cloud_viewer.h>
+#include <point_clouds/cloud_viewer.h>
 #include "bp-vision/stereo_functions.h"
 
 static const bool DEFAULT_FULL_DP = true;

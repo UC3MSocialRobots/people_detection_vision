@@ -68,11 +68,11 @@ in the user mask.
 #endif
 
 // AD
-#include <src/map/map_utils.h>
-#include <src/time/timer.h>
-#include <src/templates/pplp_template.h>
+#include <map/map_utils.h>
+#include <time/timer.h>
+#include <templates/pplp_template.h>
 // people_msgs
-#include <src/ppl_utils/rgb_depth_user2ppl.h>
+#include <ppl_utils/rgb_depth_user2ppl.h>
 
 #define DEBUG_PRINT(...)   {}
 //#define DEBUG_PRINT(...)   ROS_INFO_THROTTLE(5, __VA_ARGS__)

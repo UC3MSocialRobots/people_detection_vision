@@ -41,8 +41,8 @@ ________________________________________________________________________________
 
 #include "color_face_detector.h"
 #include <vision_utils/img_path.h>
-#include "src/time/timer.h"
-#include "src/combinatorics/combinatorics_utils.h"
+#include "time/timer.h"
+#include "combinatorics/combinatorics_utils.h"
 
 void train(const std::string & training_filename) {
   ColorFaceDetector detec;

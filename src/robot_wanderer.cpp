@@ -28,12 +28,12 @@
 #include <geometry_msgs/Twist.h>
 #include <signal.h>
 // people_msgs
-#include <src/ros_utils/marker_utils.h>
-#include <src/ros_utils/odom_utils.h>
-#include <src/ros_utils/laser_utils.h>
-#include <src/geom/distances.h>
-#include <src/geom/geometry_utils.h>
-#include <src/time/timer.h>
+#include <ros_utils/marker_utils.h>
+#include <ros_utils/odom_utils.h>
+#include <ros_utils/laser_utils.h>
+#include <geom/distances.h>
+#include <geom/geometry_utils.h>
+#include <time/timer.h>
 
 /*
 

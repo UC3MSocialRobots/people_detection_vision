@@ -53,13 +53,13 @@ http://experienceopencv.blogspot.com/2011/02/hog-descriptor.html
 // OpenCV
 #include "opencv2/objdetect/objdetect.hpp"
 // AD
-#include <src/geom/Rect3.h>
-#include <src/time/timer.h>
-#include "vision_utils/image_utils/io.h"
-#include "vision_utils/point_clouds/image_clusterer.h"
+#include <geom/Rect3.h>
+#include <time/timer.h>
+#include "image_utils/io.h"
+#include "point_clouds/image_clusterer.h"
 // people_msgs
-#include "src/templates/rgb_depth_pplp_template.h"
-#include "src/ppl_utils/images2pp.h"
+#include "templates/rgb_depth_pplp_template.h"
+#include "ppl_utils/images2pp.h"
 
 class HogPPLP : public RgbDepthPPLPublisherTemplate  {
 public:

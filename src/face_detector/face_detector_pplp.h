@@ -67,15 +67,15 @@ It consists of two steps:
 #define FACE_DETECTOR_PPLP_PPL_H
 
 // AD
-#include <src/geom/Rect3.h>
-#include <src/time/timer.h>
-#include <src/ros_utils/pt_utils.h>
-#include <vision_utils/image_utils/opencv_face_detector.h>
-#include <vision_utils/point_clouds/blob_segmenter.h>
-#include <vision_utils/color/color_utils.h>
+#include <geom/Rect3.h>
+#include <time/timer.h>
+#include <ros_utils/pt_utils.h>
+#include <image_utils/opencv_face_detector.h>
+#include <point_clouds/blob_segmenter.h>
+#include <color/color_utils.h>
 // people_msgs
-#include "src/templates/rgb_depth_pplp_template.h"
-#include "src/ppl_utils/images2pp.h"
+#include "templates/rgb_depth_pplp_template.h"
+#include "ppl_utils/images2pp.h"
 
 class FaceDetectorPPLP : public RgbDepthPPLPublisherTemplate {
 public:

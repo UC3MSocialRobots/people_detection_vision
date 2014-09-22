@@ -40,10 +40,10 @@ ________________________________________________________________________________
 #include <opencv2/highgui/highgui.hpp>
 // vision
 #include <people_msgs/PeoplePoseList.h>
-#include <vision_utils/skill_templates/nano_skill.h>
+#include <skill_templates/nano_skill.h>
 #include "motion_based_speaker_detector.h"
 // people_msgs
-#include <src/ppl_utils/ppl_attributes.h>
+#include <ppl_utils/ppl_attributes.h>
 
 class MotionBasedSpeakerDetectorSkill : public NanoSkill {
 public:

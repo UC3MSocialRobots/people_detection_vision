@@ -49,8 +49,8 @@ A simple node for compressing point clouds.
 
  */
 
-#include "src/debug/error.h"
-#include "src/time/timer.h"
+#include "debug/error.h"
+#include "time/timer.h"
 
 // ROS
 #include <tf/transform_listener.h>

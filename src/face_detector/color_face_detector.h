@@ -29,14 +29,14 @@ ________________________________________________________________________________
 
 #include <opencv2/highgui/highgui.hpp>
 // vision
-#include <vision_utils/visu_utils/array_to_color.h>
+#include <visu_utils/array_to_color.h>
 //#include <vision_utils/image_utils/io.h>
 // utils
-#include <src/gnuplot-cpp/gnuplot_i.hpp>
-#include <src/system/system_utils.h>
-#include <src/stats/stats_utils.h>
+#include <gnuplot-cpp/gnuplot_i.hpp>
+#include <system/system_utils.h>
+#include <stats/stats_utils.h>
 
-#include <vision_utils/image_utils/opencv_face_detector.h>
+#include <image_utils/opencv_face_detector.h>
 
 //#define LUT_ELEM_TYPE float
 //#define LUT_ELEM_TYPE_CV CV_32F

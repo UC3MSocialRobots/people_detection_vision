@@ -42,7 +42,6 @@ SET_TARGET_PROPERTIES(libdai PROPERTIES
 TARGET_LINK_LIBRARIES(libdai gmpxx gmp)
 
 ### dlib
-add_maggie_test(test_dlib.exe
-    SOURCES     test_dlib.cpp
-                dlib/bayes_utils.h dlib/graph_utils.h dlib/graph.h dlib/directed_graph.h
-)
+add_executable(test_dlib.exe test_dlib.cpp dlib/bayes_utils.h 
+			   dlib/graph_utils.h dlib/graph.h dlib/directed_graph.h)
+#target_link_libraries(test_dlib.exe )

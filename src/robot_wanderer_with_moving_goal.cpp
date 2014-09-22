@@ -151,15 +151,15 @@
 #include <geometry_msgs/PointStamped.h>
 #include <tf/transform_listener.h>
 // ros utils
-#include <src/ros_utils/marker_utils.h>
-#include <src/ros_utils/costmap_utils.h>
-#include <src/ros_utils/odom_utils.h>
-#include <src/ros_utils/pt_utils.h>
-#include <src/geom/geometry_utils.h>
-#include <src/time/timer.h>
+#include <ros_utils/marker_utils.h>
+#include <ros_utils/costmap_utils.h>
+#include <ros_utils/odom_utils.h>
+#include <ros_utils/pt_utils.h>
+#include <geom/geometry_utils.h>
+#include <time/timer.h>
 
 #ifdef USE_ETTS
-#include <vision_utils/skill_templates/nano_etts_api.h>
+#include <skill_templates/nano_etts_api.h>
 #endif // USE_ETTS
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -378,7 +378,7 @@ inline float traj_grade(const SpeedOrder & order) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <src/genetic/genetic.h>
+#include <genetic/genetic.h>
 
 class SpeedGeneticFinder : public GeneticSolver<SpeedOrder> {
   //! the higher the better

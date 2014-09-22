@@ -32,8 +32,8 @@ IEEE Computer Society Conference on.. Vol. 2. IEEE, 1999.
 #define TEXTURE_SENSOR_H
 
 #include <opencv2/highgui/highgui.hpp>
-#include <src/geom/rect_utils.h>
-#include "src/stats/stats_utils.h"
+#include <geom/rect_utils.h>
+#include "stats/stats_utils.h"
 
 class TextureSensor {
 public:
