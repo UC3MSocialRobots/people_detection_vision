@@ -1,5 +1,5 @@
 add_library(multi_modal cloud_filter.cpp)
-target_link_libraries(multi_modal ${PCL_LIBRARIES} ${catkin_LIBRARIES})
+target_link_libraries(multi_modal OpenNI ${OpenCV_LIBS} ${PCL_LIBRARIES} ${catkin_LIBRARIES})
 
 add_executable(floor_removal.exe floor_removal.cpp)
 target_link_libraries(floor_removal.exe ${catkin_LIBRARIES})

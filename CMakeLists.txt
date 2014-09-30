@@ -5,10 +5,11 @@ project(people_detection_vision)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS roscpp people_msgs 
-                                        people_utils followme_laser
+                                        people_utils utils vision_utils followme_laser
                                         compressed_rounded_image_transport
-                                        cv_bridge)
+                                        cv_bridge pcl_ros)
 find_package(PCL REQUIRED)
+find_package(OpenCV REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -83,7 +84,7 @@ catkin_package(
   INCLUDE_DIRS src
   CATKIN_DEPENDS roscpp cv_bridge
   DEPENDS people_msgs people_utils followme_laser
-          compressed_rounded_image_transport
+          compressed_rounded_image_transport utils vision_utils
 )
 
 ###########
@@ -99,8 +100,10 @@ include_directories(
   ${followme_laser_INCLUDE_DIRS}
   ${compressed_rounded_image_transport_INCLUDE_DIRS}  
   ${ar_tools_INCLUDE_DIRS}
+  ${utils_INCLUDE_DIRS}
+  ${vision_utils_INCLUDE_DIRS}
   /usr/include/opencv2
-  /usr/include/pcl-1.7
+  ${PCL_INCLUDE_DIRS}
 )
 
 SET(AD_USE_ROS 1)

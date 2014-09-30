@@ -60,8 +60,10 @@ A simple node for compressing point clouds.
 //#include <pcl/filters/impl>
 #include <pcl/segmentation/extract_clusters.h>
 // Need to include the pcl ros utilities
-#include <pcl_ros/point_cloud.h>
-#include <pcl_ros/transforms.h>
+//#include <pcl/point_cloud.h>
+//#include <pcl/common/transforms.h>
+// pcl conversions to indigo
+#include <pcl_conversions/pcl_conversions.h>
 
 namespace multi_modal {
 
@@ -203,7 +205,7 @@ public:
     //    }
     _cloud_filtered_output_frame.clear();
     _cloud_filtered_output_frame.header.frame_id = output_frame;
-    pcl_ros::transformPointCloud(*_cloud_filtered_src_frame, _cloud_filtered_output_frame,
+    pcl::transformPointCloud(*_cloud_filtered_src_frame, _cloud_filtered_output_frame,
                                  src_to_dst_transform);
 
     maggieDebug2("Filtering: %g ms - Converting: %g ms, "
