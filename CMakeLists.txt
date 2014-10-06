@@ -7,7 +7,7 @@ project(people_detection_vision)
 find_package(catkin REQUIRED COMPONENTS roscpp people_msgs 
                                         people_utils utils vision_utils followme_laser
                                         compressed_rounded_image_transport
-                                        cv_bridge pcl_ros)
+                                        cv_bridge)
 find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
 

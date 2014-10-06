@@ -7,7 +7,8 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/segmentation/extract_clusters.h>
-#include <pcl/conversions.h>
+#include <pcl_conversions/pcl_conversions.h>
+
 // Need to include the pcl ros utilities
 //#include <pcl/point_cloud.h>
 // AD
