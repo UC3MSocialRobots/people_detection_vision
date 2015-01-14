@@ -22,7 +22,6 @@ if [ -z $ROS_WORKSPACE ]; then
     echo "###########################################################"
     echo ""
 else
-	echo 'Workspace is: $ROS_WORKSPACE'
     cd ${ROS_WORKSPACE}/src
     #git clone https://github.com/LucidOne/ar_tools
     #indigo fork
