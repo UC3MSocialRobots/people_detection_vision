@@ -1,11 +1,11 @@
 #!/bin/sh
 # External, ROS and system package dependencies
 
-PACKAGES="ros-indigo-openni-camera
-          ros-indigo-openni-tracker
-          ros-indigo-openni-launch
+PACKAGES="ros-hydro-openni-camera
+          ros-hydro-openni-tracker
+          ros-hydro-openni-launch
           libgmp-dev
-          ros-indigo-resource-retriever
+          ros-hydro-resource-retriever
           freeglut3
           freeglut3-dev
 	  binutils-gold
@@ -22,7 +22,8 @@ if [ -z $ROS_WORKSPACE ]; then
     echo "###########################################################"
     echo ""
 else
-    cd $ROS_WORKSPACE
+	echo 'Workspace is: $ROS_WORKSPACE'
+    cd ${ROS_WORKSPACE}/src
     #git clone https://github.com/LucidOne/ar_tools
     #indigo fork
     git clone -b catkin https://github.com/xqms/ar_tools.git    
