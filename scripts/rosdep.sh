@@ -22,10 +22,10 @@ if [ -z $ROS_WORKSPACE ]; then
     echo "###########################################################"
     echo ""
 else
-    cd ${ROS_WORKSPACE}/src
+    cd $ROS_WORKSPACE
     #git clone https://github.com/LucidOne/ar_tools
     #indigo fork
-    git clone -b catkin https://github.com/xqms/ar_tools.git    
+    git clone -b catkin https://github.com/xqms/ar_tools.git   
     cd ..
     catkin_make --pkg ar_tools
 fi
