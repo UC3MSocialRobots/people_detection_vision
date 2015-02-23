@@ -966,10 +966,8 @@ private:
   cv::Mat1b img_uchar_with_no_nan;
 
   // edge detection
-  double canny_param1;
-  double canny_param2;
-  int canny_tb1_value;
-  int canny_tb2_value;
+  double canny_param1, canny_param2;
+  int canny_tb1_value, canny_tb2_value;
 
   cv::Mat1b edges;
   cv::Mat1b edges_inverted;

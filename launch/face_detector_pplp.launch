@@ -16,11 +16,11 @@ rosrun people_utils ppl_viewer.exe _ppl_topics:=/kinect_only/face_detector_pplp/
 
   <!-- conversion to ROS rviz marker -->
   <node if="$(arg marker)" pkg="people_utils" type="ppl2marker.exe"
-        output="screen" name="ppl2marker_leg_pplp"
+        output="screen" name="ppl2marker_face_pplp"
         args="_red:=1 _green:=0 _blue:=0 _input_topic:=face_detector_pplp/ppl" />
 
   <!-- event GUI -->
-  <node pkg="ad_core" type="launcher_qt_event_sender_interface.exe"
+  <node if="$(arg eventgui)" pkg="ad_core" type="launcher_qt_event_sender_interface.exe"
         name="face_detector_pplp_event_gui"
         output="screen"
         args='event_keys="|FACE_DETECTOR_PPLP_START;FACE_DETECTOR_PPLP_START;0

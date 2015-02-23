@@ -53,10 +53,8 @@ in the user mask.
         The detected users in the mask
 
  */
-
 #ifndef NITE_USER_MASK_PPLP_H
 #define NITE_USER_MASK_PPLP_H
-
 // ROS
 #include <image_transport/image_transport.h>
 #include <image_transport/subscriber_filter.h>
@@ -185,13 +183,14 @@ public:
   inline void process_rgb_depth_user(const cv::Mat3b& rgb,
                                      const cv::Mat1f& depth,
                                      const cv::Mat1b& user_mask) {
-    Timer timer;
+    //Timer timer;
     // compte center of masses
     if (!_ppl_conv.convert(rgb, depth, user_mask, NULL, &_images_header)) {
       return;
     }
-    _ppl_conv.get_ppl().method = "nite_user_mask_pplp";
-    publish_PPL(_ppl_conv.get_ppl());
+    PPL* ppl = &(_ppl_conv.get_ppl());
+    ppl->method = "nite_user_mask_pplp";
+    publish_PPL(*ppl);
     //  printf("NiteUserMask2Ppl::process(): %g ms, publishing a PPL of %i people\n",
     //                    timer.time(), _ppl_conv.nusers());
   } // end process();

@@ -5,69 +5,63 @@
      benchmark_ppl.launch and
      ukf_multimodal.launch (in people_recognition_vision pkg) -->
 <arg name="robot"/>
-
-<!-- decompress the kinect images -->
-<!--
-<include file="$(find kinect)/launch/republish_kinect_rgb_and_depth.launch">
-  <arg name="robot" value="$(arg robot)" />
-</include>
--->
-
-<!--
-<include file="$(find main_control)/launch/viz.launch">
-  <arg name="robot" value="$(arg robot)" />
-</include>
--->
+<arg name="eventgui" default="true"/>
 
 <!-- ARToolkit -->
 <include file="$(find people_detection_vision)/launch/artoolkit2ppl.launch">
   <arg name="robot" value="$(arg robot)" />
+  <arg name="eventgui" value="$(arg eventgui)" />
 </include>
 
 <!-- the face detection algorithm -->
 <include file="$(find people_detection_vision)/launch/face_detector_pplp.launch">
   <arg name="robot" value="$(arg robot)" />
+  <arg name="eventgui" value="$(arg eventgui)" />
 </include>
 
 <!-- the leg_pplp -->
 <include file="$(find people_detection_vision)/launch/leg_detector.launch">
   <arg name="robot" value="$(arg robot)" />
+  <arg name="eventgui" value="$(arg eventgui)" />
 </include>
 
 <!-- the HOG detector -->
 <include file="$(find people_detection_vision)/launch/hog_detector.launch">
   <arg name="robot" value="$(arg robot)" />
-  <arg name="marker" value="true" />
+  <arg name="eventgui" value="$(arg eventgui)" />
 </include>
 
 <!-- the NITE based detector -->
 <include file="$(find people_detection_vision)/launch/nite_user_mask_pplp.launch">
   <arg name="robot" value="$(arg robot)" />
+  <arg name="eventgui" value="$(arg eventgui)" />
 </include>
 
 <!-- the PPM detector -->
 <include file="$(find people_detection_vision)/launch/ppm_pplp.launch">
   <arg name="robot" value="$(arg robot)" />
+  <arg name="eventgui" value="$(arg eventgui)" />
 </include>
 
 <!-- the tabletop detector -->
 <include file="$(find people_detection_vision)/launch/tabletop_pplp.launch">
   <arg name="robot" value="$(arg robot)" />
+  <arg name="eventgui" value="$(arg eventgui)" />
 </include>
-
-
 
 <!-- normal cluster detector -->
 <!--
 <include file="$(find people_detection_vision)/launch/cluster_detector.launch">
   <arg name="robot" value="$(arg robot)" />
+  <arg name="eventgui" value="$(arg eventgui)" />
 </include>
 -->
 
-<!-- normal cluster detector -->
+<!-- fast cluster detector -->
 <!--
 <include file="$(find people_detection_vision)/launch/fast_cluster_detector.launch">
   <arg name="robot" value="$(arg robot)" />
+  <arg name="eventgui" value="$(arg eventgui)" />
 </include>
 -->
 

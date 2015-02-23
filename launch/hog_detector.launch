@@ -29,7 +29,7 @@
         args="_red:=0 _green:=0 _blue:=1 _input_topic:=hog_pplp/ppl" />
 
   <!-- event GUI -->
-  <node pkg="ad_core" type="launcher_qt_event_sender_interface.exe"
+  <node if="$(arg eventgui)" pkg="ad_core" type="launcher_qt_event_sender_interface.exe"
         name="hog_event_gui"
         output="screen"
         args='event_keys="|HOG_PPLP_START;HOG_PPLP_START;0

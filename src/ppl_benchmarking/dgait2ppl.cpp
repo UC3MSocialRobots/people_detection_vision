@@ -20,23 +20,22 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ________________________________________________________________________________
 
-\todo Description of the file
+Read a DGait ONI file and
+converts it into 3 image channels (rgb, depth, user)
+and a ground truth PPL.
 
 \section Parameters
-  - \b "foo"
-        [string] (default: "bar")
-        Description of the parameter.
-
-\section Subscriptions
-  - \b "/foo"
-        [xxx]
-        Descrption of the subscription
+  - \b "~display"
+      [bool, default: true]
 
 \section Publications
-  - \b "~foo"
-        [xxx]
-        Descrption of the publication
+  - \b "rgb", "depth", "user"
+        [sensor_msgs/Image]
+        The image
 
+  - \b "ground_truth_ppl"
+        [people_msgs::PeoplePoseList]
+        The ground truth positions
  */
 
 #include <databases_io/dgaitdb.h>
@@ -88,7 +87,7 @@ int dgait2ppl(int argc, char **argv) {
     const cv::Mat1b & user = reader.get_user();
 
     std_msgs::Header curr_header;
-    curr_header.frame_id = "rgb_frame";
+    curr_header.frame_id = "openni_rgb_optical_frame";
     curr_header.stamp = ros::Time::now();
     // publish rgb, depth, user
     rgb_bridge.header = depth_bridge.header = user_bridge.header = curr_header;

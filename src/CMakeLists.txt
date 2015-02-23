@@ -32,6 +32,7 @@ ADD_SUBDIRECTORY(third_parties)
 
 ADD_SUBDIRECTORY(artoolkit)
 #ADD_SUBDIRECTORY(cluster_detector) // Problemas con pcl y catkin
+ADD_SUBDIRECTORY(bg_substractor_pplp)
 ADD_SUBDIRECTORY(depth_people_detector)
 ADD_SUBDIRECTORY(face_detector)
 ADD_SUBDIRECTORY(fast_cluster)

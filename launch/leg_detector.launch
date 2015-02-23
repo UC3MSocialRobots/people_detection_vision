@@ -14,7 +14,7 @@
         args="_red:=1 _green:=0 _blue:=0 _input_topic:=leg_pplp/ppl" />
 
   <!-- event GUI -->
-  <node pkg="ad_core" type="launcher_qt_event_sender_interface.exe"
+  <node if="$(arg eventgui)" pkg="ad_core" type="launcher_qt_event_sender_interface.exe"
         name="leg_pplp_event_gui"
         output="screen"
         args='event_keys="|LEG_PPLP_START;LEG_PPLP_START;0

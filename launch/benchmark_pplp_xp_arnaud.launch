@@ -1,18 +1,32 @@
 <launch>
-<arg name="robot" value="datagrabber_kinect"/>
-<arg name="ceilingrobot" value="datagrabber_ceiling"/>
-<arg name="viewer" default="true"/>
+<arg name="robot" value="datagrabber"/>
+<arg name="viewer" default="false"/>
+<arg name="input_use_rlpd" default="true"/>
+<arg name="input_use_dgait" default="false"/>
+<arg name="rate" value=".5"/> <!-- Hz -->
 
-<!-- MCP -->
-<include file="$(find ad_core)/launch/ad_servers.launch">
+<!-- the detectors and their GUIs - launch them last to ensure mcp_server alive -->
+<include file="$(find people_detection_vision)/launch/all_pplp.launch">
   <arg name="robot" value="$(arg robot)" />
+  <arg name="eventgui" value="false"/>
 </include>
 
-<!-- raw data -->
-<include file="$(find people_utils)/launch/database_player.launch">
-  <arg name="display" value="true" />
+<!-- input data and truth PPL publisher -->
+<include  if="$(arg input_use_rlpd)"
+          file="$(find people_utils)/launch/database_player.launch">
+  <arg name="display" value="false" />
+  <arg name="rate" value="$(arg rate)"/>
 </include>
-
+<group ns="$(arg robot)">
+  <node if="$(arg input_use_dgait)"
+    pkg="people_detection_vision" type="dgait2ppl.exe"
+    name="dgait2ppl"  output="screen" required="true"
+    args="/home/user/Downloads/0datasets/DGaitDB/*.oni" />
+  <!--
+    args="/home/user/Downloads/0datasets/DGaitDB/1.oni" />
+    args="/media/disk/Datasets/DGaitDB/1.oni" />
+  -->
+</group>
 
 <group ns="$(arg robot)">
   <arg name="ppl_topics" default="nite_user_mask_pplp/ppl;hog_pplp/ppl;tabletop_pplp/ppl;ppm_pplp/ppl;face_detector_pplp/ppl;artoolkit_pplp/ppl;leg_pplp/ppl"/>
@@ -28,25 +42,24 @@
   <node if="$(arg viewer)" pkg="people_utils" type="ppl_viewer.exe"
     name="ppl_viewer"  output="screen"
     args="_ppl_topics:='ground_truth_ppl;$(arg ppl_topics)'
-          _reprojection_mode:=xz
           _width:=480 _height:=800
+          _reprojection_mode:=xz
           _xmin:=-3 _xmax:=3 _ymin:=0 _ymax:=4" />
 
+<!-- publish eventS to start PPLP -->
+  <node pkg="rostopic" type="rostopic" name="artoolkit_pplp_starter" output="screen"
+        args="pub ARTOOLKIT_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
+  <node pkg="rostopic" type="rostopic" name="FACE_DETECTOR_pplp_starter" output="screen"
+        args="pub FACE_DETECTOR_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
+  <node pkg="rostopic" type="rostopic" name="LEG_pplp_starter" output="screen"
+        args="pub LEG_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
+  <node pkg="rostopic" type="rostopic" name="HOG_pplp_starter" output="screen"
+        args="pub HOG_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
+  <node pkg="rostopic" type="rostopic" name="NITE_USER_MASK_pplp_starter" output="screen"
+        args="pub NITE_USER_MASK_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
+  <node pkg="rostopic" type="rostopic" name="PPM_pplp_starter" output="screen"
+        args="pub PPM_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
+  <node pkg="rostopic" type="rostopic" name="TABLETOP_pplp_starter" output="screen"
+        args="pub TABLETOP_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
 </group>
-
-<!-- the detectors and their GUIs - launch them last to ensure mcp_server alive -->
-<!--
-<include file="$(find people_detection_vision)/launch/all_pplp.launch">
-  <arg name="robot" value="$(arg robot)" />
-</include>
--->
-
-<include file="$(find people_detection_vision)/launch/artoolkit2ppl.launch">
-  <arg name="robot" value="$(arg ceilingrobot)_camera" />
-</include>
-
-<node pkg="camera" type="yaml2camera_info"
-  name="yaml2camera_info"  output="screen"
-  args="_file_name:=$(find kinect)/data/eeePc_arnaud_webcam_calibration_new.yaml
-        _camera_name:=head_camera  _topic_name:=/$(arg ceilingrobot)_camera/camera_info" />
 </launch>
