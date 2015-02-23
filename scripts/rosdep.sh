@@ -1,3 +1,4 @@
+
 #!/bin/sh
 # External, ROS and system package dependencies
 
@@ -8,7 +9,7 @@ PACKAGES="ros-hydro-openni-camera
           ros-hydro-resource-retriever
           freeglut3
           freeglut3-dev
-	  binutils-gold
+		  binutils-gold
           libgstreamer0.10-dev
           libv4l-dev"
 
@@ -22,15 +23,17 @@ if [ -z $ROS_WORKSPACE ]; then
     echo "###########################################################"
     echo ""
 else
-    cd $ROS_WORKSPACE/src
-    #git clone https://github.com/LucidOne/ar_tools
 
-#    git clone -b catkin https://github.com/xqms/ar_tools
-#    cd ar_tools/ar_pose
-#    rosmake
-#    cd ../artoolkit
-#    rosmake  
-#    cd $ROS_WORKSPACE
-#    rospack profile
-#    catkin_make --pkg ar_tools
+	echo ""
+    echo "###########################################################"
+    echo 'WARNING. This script will delete your build folder'
+    echo "###########################################################"
+    echo ""
+
+    cd $ROS_WORKSPACE
+    git clone -b catkin https://github.com/xqms/ar_tools src/ar_tools
+	catkin_make --only-pkg-with-deps artoolkit
+	rm -rf build/
+	catkin_make --pkg ar_tools
+	
 fi

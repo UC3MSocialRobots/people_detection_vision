@@ -80,19 +80,19 @@ class LegPPLP : public PPLPublisherTemplate {
 public:
   //! a minimalistic Point structure
   typedef geometry_utils::FooPoint2f Point2;
-  static const double ADJACENT_EDGES_DISTANCE_THRESH = .3 * .3; // m^2
-  static const double ADJACENT_EDGES_ANGLE_THRESH = .2; // radians
+  static const double ADJACENT_EDGES_DISTANCE_THRESH;// = .3 * .3; // m^2
+  static const double ADJACENT_EDGES_ANGLE_THRESH;// = .2; // radians
   // distance parameters
   //! called "a" in the paper (adviced as 10 < a < 20 in part. IV)
-  static const double LEG_PATTERN_LA_LEG_WIDTH = .15; // meters
+  static const double LEG_PATTERN_LA_LEG_WIDTH;// = .15; // meters
   //! called "b" in the paper (adviced as b < 40 in part. IV)
-  static const double LEG_PATTERN_LA_LEG_GAP = .3; // meters
+  static const double LEG_PATTERN_LA_LEG_GAP;// = .3; // meters
   //! called "c" in the paper (adviced as 10 < c < 40 in part. IV)
-  static const double LEG_PATTERN_SL_LEG_WIDTH = .35; // meters
+  static const double LEG_PATTERN_SL_LEG_WIDTH;// = .35; // meters
   // max pattern distances
-  static const double LEG_PATTERN_LA_MAX_DIST = .1;
-  static const double LEG_PATTERN_FS_MAX_DIST = .2;
-  static const double LEG_PATTERN_SL_MAX_DIST = .1;
+  static const double LEG_PATTERN_LA_MAX_DIST;// = .1;
+  static const double LEG_PATTERN_FS_MAX_DIST;// = .2;
+  static const double LEG_PATTERN_SL_MAX_DIST;// = .1;
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -546,6 +546,21 @@ private:
   //! ROS message to share results
   people_msgs::PeoplePoseList _ppl;
 }; // end class LegPPLP
+
+//!CORRECT DECLARATION OF LegPPLP STATIC CONSTS
+const double LegPPLP::ADJACENT_EDGES_DISTANCE_THRESH = .3 * .3; // m^2
+const double LegPPLP::ADJACENT_EDGES_ANGLE_THRESH = .2; // radians
+  // distance parameters
+  //! called "a" in the paper (adviced as 10 < a < 20 in part. IV)
+const double LegPPLP::LEG_PATTERN_LA_LEG_WIDTH = .15; // meters
+  //! called "b" in the paper (adviced as b < 40 in part. IV)
+const double LegPPLP::LEG_PATTERN_LA_LEG_GAP = .3; // meters
+  //! called "c" in the paper (adviced as 10 < c < 40 in part. IV)
+const double LegPPLP::LEG_PATTERN_SL_LEG_WIDTH = .35; // meters
+  // max pattern distances
+const double LegPPLP::LEG_PATTERN_LA_MAX_DIST = .1;
+const double LegPPLP::LEG_PATTERN_FS_MAX_DIST = .2;
+const double LegPPLP::LEG_PATTERN_SL_MAX_DIST = .1;
 
 ////////////////////////////////////////////////////////////////////////////////
 
