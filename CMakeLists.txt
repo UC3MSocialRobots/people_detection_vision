@@ -107,7 +107,6 @@ include_directories(
   ${PCL_INCLUDE_DIRS}
 )
 
-SET(AD_USE_ROS 1)
 ADD_SUBDIRECTORY(src)
 
 ## Declare a cpp library
