@@ -40,7 +40,7 @@ ________________________________________________________________________________
  */
 
 #include "opencv2/features2d/features2d.hpp"
-#include "opencv2/nonfree/features2d.hpp"
+#include "opencv2/features2d/features2d.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/legacy/legacy.hpp"
 
@@ -555,7 +555,7 @@ void surf(const cv::Mat & face1,
   Timer timer;
 
   // Construct the SURF feature detector object
-  cv::SurfFeatureDetector surf(500.); // threshold
+  cv::SurfAdjuster surf(500.); // threshold
 
   // vector of keypoints
   std::vector<cv::KeyPoint> keypoints1, keypoints2;

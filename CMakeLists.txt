@@ -4,10 +4,11 @@ project(people_detection_vision)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp people_msgs 
+find_package(catkin REQUIRED COMPONENTS roscpp cv_bridge # ar_pose
+                                        people_msgs
                                         people_utils utils vision_utils followme_laser
                                         compressed_rounded_image_transport
-                                        cv_bridge)
+                                        )
 find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
 
@@ -98,7 +99,7 @@ include_directories(
   ${people_msgs_INCLUDE_DIRS}
   ${people_utils_INCLUDE_DIRS}
   ${followme_laser_INCLUDE_DIRS}
-  ${compressed_rounded_image_transport_INCLUDE_DIRS}  
+  ${compressed_rounded_image_transport_INCLUDE_DIRS}
   ${ar_tools_INCLUDE_DIRS}
   ${utils_INCLUDE_DIRS}
   ${vision_utils_INCLUDE_DIRS}
@@ -108,7 +109,6 @@ include_directories(
 
 SET(AD_USE_ROS 1)
 ADD_SUBDIRECTORY(src)
-ADD_SUBDIRECTORY(test)
 
 ## Declare a cpp library
 # add_library(foo
@@ -166,12 +166,4 @@ install(DIRECTORY include/${PROJECT_NAME}/
 ## Testing ##
 #############
 
-## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_foo.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
-
-## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)
-
+ADD_SUBDIRECTORY(test)
