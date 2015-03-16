@@ -26,7 +26,8 @@ Some tests for the texture sensor.
 #include "texture_sensor.h"
 #include <opencv2/imgproc/imgproc.hpp>
 #include <vision_utils/img_path.h>
-#include <cv_conversion_float_uchar.h>
+#include "compressed_rounded_image_transport/cv_conversion_float_uchar.h"
+
 #include <time/timer.h>
 
 ////////////////////////////////////////////////////////////////////////////////

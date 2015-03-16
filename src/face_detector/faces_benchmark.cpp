@@ -25,7 +25,8 @@ ________________________________________________________________________________
 #include <vision_utils/img_path.h>
 #include "time/timer.h"
 #include "xml_images_interface/xml_images_interface.h"
-#include <cv_conversion_float_uchar.h>
+#include "compressed_rounded_image_transport/cv_conversion_float_uchar.h"
+
 // detectors
 #include "color_face_detector.h"
 #include "texture_sensor.h"

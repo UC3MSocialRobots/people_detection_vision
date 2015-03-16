@@ -72,7 +72,8 @@ or another without odometry.
 
 // boost
 #include "boost/filesystem.hpp" // for creating folders
-#include <cv_conversion_float_uchar.h>
+#include "compressed_rounded_image_transport/cv_conversion_float_uchar.h"
+
 // utils
 #include <image_utils/io.h>
 #include <ros_utils/pt_utils.h>

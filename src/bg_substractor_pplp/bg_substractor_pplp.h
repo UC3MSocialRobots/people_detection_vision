@@ -77,7 +77,8 @@ this can be useful to discriminate between users and other objects for instance.
 #define BG_SUBSTRACTOR_PPLP_H
 
 // AD
-#include <cv_conversion_float_uchar.h>
+#include "compressed_rounded_image_transport/cv_conversion_float_uchar.h"
+
 #include <kinect_utils/kinect_openni_utils.h>
 #include <ros_utils/pt_utils.h>
 #include <string/timestamp.h>

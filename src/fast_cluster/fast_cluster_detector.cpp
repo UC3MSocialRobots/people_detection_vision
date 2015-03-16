@@ -108,7 +108,8 @@
 #include <followme_laser/TrackingStatus.h>
 #include <followme_laser/SetTrackingSeed.h>
 // people_msgs
-#include <cv_conversion_float_uchar.h>
+#include "compressed_rounded_image_transport/cv_conversion_float_uchar.h"
+
 #include "connected_components_matcher.h"
 #include "fast_cluster_functions.h"
 #include "ros_utils/marker_utils.h"
