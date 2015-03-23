@@ -33,7 +33,6 @@ else
     cd $ROS_WORKSPACE
     git clone -b catkin https://github.com/xqms/ar_tools src/ar_tools
 	catkin_make --only-pkg-with-deps artoolkit
-	rm -rf build/
-	catkin_make --pkg ar_tools
+	catkin_make --only-pkg-with-deps ar_tools
 	
 fi
