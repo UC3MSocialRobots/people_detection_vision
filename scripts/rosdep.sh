@@ -2,14 +2,14 @@
 #!/bin/sh
 # External, ROS and system package dependencies
 
-PACKAGES="ros-hydro-openni-camera
-          ros-hydro-openni-tracker
-          ros-hydro-openni-launch
+PACKAGES="ros-`rosversion -d`-openni-camera
+          ros-`rosversion -d`-openni-tracker
+          ros-`rosversion -d`-openni-launch
           libgmp-dev
-          ros-hydro-resource-retriever
+          ros-`rosversion -d`-resource-retriever
           freeglut3
           freeglut3-dev
-		  binutils-gold
+      binutils-gold
           libgstreamer0.10-dev
           libv4l-dev"
 
@@ -24,7 +24,7 @@ if [ -z $ROS_WORKSPACE ]; then
     echo ""
 else
 
-	echo ""
+  echo ""
     echo "###########################################################"
     echo 'WARNING. This script will delete your build folder'
     echo "###########################################################"
@@ -32,7 +32,7 @@ else
 
     cd $ROS_WORKSPACE
     git clone -b catkin https://github.com/xqms/ar_tools src/ar_tools
-	catkin_make --only-pkg-with-deps artoolkit
-	catkin_make --only-pkg-with-deps ar_tools
-	
+  catkin_make --only-pkg-with-deps artoolkit
+  catkin_make --only-pkg-with-deps ar_tools
+
 fi
