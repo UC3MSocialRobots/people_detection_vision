@@ -1,4 +1,4 @@
-#ADD_SUBDIRECTORY(cluster_detector)
+ADD_SUBDIRECTORY(cluster_detector)
 
 INCLUDE_DIRECTORIES(bp-vision)
 

@@ -40,4 +40,4 @@ ADD_SUBDIRECTORY(hog_pplp) # troubles with PCL: /usr/include/pcl-1.7/pcl/kdtree/
 ADD_SUBDIRECTORY(leg_detector)
 ADD_SUBDIRECTORY(ppl_benchmarking)
 ADD_SUBDIRECTORY(speaker_detector)
-#ADD_SUBDIRECTORY(stereo) ##  error: ‘cloud_viewer::Viewer’ no tiene un miembro llamado ‘camera_’
+ADD_SUBDIRECTORY(stereo)

@@ -1,11 +1,24 @@
+/*!
+  Cf
+  * Hydro migration in http://wiki.ros.org/hydro/Migration
+  * http://www.pointclouds.org/documentation/tutorials/cluster_extraction.php
+  */
 #include "debug/error.h"
 
 // ROS
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
 // PCL
-#include <pcl/features/normal_3d.h>
+#include <pcl/ModelCoefficients.h>
+#include <pcl/point_types.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/filters/extract_indices.h>
 #include <pcl/filters/voxel_grid.h>
+#include <pcl/features/normal_3d.h>
+#include <pcl/kdtree/kdtree.h>
+#include <pcl/sample_consensus/method_types.h>
+#include <pcl/sample_consensus/model_types.h>
+#include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/segmentation/extract_clusters.h>
 #include <pcl_conversions/pcl_conversions.h>
 
@@ -15,14 +28,14 @@
 #include <debug/debug_utils.h>
 #include <time/timer.h>
 #include <geom/Rect3.h>
-#include <compressed_rounded_image_transport/CompressedRoundedImage.h>
 #include <color/color_utils.h>
 // C
 #include <map>
 
 class ClusterDetector {
 public:
-  typedef pcl::PointCloud<pcl::PointXYZ> Cloud;
+  typedef sensor_msgs::PointCloud2 ROSCloud;
+  typedef pcl::PointCloud<pcl::PointXYZ> PCLCloud;
   //typedef pcl::KdTreeFLANN<pcl::PointXYZ> Tree;
   typedef pcl::search::KdTree<pcl::PointXYZ> Tree;
   typedef geometry_utils::Rect3f Bbox;
@@ -36,7 +49,7 @@ public:
   //////////////////////////////////////////////////////////////////////////////
 
   ClusterDetector() {
-    _cloud_subscriber = n.subscribe<Cloud>
+    _cloud_subscriber = n.subscribe<ROSCloud>
         ("camera/depth/points_filtered",
          1,
          &ClusterDetector::compute_cluster_from_cloud,
@@ -58,7 +71,7 @@ public:
 
   //////////////////////////////////////////////////////////////////////////////
 
-  void compute_cluster_from_cloud(const Cloud::ConstPtr& cloud_msg) {
+  void compute_cluster_from_cloud(const ROSCloud::ConstPtr& cloud_msg) {
     maggieDebug2("compute_cluster_from_cloud()");
 
     // Creating the KdTree object for the search method of the extraction
@@ -76,39 +89,12 @@ public:
     maggieDebug2("euclidin clustering:%g ms, \tnumber of clusters:%i",
                  timer.getTimeMilliseconds(),
                  _n_clusters);
-
-    // Write the planar inliers to disk
-#if 0
-    timer.reset();
-    pcl::PCDWriter writer;
-    int j = 0;
-    for (std::vector<pcl::PointIndices>::const_iterator it = _cluster_indices.begin ();
-         it != _cluster_indices.end ();
-         ++it) {
-      Cloud::Ptr cloud_cluster(new Cloud);
-      for (std::vector<int>::const_iterator pit = it->indices.begin (); pit
-           != it->indices.end (); pit++) {
-        cloud_cluster->points.push_back (cloud_msg->points[*pit]);
-      } // end loop cluster point
-
-      cloud_cluster->width = cloud_cluster->points.size ();
-      cloud_cluster->height = 1;
-      cloud_cluster->is_dense = true;
-      std::cout << "cloud representing the Cluster: " <<
-                   cloud_cluster->points.size () << " data points." << std::endl;
-      std::stringstream ss;
-      ss << "cloud_cluster_" << j << ".pcd";
-      writer.write<pcl::PointXYZ> (ss.str (), *cloud_cluster, false); //*
-      j++;
-    } // end loop cluster index
-#endif
-
     compute_bounding_boxes(cloud_msg);
   } // end compute_cluster_from_cloud();
 
   //////////////////////////////////////////////////////////////////////////////
 
-  inline void compute_bounding_boxes(const Cloud::ConstPtr& cloud_msg) {
+  inline void compute_bounding_boxes(const PCLCloud::ConstPtr& cloud_msg) {
     maggieDebug2("compute_bounding_boxes()");
 
     Timer timer;
