@@ -26,7 +26,7 @@ ADD_SUBDIRECTORY(bg_substractor_pplp)
 ADD_SUBDIRECTORY(depth_people_detector)
 ADD_SUBDIRECTORY(face_detector)
 ADD_SUBDIRECTORY(fast_cluster)
-ADD_SUBDIRECTORY(hog_pplp) # troubles with PCL: /usr/include/pcl-1.7/pcl/kdtree/kdtree_flann.h:115:9: error: ‘param_k_’ was not declared in this scope
+ADD_SUBDIRECTORY(hog_pplp) 
 ADD_SUBDIRECTORY(leg_detector)
 ADD_SUBDIRECTORY(ppl_benchmarking)
 
