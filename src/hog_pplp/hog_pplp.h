@@ -50,16 +50,16 @@ http://experienceopencv.blogspot.com/2011/02/hog-descriptor.html
 #ifndef HOG_PPLP_H
 #define HOG_PPLP_H
 
-// OpenCV
-#include "opencv2/objdetect/objdetect.hpp"
 // AD
+#include "point_clouds/image_clusterer.h"
 #include <geom/Rect3.h>
 #include <time/timer.h>
 #include "image_utils/io.h"
-#include "point_clouds/image_clusterer.h"
 // people_msgs
 #include "templates/rgb_depth_pplp_template.h"
 #include "ppl_utils/images2pp.h"
+// OpenCV
+#include "opencv2/objdetect/objdetect.hpp"
 
 class HogPPLP : public RgbDepthPPLPublisherTemplate  {
 public:

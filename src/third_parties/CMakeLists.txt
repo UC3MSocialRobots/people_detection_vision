@@ -40,8 +40,3 @@ SET_TARGET_PROPERTIES(libdai PROPERTIES
   COMPILE_FLAGS "-DDAI_DEBUG  -DDAI_WITH_BP -DDAI_WITH_FBP -DDAI_WITH_TRWBP -DDAI_WITH_MF -DDAI_WITH_HAK -DDAI_WITH_LC -DDAI_WITH_TREEEP -DDAI_WITH_JTREE -DDAI_WITH_MR -DDAI_WITH_GIBBS -DDAI_WITH_CBP -DDAI_WITH_DECMAP -DDAI_WITH_GLC"
 )
 TARGET_LINK_LIBRARIES(libdai gmpxx gmp)
-
-### dlib
-add_executable(test_dlib.exe test_dlib.cpp dlib/bayes_utils.h 
-			   dlib/graph_utils.h dlib/graph.h dlib/directed_graph.h)
-#target_link_libraries(test_dlib.exe )

@@ -1,12 +1,3 @@
-########################################################################
-### options
-########################################################################
-#OPTION(FOO_OPTION           "a string explaining it"     OFF)
-
-########################################################################
-### find deps
-########################################################################
-#AD_CHECK_PROGRAM_INSTALLED(mplayer)
 INCLUDE_DIRECTORIES("third_parties/libdai/include")
 
 ########################################################################
@@ -30,8 +21,7 @@ target_link_libraries(robot_wanderer_with_moving_goal.exe ${catkin_LIBRARIES})
 
 ADD_SUBDIRECTORY(third_parties)
 
-ADD_SUBDIRECTORY(artoolkit) # how to find rosmake-based "ar_pose" project?
-ADD_SUBDIRECTORY(cluster_detector) ## error: ‘transformPointCloud’ no es un miembro de ‘pcl’
+ADD_SUBDIRECTORY(artoolkit)
 ADD_SUBDIRECTORY(bg_substractor_pplp)
 ADD_SUBDIRECTORY(depth_people_detector)
 ADD_SUBDIRECTORY(face_detector)
@@ -39,5 +29,4 @@ ADD_SUBDIRECTORY(fast_cluster)
 ADD_SUBDIRECTORY(hog_pplp) # troubles with PCL: /usr/include/pcl-1.7/pcl/kdtree/kdtree_flann.h:115:9: error: ‘param_k_’ was not declared in this scope
 ADD_SUBDIRECTORY(leg_detector)
 ADD_SUBDIRECTORY(ppl_benchmarking)
-ADD_SUBDIRECTORY(speaker_detector)
-ADD_SUBDIRECTORY(stereo)
+

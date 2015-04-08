@@ -24,8 +24,8 @@ catkin_package(
 include_directories(
   include src
   ${catkin_INCLUDE_DIRS}
-  /usr/include/opencv2
   ${PCL_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
 )
 ADD_SUBDIRECTORY(src)
 ### 8 - Tests to build (catkin_add_gtest())
