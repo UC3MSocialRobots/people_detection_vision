@@ -68,7 +68,7 @@ such as a minimum size for the blobs.
 
 // people_msgs
 #include <templates/rgb_depth_pplp_template.h>
-#include "ppl_utils/images2pp.h"
+#include "ppl_utils/images2ppl.h"
 #include "color/color_utils.h"
 #include "point_clouds/blob_segmenter.h"
 #include "image_utils/content_processing.h"

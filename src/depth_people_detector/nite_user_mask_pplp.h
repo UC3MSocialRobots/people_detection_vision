@@ -70,7 +70,7 @@ in the user mask.
 #include <time/timer.h>
 #include <templates/pplp_template.h>
 // people_msgs
-#include <ppl_utils/rgb_depth_user2ppl.h>
+#include <ppl_utils/images2ppl.h>
 
 #define DEBUG_PRINT(...)   {}
 //#define DEBUG_PRINT(...)   ROS_INFO_THROTTLE(5, __VA_ARGS__)
@@ -214,7 +214,7 @@ protected:
   message_filters::Synchronizer<MySyncPolicy>* _sync;
   cv_bridge::CvImage::ConstPtr _rgb_bridge, _depth_bridge, _user_bridge;
   //! information sharing
-  ppl_utils::RgbDepthUser2PPL _ppl_conv;
+  ppl_utils::Images2PPL _ppl_conv;
 }; // end NiteUserMask2Ppl
 
 #endif // NITE_USER_MASK_PPLP_H

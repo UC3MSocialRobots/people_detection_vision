@@ -89,7 +89,7 @@ this can be useful to discriminate between users and other objects for instance.
 #include <image_utils/head_finder.h>
 // people_msgs
 #include "templates/rgb_depth_pplp_template.h"
-#include "ppl_utils/images2pp.h"
+#include "ppl_utils/images2ppl.h"
 // ROS
 #include <tf/transform_datatypes.h>
 #include <tf/transform_listener.h>

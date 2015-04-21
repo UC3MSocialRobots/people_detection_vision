@@ -57,7 +57,7 @@ http://experienceopencv.blogspot.com/2011/02/hog-descriptor.html
 #include "image_utils/io.h"
 // people_msgs
 #include "templates/rgb_depth_pplp_template.h"
-#include "ppl_utils/images2pp.h"
+#include "ppl_utils/images2ppl.h"
 // OpenCV
 #include "opencv2/objdetect/objdetect.hpp"
 
