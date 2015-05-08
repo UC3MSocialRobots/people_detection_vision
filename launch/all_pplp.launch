@@ -5,7 +5,7 @@
      benchmark_ppl.launch and
      ukf_multimodal.launch (in people_recognition_vision pkg) -->
 <arg name="robot"/>
-<arg name="eventgui" default="true"/>
+<arg name="eventgui" default="false"/>
 
 <!-- ARToolkit -->
 <include file="$(find people_detection_vision)/launch/artoolkit2ppl.launch">

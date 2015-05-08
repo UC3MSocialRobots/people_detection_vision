@@ -1,18 +1,20 @@
 <launch>
 <arg name="robot"/>
-<arg name="eventgui" default="true"/>
-<arg name="marker" default="false"/>
-
-<!--
-<include file="$(find main_control)/launch/nite_only_start.launch"/>
-<include file="$(find main_control)/launch/kinect_only_start.launch"/>
-rosrun people_utils ppl_viewer.exe _ppl_topics:=/kinect_only/face_detector_pplp/ppl
--->
+<!-- autostart: true to start the PPLP at startup -->
+<arg name="autostart" default="false"/>
+<!-- eventgui: true to create a GUI that allows to start the PPLP -->
+<arg name="eventgui"  default="false"/>
+<!-- marker: true to create a node converting the published PPL into a Vizualisation marker -->
+<arg name="marker"    default="false"/>
 
 <group ns="$(arg robot)">
   <node pkg="people_detection_vision" type="face_detector_pplp.exe"
     name="face_detector_pplp"  output="screen"
     args="" />
+
+  <!-- autostart: publish and latch starting event for skill, then die -->
+  <node if="$(arg autostart)" pkg="rostopic" type="rostopic" name="face_detector_pplp_starter"
+        output="screen" args="pub FACE_DETECTOR_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
 
   <!-- conversion to ROS rviz marker -->
   <node if="$(arg marker)" pkg="people_utils" type="ppl2marker.exe"

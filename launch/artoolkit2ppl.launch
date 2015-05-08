@@ -1,16 +1,12 @@
 <launch>
 <arg name="robot"/>
-<arg name="eventgui" default="true"/>
-<arg name="marker" default="false"/>
+<!-- autostart: true to start the PPLP at startup -->
+<arg name="autostart" default="false"/>
+<!-- eventgui: true to create a GUI that allows to start the PPLP -->
+<arg name="eventgui"  default="false"/>
+<!-- marker: true to create a node converting the published PPL into a Vizualisation marker -->
+<arg name="marker"    default="false"/>
 <arg name="camera_topic" default="/$(arg robot)/rgb"/>
-
-<!-- launch the driver -->
-<!--
-<include file="$(find main_control)/launch/$(arg robot)_start.launch"/>
-<include file="$(find main_control)/launch/viz.launch">
-  <arg name="robot" value="$(arg robot)" />
-</include>
--->
 
 <group ns="$(arg robot)">
   <arg name="marker_pattern_list" value="$(find people_detection_vision)/data/artoolkit/markers.dat"/>
@@ -39,6 +35,10 @@
     <param name="artoolkit_markers_topic" value="ar_pose_marker"/>
     <param name="marker_pattern_list" value="$(arg marker_pattern_list)"/>
   </node>
+
+  <!-- autostart: publish and latch starting event for skill, then die -->
+  <node if="$(arg autostart)" pkg="rostopic" type="rostopic" name="artoolkit_pplp_starter"
+        output="screen" args="pub ARTOOLKIT_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
 
   <!-- conversion to ROS rviz marker -->
   <node if="$(arg marker)" pkg="people_utils" type="ppl2marker.exe"

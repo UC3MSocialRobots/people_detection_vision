@@ -1,12 +1,11 @@
 <launch>
 <arg name="robot"/>
-<arg name="eventgui" default="true"/>
-<arg name="marker" default="false"/>
-
-<!--
-<include file="$(find main_control)/launch/nite_only_start.launch"/>
-<include file="$(find main_control)/launch/kinect_only_start.launch"/>
--->
+<!-- autostart: true to start the PPLP at startup -->
+<arg name="autostart" default="false"/>
+<!-- eventgui: true to create a GUI that allows to start the PPLP -->
+<arg name="eventgui"  default="false"/>
+<!-- marker: true to create a node converting the published PPL into a Vizualisation marker -->
+<arg name="marker"    default="false"/>
 
 <group ns="$(arg robot)">
   <!-- HOG people detector
@@ -22,6 +21,10 @@
                               _resize_scale:=0.4
                               _hog_hitThreshold:=2.0
 -->
+
+  <!-- autostart: publish and latch starting event for skill, then die -->
+  <node if="$(arg autostart)" pkg="rostopic" type="rostopic" name="hog_pplp_starter"
+        output="screen" args="pub HOG_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
 
   <!-- conversion to ROS rviz marker -->
   <node if="$(arg marker)" pkg="people_utils" type="ppl2marker.exe"
