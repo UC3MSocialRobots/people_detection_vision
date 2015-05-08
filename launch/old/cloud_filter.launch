@@ -3,9 +3,9 @@
 <group ns="$(arg robot)">
 
   <node pkg="nodelet" type="nodelet" name="CloudFilter" output="screen"
-      args="load multi_modal/CloudFilter /$(arg robot)/camera_nodelet_manager
-            _input_topic:=/$(arg robot)/camera/depth_registered/points
-            _output_topic:=/$(arg robot)/camera/depth_registered/points_filtered
+      args="load multi_modal/CloudFilter /$(arg robot)_camera_nodelet_manager
+            _input_topic:=/$(arg robot)_camera/depth_registered/points
+            _output_topic:=/$(arg robot)_camera/depth_registered/points_filtered
             _output_frame:=/base_link"/>
 
 

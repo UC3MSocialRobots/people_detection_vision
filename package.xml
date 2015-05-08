@@ -2,81 +2,45 @@
 <package format="2">
   <name>people_detection_vision</name>
   <version>0.0.0</version>
-  <description>
-
-  people_detection_vision is a stack for finding people around a robot.
-
-  </description>
-
-  <!-- One maintainer tag required, multiple allowed, one person per tag -->
-  <!-- Example:  -->
-  <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
+  <description>people_detection_vision is a stack for finding people around a
+  robot.</description>
   <maintainer email="arnaud.a.ramey@gmail.com">Arnaud Ramey</maintainer>
-
-
-  <!-- One license tag required, multiple allowed, one license per tag -->
-  <!-- Commonly used license strings: -->
-  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
   <license>LGPLv3</license>
-
-
-  <!-- Url tags are optional, but mutiple are allowed, one per tag -->
-  <!-- Optional attribute type can be: website, bugtracker, or repository -->
-  <!-- Example: -->
   <url type="website">http://ros.org/wiki/people_detection_vision</url>
-
-
-  <!-- Author tags are optional, mutiple are allowed, one per tag -->
-  <!-- Authors do not have to be maintianers, but could be -->
-  <!-- Example: -->
-  <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
-
-
-  <!-- The *_depend tags are used to specify dependencies -->
-  <!-- Dependencies can be catkin packages or system dependencies -->
-  <!-- Examples: -->
-  <!-- Use build_depend for packages you need at compile time: -->
-  <!--   <build_depend>message_generation</build_depend> -->
-  <!-- Use buildtool_depend for build tool packages: -->
-  <!--   <buildtool_depend>catkin</buildtool_depend> -->
-  <!-- Use run_depend for packages you need at runtime: -->
-  <!--   <run_depend>message_runtime</run_depend> -->
-  <!-- Use test_depend for packages you need only for testing: -->
-  <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
 
+  <!-- dependencies -->
   <build_depend>roscpp</build_depend>
-  <exec_depend>roscpp</exec_depend>
-  <depend>ar_pose</depend>
-  <depend>openni_camera</depend>
-  <depend>opencv2</depend>
-  <depend>openni</depend>
-  <depend>camera</depend>
+  <build_depend>openni_camera</build_depend>
+  <build_depend>openni</build_depend>
+  <build_depend>pcl_conversions</build_depend>
+  <build_depend>cv_bridge</build_depend>
+  <build_depend>ar_pose</build_depend>
   <build_depend>libpcl-all-dev</build_depend>
+
+  <build_depend>people_msgs</build_depend>
+  <build_depend>people_utils</build_depend>
+  <build_depend>camera</build_depend>
+  <build_depend>followme_laser</build_depend>
+  <build_depend>utils</build_depend>
+  <build_depend>vision_utils</build_depend>
+
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>openni_camera</exec_depend>
+  <exec_depend>openni</exec_depend>
+  <exec_depend>pcl_conversions</exec_depend>
+  <exec_depend>cv_bridge</exec_depend>
+  <exec_depend>ar_pose</exec_depend>
   <exec_depend>libpcl-all-dev</exec_depend>
 
-  <depend>people_msgs</depend>
-  <depend>people_utils</depend>
-  <depend>followme_laser</depend>
-  <depend>pcl_conversions </depend>
-  <depend>cv_bridge</depend>
-  <depend>utils</depend>
-  <depend>vision_utils</depend>
+  <exec_depend>people_msgs</exec_depend>
+  <exec_depend>people_utils</exec_depend>
+  <exec_depend>camera</exec_depend>
+  <exec_depend>followme_laser</exec_depend>
+  <exec_depend>utils</exec_depend>
+  <exec_depend>vision_utils</exec_depend>
 
-
-  <!-- The export tag contains other, unspecified, tags -->
   <export>
-      <nodelet plugin="${prefix}/nodelets.xml" />
-    <!-- You can specify that this package is a metapackage here: -->
-    <!-- <metapackage/> -->
-
-    <!-- Other tools can request additional information be placed here -->
-        <cpp cflags="-I${prefix} -I${prefix}/build"
-         lflags="-L${prefix}/lib -Wl,-rpath,${prefix}/lib"/>
+    <nodelet plugin="${prefix}/nodelets.xml" />
   </export>
 </package>
-
-
-
-
-

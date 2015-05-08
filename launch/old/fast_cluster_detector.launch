@@ -38,7 +38,7 @@ A super nice drawing for the code of the buttons on the
               _tracking_timeout:=5.0
               _max_mark_for_assoc:=.8
               _mark_ratio_bbox_to_d22:=3
-              _camera_info_topic:=/$(arg robot)/camera/depth/camera_info"
+              _camera_info_topic:=/$(arg robot)_camera/depth/camera_info"
         required="true" />
   <!-- compress the compnent illus with png -
   cf http://www.ros.org/wiki/compressed_image_transport -->

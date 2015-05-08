@@ -34,7 +34,7 @@
   <!-- the AD skill starting or stopping ar_pose -->
  <node pkg="people_detection_vision" type="artoolkit_pplp.exe"
       name="artoolkit_pplp"  output="screen" respawn="false">
-    <param name="input_caminfo_topic" value="/$(arg robot)/camera_info"/>
+    <param name="input_caminfo_topic" value="/$(arg robot)_camera_info"/>
     <param name="artoolkit_caminfo_topic" value="$(arg ar_pose_caminfo_launcher)"/>
     <param name="artoolkit_markers_topic" value="ar_pose_marker"/>
     <param name="marker_pattern_list" value="$(arg marker_pattern_list)"/>
