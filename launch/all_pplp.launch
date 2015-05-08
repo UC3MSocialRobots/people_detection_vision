@@ -3,7 +3,7 @@
      If you add a new PPLP,
      don't forget to add  its topic to
      benchmark_ppl.launch and
-     ukf_multimodal.launch (in people_recognition_vision pkg) -->
+     ukf_multimodal_lite.launch (in people_recognition_vision pkg) -->
 <arg name="robot"/>
 <arg name="eventgui" default="false"/>
 
