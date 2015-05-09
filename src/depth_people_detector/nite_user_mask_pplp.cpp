@@ -27,6 +27,7 @@ ________________________________________________________________________________
 int main(int argc, char** argv) {
   ros::init(argc, argv, "nite_user_mask_pplp");
   NiteUserMask2Ppl skill;
+  skill.check_autostart();
   ros::spin();
   return 0;
 }

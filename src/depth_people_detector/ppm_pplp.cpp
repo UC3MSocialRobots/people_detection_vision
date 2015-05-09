@@ -96,6 +96,7 @@ int main(int argc, char** argv) {
 int main(int argc, char** argv) {
   ros::init(argc, argv, "Ppm");
   Ppm skill;
+  skill.check_autostart();
   ros::spin();
   return 0;
 }

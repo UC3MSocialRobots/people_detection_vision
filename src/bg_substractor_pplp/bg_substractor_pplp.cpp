@@ -25,6 +25,7 @@ ________________________________________________________________________________
 int main(int argc, char** argv) {
   ros::init(argc, argv, "BackgroundSubstractorPPLP");
   BackgroundSubstractorPPLP skill;
+  skill.check_autostart();
   ros::spin();
   return 0;
 }

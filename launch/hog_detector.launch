@@ -16,15 +16,14 @@
                               _resize_scale:=1
                               _hog_hitThreshold:=0
                               _data_acquisition_want_depth:=true
-                              _data_acquisition_by_wait_for_message:=true" />
+                              _data_acquisition_by_wait_for_message:=true">
+    <!-- autostart param - must be before the XML tag of the skill (node) -->
+    <param if="$(arg autostart)" name="autostart" value="true"/>
+  </node>
 <!--
                               _resize_scale:=0.4
                               _hog_hitThreshold:=2.0
 -->
-
-  <!-- autostart: publish and latch starting event for skill, then die -->
-  <node if="$(arg autostart)" pkg="rostopic" type="rostopic" name="hog_pplp_starter"
-        output="screen" args="pub HOG_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
 
   <!-- conversion to ROS rviz marker -->
   <node if="$(arg marker)" pkg="people_utils" type="ppl2marker.exe"

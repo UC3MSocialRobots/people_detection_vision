@@ -216,6 +216,7 @@ private:
 int main(int argc, char** argv) {
   ros::init(argc, argv, "FaceDetector2DPPLP");
   FaceDetector2DPPLP skill;
+  skill.check_autostart();
   ros::spin();
   return 0;
 }

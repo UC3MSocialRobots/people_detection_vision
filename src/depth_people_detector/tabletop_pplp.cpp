@@ -26,6 +26,7 @@ A short launcher for TabletopPPLP.
 int main(int argc, char** argv) {
   ros::init(argc, argv, "tabletop_pplp");
   TabletopPPLP skill;
+  skill.check_autostart();
   ros::spin();
   return 0;
 }

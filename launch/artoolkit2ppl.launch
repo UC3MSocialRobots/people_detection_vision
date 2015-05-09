@@ -28,17 +28,15 @@
   </node>
 
   <!-- the AD skill starting or stopping ar_pose -->
- <node pkg="people_detection_vision" type="artoolkit_pplp.exe"
+  <node pkg="people_detection_vision" type="artoolkit_pplp.exe"
       name="artoolkit_pplp"  output="screen" respawn="false">
     <param name="input_caminfo_topic" value="/$(arg robot)_camera_info"/>
     <param name="artoolkit_caminfo_topic" value="$(arg ar_pose_caminfo_launcher)"/>
     <param name="artoolkit_markers_topic" value="ar_pose_marker"/>
     <param name="marker_pattern_list" value="$(arg marker_pattern_list)"/>
+    <!-- autostart param -->
+    <param if="$(arg autostart)" name="autostart" value="true"/>
   </node>
-
-  <!-- autostart: publish and latch starting event for skill, then die -->
-  <node if="$(arg autostart)" pkg="rostopic" type="rostopic" name="artoolkit_pplp_starter"
-        output="screen" args="pub ARTOOLKIT_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
 
   <!-- conversion to ROS rviz marker -->
   <node if="$(arg marker)" pkg="people_utils" type="ppl2marker.exe"

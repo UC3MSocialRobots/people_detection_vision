@@ -26,6 +26,7 @@
 int main(int argc, char** argv) {
   ros::init(argc, argv, "FaceDetectorPPLP");
   FaceDetectorPPLP skill;
+  skill.check_autostart();
   ros::spin();
   return 0;
 }

@@ -222,6 +222,7 @@ private:
 int main(int argc, char **argv) {
   ros::init (argc, argv, "ARToolkitPPLP");
   ARToolkitPPLP skill;
+  skill.check_autostart();
   ros::spin();
   return 0;
 }

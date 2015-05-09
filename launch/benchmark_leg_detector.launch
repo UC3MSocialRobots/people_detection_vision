@@ -16,7 +16,7 @@
   <node pkg="people_detection_vision" type="leg_pplp.exe"
         name="leg_pplp" output="screen" args="_laser_src_topic:=scan" />
   <!-- publish event LEG_PPLP_START to start PPLP -->
-  <node pkg="rostopic" type="rostopic" name="artoolkit_pplp_starter" output="screen"
+  <node pkg="rostopic" type="rostopic" name="leg_pplp_starter" output="screen"
         args="pub LEG_PPLP_START std_msgs/Int16 '{data: 0}' -l  -1"/>
 
   <!-- PPL benchmarker -->

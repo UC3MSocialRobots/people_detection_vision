@@ -1021,15 +1021,7 @@ private:
 
 int main(int argc, char**argv) {
   ros::init(argc, argv, "FastClusterDetector");
-
   FastClusterDetector detec;
-
-  /**
-  *ros::spin() will enter a loop, pumping callbacks.  With this version, all
-  *callbacks will be called from within this thread (the main one).  ros::spin()
-  *will exit when Ctrl-C is pressed, or the node is shutdown by the master.
-  */
   ros::spin();
-
   return 0;
 }

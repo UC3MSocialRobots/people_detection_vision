@@ -556,6 +556,7 @@ private:
 int main(int argc, char** argv) {
   ros::init(argc, argv, "leg_pplp");
   LegPPLP skill;
+  skill.check_autostart();
   ros::spin();
   return 0;
 }

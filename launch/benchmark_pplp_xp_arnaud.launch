@@ -5,10 +5,16 @@
 <arg name="input_use_dgait" default="false"/>
 <arg name="rate" value=".5"/> <!-- Hz -->
 
-<!-- the detectors and their GUIs - launch them last to ensure mcp_server alive -->
-<include file="$(find people_detection_vision)/launch/all_pplp.launch">
+<!-- spawn all PPLP and PPLM, use simple filtering (Euclidean) -->
+<include file="$(find people_recognition_vision)/launch/ukf_multimodal_lite.launch">
   <arg name="robot" value="$(arg robot)" />
-  <arg name="eventgui" value="false"/>
+  <arg name="pplp_use_artoolkit"              value="true"/>
+  <arg name="pplp_use_face_detector3d"        value="true"/>
+  <arg name="pplp_use_hog_detector"           value="true"/>
+  <arg name="pplp_use_leg_detector"           value="true"/>
+  <arg name="pplp_use_nite_user_mask"         value="true"/>
+  <arg name="pplp_use_ppm"                    value="true"/>
+  <arg name="pplp_use_tabletop"               value="true"/>
 </include>
 
 <!-- input data and truth PPL publisher -->
@@ -45,21 +51,5 @@
           _width:=480 _height:=800
           _reprojection_mode:=xz
           _xmin:=-3 _xmax:=3 _ymin:=0 _ymax:=4" />
-
-<!-- publish eventS to start PPLP -->
-  <node pkg="rostopic" type="rostopic" name="artoolkit_pplp_starter" output="screen"
-        args="pub ARTOOLKIT_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
-  <node pkg="rostopic" type="rostopic" name="FACE_DETECTOR_pplp_starter" output="screen"
-        args="pub FACE_DETECTOR_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
-  <node pkg="rostopic" type="rostopic" name="LEG_pplp_starter" output="screen"
-        args="pub LEG_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
-  <node pkg="rostopic" type="rostopic" name="HOG_pplp_starter" output="screen"
-        args="pub HOG_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
-  <node pkg="rostopic" type="rostopic" name="NITE_USER_MASK_pplp_starter" output="screen"
-        args="pub NITE_USER_MASK_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
-  <node pkg="rostopic" type="rostopic" name="PPM_pplp_starter" output="screen"
-        args="pub PPM_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
-  <node pkg="rostopic" type="rostopic" name="TABLETOP_pplp_starter" output="screen"
-        args="pub TABLETOP_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
 </group>
 </launch>

@@ -13,11 +13,10 @@
         args="_user_topic:=user
               _depth_topic:=depth
               _data_acquisition_by_wait_for_message:=false
-              --display" />
-
-  <!-- autostart: publish and latch starting event for skill, then die -->
-  <node if="$(arg autostart)" pkg="rostopic" type="rostopic" name="nite_user_mask_pplp_starter"
-        output="screen" args="pub NITE_USER_MASK_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
+              --display">
+    <!-- autostart param - must be before the XML tag of the skill (node) -->
+    <param if="$(arg autostart)" name="autostart" value="true"/>
+  </node>
 
   <!-- conversion to ROS rviz marker -->
   <node if="$(arg marker)" pkg="people_utils" type="ppl2marker.exe"

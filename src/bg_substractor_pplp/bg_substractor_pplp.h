@@ -1,5 +1,5 @@
 /*!
-  \file        BG_SUBSTRACTOR_PPLP.h
+  \file        bg_substractor_pplp.h
   \author      Arnaud Ramey <arnaud.a.ramey@gmail.com>
                 -- Robotics Lab, University Carlos III of Madrid
   \date        2014/09

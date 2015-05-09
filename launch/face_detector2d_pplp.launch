@@ -14,15 +14,14 @@
   <node pkg="people_detection_vision" type="face_detector2d_pplp.exe"
     name="face_detector2d_pplp"  output="screen"
     args="_rgb_topic:=$(arg rgb_topic)
-          _display:=false" />
-
-  <!-- autostart: publish and latch starting event for skill, then die -->
-  <node if="$(arg autostart)" pkg="rostopic" type="rostopic" name="face_detector2d_pplp_starter"
-        output="screen" args="pub FACE_DETECTOR2D_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
+          _display:=false">
+    <!-- autostart param - must be before the XML tag of the skill (node) -->
+    <param if="$(arg autostart)" name="autostart" value="true"/>
+  </node>
 
   <!-- conversion to ROS rviz marker -->
   <node if="$(arg marker)" pkg="people_utils" type="ppl2marker.exe"
-        output="screen" name="ppl2marker_face2d_pplp"
+        output="screen" name="face_detector2d_pplp_ppl2marker"
         args="_red:=1 _green:=0 _blue:=0 _input_topic:=face_detector2d_pplp/ppl" />
 
   <!-- event GUI -->

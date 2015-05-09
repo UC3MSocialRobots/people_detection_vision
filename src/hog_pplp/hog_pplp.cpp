@@ -25,6 +25,7 @@ ________________________________________________________________________________
 int main(int argc, char** argv) {
   ros::init(argc, argv, "HogPPLP");
   HogPPLP skill;
+  skill.check_autostart();
   ros::spin();
   return 0;
 }

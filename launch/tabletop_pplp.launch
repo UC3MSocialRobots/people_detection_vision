@@ -10,11 +10,10 @@
 <group ns="$(arg robot)">
   <node pkg="people_detection_vision" type="tabletop_pplp.exe"
     name="tabletop_pplp"  output="screen"
-    args="_max_dist_m:=5 _min_blob_size_pix:=3000 _max_blobs_nb:=1" />
-
-  <!-- autostart: publish and latch starting event for skill, then die -->
-  <node if="$(arg autostart)" pkg="rostopic" type="rostopic" name="tabletop_pplp_starter"
-        output="screen" args="pub TABLETOP_PPLP_START std_msgs/Int16 '{data: 0}' --latch  -1"/>
+    args="_max_dist_m:=5 _min_blob_size_pix:=3000 _max_blobs_nb:=1">
+    <!-- autostart param - must be before the XML tag of the skill (node) -->
+    <param if="$(arg autostart)" name="autostart" value="true"/>
+  </node>
 
   <!-- conversion to ROS rviz marker -->
   <node if="$(arg marker)" pkg="people_utils" type="ppl2marker.exe"
