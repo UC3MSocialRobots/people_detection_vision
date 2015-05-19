@@ -1,0 +1,30 @@
+<launch>
+<arg name="robot"/>
+<!-- autostart: true to start the PPLP at startup -->
+<arg name="autostart" default="false"/>
+<!-- eventgui: true to create a GUI that allows to start the PPLP -->
+<arg name="eventgui"  default="false"/>
+<!-- marker: true to create a node converting the published PPL into a Vizualisation marker -->
+<arg name="marker"    default="false"/>
+
+<group ns="$(arg robot)">
+  <node pkg="people_detection_vision" type="bg_substractor_pplp.exe"
+    name="bg_substractor_pplp"  output="screen"
+    args="_static_frame:=base_link">
+    <!-- autostart param - must be before the XML tag of the skill (node) -->
+    <param if="$(arg autostart)" name="autostart" value="true"/>
+  </node>
+
+  <!-- conversion to ROS rviz marker -->
+  <node if="$(arg marker)" pkg="people_utils" type="ppl2marker.exe"
+        output="screen" name="bg_substractor_pplp_ppl2marker"
+        args="_red:=1 _green:=0 _blue:=0 _input_topic:=bg_substractor_pplp/ppl" />
+
+  <!-- event GUI -->
+  <node if="$(arg eventgui)" pkg="ad_core" type="launcher_qt_event_sender_interface.exe"
+        name="bg_substractor_pplp_event_gui"
+        output="screen"
+        args='event_keys="|BG_SUBSTRACTOR_PPLP_START;BG_SUBSTRACTOR_PPLP_START;0
+                          |BG_SUBSTRACTOR_PPLP_STOP;BG_SUBSTRACTOR_PPLP_STOP;0"'/>
+</group>
+</launch>
