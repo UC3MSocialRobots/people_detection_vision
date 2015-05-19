@@ -157,6 +157,7 @@
 #include <ros_utils/pt_utils.h>
 #include <geom/geometry_utils.h>
 #include <time/timer.h>
+#include <genetic/genetic.h>
 
 #ifdef USE_ETTS
 #include <skill_templates/nano_etts_api.h>
@@ -169,16 +170,6 @@ typedef geometry_utils::FooPoint2f Pt2;
 struct Pose2 {
   Pt2 position;
   float yaw;
-};
-
-////////////////////////////////////////////////////////////////////////////////
-
-enum Action {
-  UNDEFINED = -1,
-  KEEP_SAME_SPEED = 0,
-  STOP = 1,
-  ROTATE_ON_PLACE = 2,
-  RECOMPUTE_SPEED = 3
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -212,175 +203,27 @@ struct SpeedOrder {
     vel_ang = clamp(vel_ang, -max_vel_ang_, max_vel_ang_);
     vel_lin = clamp(vel_lin, min_vel_lin_, max_vel_lin_);
   } // end clamp();
-}; // end SpeedOrder
+}; // end class SpeedOrder
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-//! the publishers
-ros::Publisher _marker_pub;
-//! the vizu marker
-visualization_msgs::Marker _marker;
+class RobotWandererWithMovingGoal : public GeneticSolver<SpeedOrder> {
+public:
+  //! the time step simulation
+  static const double DT = 0.2;
+  enum Action {
+    UNDEFINED = -1,
+    KEEP_SAME_SPEED = 0,
+    STOP = 1,
+    ROTATE_ON_PLACE = 2,
+    RECOMPUTE_SPEED = 3
+  };
 
-std::string _static_frame_id = "/odom";
+  ////////////////////////////////////////////////////////////////////////////////
+  //class SpeedGeneticFinder : public GeneticSolver<SpeedOrder> {
+  ////////////////////////////////////////////////////////////////////////////////
 
-/*
-* Parameters of the robot
-*/
-std::string _robot_frame_id = "/base_link";
-//! the maximal velocities, m/s or rad/s
-double _min_vel_lin = .1, _max_vel_lin = .3, _max_vel_ang = .5;
-double _min_rotate_on_place_speed, _max_rotate_on_place_speed;
-
-//! the current velocities, m/s or rad/s
-SpeedOrder _current_order;
-bool was_stopped = true;
-//! a flag to determine when to emit the speed orders
-bool _is_goal_active = false;
-//! the current pose of the robot
-Pose2 _current_robot_pose;
-
-// voice
-#ifdef USE_ETTS
-NanoEttsApi _etts_api;
-#endif // USE_ETTS
-
-//! the costmap receiving
-std::string _inflated_obstacles_topic =
-    "move_base/local_costmap/inflated_obstacles";
-nav_msgs::GridCells _local_costmap;
-//#define EMIT_LOCAL_COSTMAP_MARKER
-
-//! where to get the goal
-std::string _moving_goal_topic = "moving_goal";
-//! where to get the stop orders
-std::string _stop_tracking_order_topic = "stop_tracking_order";
-//! the current goal
-Pose2 _goal;
-
-/*! The minimum distance between the robot center and the goal center
-      When this distance is reached, the robot stops.
-      (do not forget that it includes the robot radius!) */
-double min_goal_distance = .6;
-double max_goal_angle = .2;
-std::string cmd_vel_topic = "cmd_vel";
-
-//! where to get the goal distance
-std::string _goal_distance_topic = "moving_goal_distance";
-ros::Publisher _goal_distance_pub;
-
-tf::TransformListener* _tf_listener;
-//! timer since last computed speed
-Timer _last_order_timer;
-//! maximum time before we choose some other speed when tracking
-double _speed_recomputation_timeout = 1;
-
-//! timer since last goal seen
-Timer _last_goal_timer;
-/*! maximum time before stopping the robot when no new goal received
-    (should be higher than speed_recomputation_timeout) */
-double _no_goal_timeout = 2;
-
-/*
-* Parameters for the simulation
-*/
-//! the forecast time in seconds
-double _time_pred = 5;
-//! the time step simulation
-double DT = 0.2;
-//! the number of tried trajectories
-int _max_tries = 1000;
-std::vector<Pt2> _traj_buffer;
-
-////////////////////////////////////////////////////////////////////////////////
-
-/*!
-  Say a sentence using the ETTS system.
-  Only does it if the flag USE_ETTS is not commented.
- \param sentence
-*/
-inline void say_sentence(const std::string & sentence) {
-  printf("robot_wanderer_with_moving_goal:say_sentence('%s')\n", sentence.c_str());
-#ifdef USE_ETTS
-   _etts_api.say_text(sentence);
-#endif // USE_ETTS
-} // end say_sentence();
-
-////////////////////////////////////////////////////////////////////////////////
-
-inline void set_speed(const SpeedOrder & new_speed) {
-  ROS_INFO_THROTTLE(1, "set_speed(lin:%g, ang:%g)",
-                    new_speed.vel_lin, new_speed.vel_ang);
-  was_stopped = (new_speed.vel_lin == 0) && (new_speed.vel_ang == 0);
-  _current_order = new_speed;
-  _is_goal_active = true;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-/*!
-  stop the robot
-*/
-inline void stop_robot() {
-  set_speed(SpeedOrder());
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-/*!
-  send a 0 speed to the robot and exit program
- \param param
-    the exit code returned
-*/
-void stop_robot_and_exit(int param = 0) {
-  ROS_INFO_THROTTLE(1, "stop_robot_and_exit()");
-  stop_robot();
-  delete _tf_listener;
-  ros::shutdown();
-  exit(param);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-//! callback when a stop order is received
-void stop_tracking_order_callback(const std_msgs::EmptyConstPtr & msg) {
-  // first time we stop, say something
-  if (!was_stopped) {
-    ROS_INFO_THROTTLE(1, "There is no valid goal. Stopping the robot.");
-    say_sentence("|en:There is no goal.");
-  }
-  stop_robot();
-  _is_goal_active = false;
-} // end stop_tracking_order_callback();
-
-////////////////////////////////////////////////////////////////////////////////
-
-/*!
- Evaluate how good a speed order is for reaching the goal.
- \param order
-    the possible speed order
- \return float
-    the lower the better.
-    infinity if collision with the costmap,
-    otherwise: fabs(min_goal_distance - the L2 distance to the goal)
-*/
-inline float traj_grade(const SpeedOrder & order) {
-  double goal_distance = costmap_utils::trajectory_mark<Pt2>
-      (_current_robot_pose.position, // Pt2
-       _current_robot_pose.yaw, // float
-       _goal.position, // Pt2
-       _local_costmap, // nav_msgs::GridCells
-       _time_pred, DT,
-       order.vel_lin, order.vel_ang,
-       _traj_buffer);
-  return goal_distance;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-#include <genetic/genetic.h>
-
-class SpeedGeneticFinder : public GeneticSolver<SpeedOrder> {
   //! the higher the better
   inline double fitness(const SpeedOrder & to_grade) {
     return - traj_grade(to_grade);
@@ -399,412 +242,539 @@ class SpeedGeneticFinder : public GeneticSolver<SpeedOrder> {
   //////////////////////////////////////////////////////////////////////////////
 
   /*!
-    The mutation function.
-    \arg mutation_rate
-          between 0 (no randomness) and 1 (completely random)
-   */
+      The mutation function.
+      \arg mutation_rate
+            between 0 (no randomness) and 1 (completely random)
+     */
   inline void mutation(const SpeedOrder & parent,
                        const double & mutation_rate,
                        SpeedOrder & mutated_son) {
     mutated_son.vel_ang = parent.vel_ang +
-        mutation_rate * (drand48() * 2 - 1) * _max_vel_ang;
+                          mutation_rate * (drand48() * 2 - 1) * _max_vel_ang;
     mutated_son.vel_lin = parent.vel_lin +
-        mutation_rate * (drand48() * 2 - 1) * _max_vel_lin;
+                          mutation_rate * (drand48() * 2 - 1) * _max_vel_lin;
     mutated_son.clamp_speed(_min_vel_lin, _max_vel_lin, _max_vel_ang);
   } // end mutation();
-};
 
-SpeedGeneticFinder _speed_genetic_finder;
+  //////////////////////////////////////////////////////////////////////////////
+  //}; // end class SpeedGeneticFinder
+  //////////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////////////
+  RobotWandererWithMovingGoal() {
+    // stop the robot if signal received
+    //signal(SIGINT, stop_robot_and_exit);
+    //signal(SIGTERM, stop_robot_and_exit);
+    //signal(SIGKILL, stop_robot_and_exit);
 
-void recompute_speed() {
-#if 0 //////////////////////////////////////////////////////////////////////////
-  SpeedOrder best_order;
-  float lowest_order_grade = std::numeric_limits<float>::infinity();
-  Timer algo_timer;
-  // choose a random speed and check it enables at least 1 second of movement
-  SpeedOrder tried_order;
-  for (int nb_tries = 0; nb_tries < _max_tries; ++nb_tries) {
-    // authorize on place rotations only after having tried many times
-    float tried_min_vel_lin = (nb_tries < 100 ? min_vel_lin : 0);
-    tried_order.vel_lin = tried_min_vel_lin + drand48()
-        * (max_vel_lin - tried_min_vel_lin);
-    tried_order.vel_ang = drand48() * 2 * max_vel_ang - max_vel_ang;
-    float tried_grade = traj_grade(tried_order);
+    _was_stopped = true;
+    _is_goal_active = false;
 
-#if 0 // export traj as marker
-    marker_utils::list_points2_as_primitives
-        (_marker, _traj_buffer, "traj_xy", 0.1, 0.03, 1, 0.5, 1, 1, _static_frame_id);
-    _marker_pub.publish(_marker);
-    ROS_INFO_THROTTLE(1, "trajectory_mark(vel_lin:%g, vel_ang:%g) : mark:%g",
-                      curr_vel_lin, curr_vel_ang, curr_grade);
-    sleep(1);
-#endif
+    //configure ROS
+    ros::NodeHandle nh_public, nh_private("~");
 
-    if (tried_grade < lowest_order_grade) {
-      lowest_order_grade = tried_grade;
-      best_order = tried_order;
-    }
-  } // end loop nb_tries
-  bool new_speed_found =
-      (lowest_order_grade < std::numeric_limits<float>::infinity());
+    // get params
+    _robot_frame_id = "/base_link";
+    nh_private.param("robot_frame_id", _robot_frame_id, _robot_frame_id);
+    _static_frame_id = "/odom";
+    nh_private.param("static_frame_id", _static_frame_id, _static_frame_id);
+    _inflated_obstacles_topic = "move_base/local_costmap/inflated_obstacles";
+    nh_private.param("inflated_obstacles_topic",
+                     _inflated_obstacles_topic,
+                     _inflated_obstacles_topic);
+    _moving_goal_topic = "moving_goal";
+    nh_private.param("goal_pt_topic", _moving_goal_topic, _moving_goal_topic);
+    _stop_tracking_order_topic = "stop_tracking_order";
+    nh_private.param("stop_tracking_order_topic", _stop_tracking_order_topic, _stop_tracking_order_topic);
+    _cmd_vel_topic = "cmd_vel";
+    nh_private.param("cmd_vel_topic", _cmd_vel_topic, _cmd_vel_topic);
+    _goal_distance_topic = "moving_goal_distance";
+    nh_private.param("goal_distance_topic",
+                     _goal_distance_topic, _goal_distance_topic);
 
-  if (!new_speed_found) {
-    ROS_ERROR("The robot is stuck! Stopping motion.");
-    stop_robot();
-    say_sentence("|en:I am completely blocked.");
-    sleep(1);
-  } // end not new_speed_found
+    nh_private.param("min_vel_lin", _min_vel_lin, .1);
+    nh_private.param("max_vel_lin", _max_vel_lin, .3);
+    nh_private.param("max_vel_ang", _max_vel_ang, .5);
+    _min_rotate_on_place_speed = fabs(_max_vel_ang) * 2. / 3;
+    nh_private.param("min_rotate_on_place_speed",
+                     _min_rotate_on_place_speed, _min_rotate_on_place_speed);
+    _max_rotate_on_place_speed = fabs(_max_vel_ang);
+    nh_private.param("max_rotate_on_place_speed",
+                     _max_rotate_on_place_speed, _max_rotate_on_place_speed);
+    nh_private.param("min_goal_distance", _min_goal_distance, .6);
+    nh_private.param("max_goal_angle", _max_goal_angle, .2);
+    nh_private.param("speed_recomputation_timeout",
+                     _speed_recomputation_timeout, 1.);
+    nh_private.param("no_goal_timeout", _no_goal_timeout, 2.);
+    nh_private.param("time_pred", _time_pred, 5.);
+    nh_private.param("max_tries", _max_tries, 1000);
 
-  if (was_stopped)
-    say_sentence("|en:Let's go!|es:Adelante!");
-  set_speed(best_order);
-  _last_order_timer.reset();
-  ROS_INFO_THROTTLE(1, "Found the most suitable couple of speed in %g ms, "
-                    "with a grade %g:"
-                    "_vel_lin:%g, _vel_ang:%g",
-                    algo_timer.getTimeMilliseconds(),
-                    lowest_order_grade,
-                    _current_order.vel_lin, _current_order.vel_ang);
+    // publishers
+    _marker_pub = nh_public.advertise<visualization_msgs::Marker>
+                  ("robot_wanderer_traj", 1);
+    _vel_pub = nh_public.advertise<geometry_msgs::Twist>
+               (_cmd_vel_topic, 1);
+    _goal_distance_pub = nh_public.advertise<std_msgs::Float64>
+                         (_goal_distance_topic, 1);
+    _etts_api.advertise();
+    // subscribers
+    _inflated_sub = nh_public.subscribe
+                    (_inflated_obstacles_topic, 1,
+                     &RobotWandererWithMovingGoal::inflated_obstacles_cb, this);
+    _goal_sub = nh_public.subscribe
+                (_moving_goal_topic, 1,
+                 &RobotWandererWithMovingGoal::goal_cb, this);
+    _stop_tracking_order_sub = nh_private.subscribe
+                               (_stop_tracking_order_topic, 1,
+                                &RobotWandererWithMovingGoal::stop_tracking_order_cb,
+                                this);
+    ROS_INFO("robot_wanderer_with_moving_goal: "
+             "Getting inflated obstacles from '%s' and goal from '%s', "
+             "emitting speed to '%s'. "
+             "Recomputing speeds every %g s. Stopping if no goal during %g s",
+             _inflated_sub.getTopic().c_str(),
+             _goal_sub.getTopic().c_str(),
+             _vel_pub.getTopic().c_str(),
+             _speed_recomputation_timeout, _no_goal_timeout);
+  } // end ctor
 
-#else //////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
 
-  Timer timer;
-  _speed_genetic_finder.run_algorithm();
-  SpeedOrder best_order = _speed_genetic_finder.get_best_element().element;
-  ROS_INFO_THROTTLE(1, "Found the most suitable couple of speed in %g ms, "
-                    "with a grade %g:"
-                    "_vel_lin:%g, _vel_ang:%g",
-                    timer.getTimeMilliseconds(),
-                    _speed_genetic_finder.get_best_element().grade,
-                    best_order.vel_lin, best_order.vel_ang);
-  set_speed(best_order);
-
-#endif //////////////////////////////////////////////////////////////////////////
-
-} // end recompute_speed();
-
-////////////////////////////////////////////////////////////////////////////////
-
-void goal_callback(const geometry_msgs::PoseStampedConstPtr & pt3D) {
-  //ROS_INFO_THROTTLE(1, "goal_callback()");
-
-  // do nothing if the pt is empty
-  if (pt3D->header.frame_id != _static_frame_id) {
-    ROS_ERROR("The point frame_id '%s' is different from our static frame_id '%s'!",
-              pt3D->header.frame_id.c_str(), _static_frame_id.c_str());
-    stop_robot();
+  ~RobotWandererWithMovingGoal() {
+    stop_robot_and_exit();
   }
 
-  // reset the timer for the last time we saw a valid goal
-  _last_goal_timer.reset();
+  ////////////////////////////////////////////////////////////////////////////////
 
-  // make a copy of the goal
-  pt_utils::copy2(pt3D->pose.position, _goal.position);
-  _goal.yaw = tf::getYaw(pt3D->pose.orientation);
-  //_goal = *pt3D;
+  void refresh() {
+    if (!_is_goal_active)
+      return;
+    // determine if we need to keep on publishing orders
+    if (_last_goal_timer.getTimeSeconds() > _no_goal_timeout) {
+      ROS_INFO_THROTTLE(1, "_no_goal_timeout,  stopping emitting speed orders");
+      stop_robot();
+      _is_goal_active = false; // need to be after stop_robot();
+    } // end if (_last_goal_timer.getTimeSeconds() > _no_goal_timeout)
 
-  // get the position of the robot in the static frame
-  geometry_msgs::PoseStamped robot_pose_robot_frame, robot_pose_static_frame;
-  robot_pose_robot_frame.pose.orientation = tf::createQuaternionMsgFromYaw(0);
-  robot_pose_robot_frame.header.frame_id = _robot_frame_id;
-  //    robot_pose_robot_frame.header.stamp = ros::Time::now();
-  robot_pose_robot_frame.header.stamp = pt3D->header.stamp;
-  robot_pose_static_frame.header.frame_id = _static_frame_id;
-  robot_pose_static_frame.header.stamp = pt3D->header.stamp;
-  try {
+    // publish the computed speed
+    _out.linear.x = _current_order.vel_lin;
+    _out.angular.z = _current_order.vel_ang;
+    ROS_INFO_THROTTLE(1, "robot_wanderer_with_moving_goal: "
+                         "Publishing _vel_lin:%g, _vel_ang:%g",
+                      _current_order.vel_lin, _current_order.vel_ang);
+    _vel_pub.publish(_out);
+  } // end refresh()
 
-    //    _tf_listener->transformPose(_static_frame_id,  ros::Time(0),
-    //                                robot_pose_robot_frame,
-    //                                _static_frame_id,
-    //                                robot_pose_static_frame);
+protected:
+  ////////////////////////////////////////////////////////////////////////////////
 
-    _tf_listener->transformPose(_static_frame_id,
-                                robot_pose_robot_frame, robot_pose_static_frame);
-  } catch (tf::ExtrapolationException e) {
-    ROS_WARN_THROTTLE(2, "transform error:'%s'", e.what());
-    return;
+  /*!
+  Say a sentence using the ETTS system.
+  Only does it if the flag USE_ETTS is not commented.
+ \param sentence
+*/
+  inline void say_sentence(const std::string & sentence) {
+    printf("robot_wanderer_with_moving_goal:say_sentence('%s')\n", sentence.c_str());
+#ifdef USE_ETTS
+    _etts_api.say_text(sentence);
+#endif // USE_ETTS
+  } // end say_sentence();
+
+  ////////////////////////////////////////////////////////////////////////////////
+
+  inline void set_speed(const SpeedOrder & new_speed) {
+    ROS_INFO_THROTTLE(1, "set_speed(lin:%g, ang:%g)",
+                      new_speed.vel_lin, new_speed.vel_ang);
+    _was_stopped = (new_speed.vel_lin == 0) && (new_speed.vel_ang == 0);
+    _current_order = new_speed;
+    _is_goal_active = true;
   }
-  pt_utils::copy2(robot_pose_static_frame.pose.position,
-                  _current_robot_pose.position);
-  _current_robot_pose.yaw = tf::getYaw(robot_pose_static_frame.pose.orientation);
-  //  ROS_INFO_THROTTLE(1, "Robot is in (%g, %g), yaw:%g in '%s'.",
-  //                    _current_robot_pose.position.x, _current_robot_pose.position.y,
-  //                    _current_robot_pose.yaw, _static_frame_id.c_str());
 
+  ////////////////////////////////////////////////////////////////////////////////
 
-  // determine if we have reached the goal - 2D distance
-  float curr_goal_distance =
-      //geometry_utils::distance_points
-      hausdorff_distances::dist_L2
-      (_current_robot_pose.position, _goal.position);
-  float vector_to_goal_yaw =
-      geometry_utils::oriented_angle_of_a_vector
-      (_goal.position - _current_robot_pose.position);
-  float angle_to_goal = vector_to_goal_yaw - _current_robot_pose.yaw;
-  if (angle_to_goal > M_PI)
-    angle_to_goal -= M_PI * 2;
-  else if (angle_to_goal < -M_PI)
-    angle_to_goal += M_PI * 2;
-  ROS_DEBUG_THROTTLE(1, "goal_distance:%g, angle_to_goal:%g degrees (%g -%g)",
-                     curr_goal_distance, angle_to_goal * RAD2DEG,
-                     vector_to_goal_yaw, _current_robot_pose.yaw);
+  /*!
+  stop the robot
+*/
+  inline void stop_robot() {
+    set_speed(SpeedOrder());
+  }
 
-  // publish distance to goal
-  std_msgs::Float64 curr_goal_distance_msg;
-  curr_goal_distance_msg.data = curr_goal_distance;
-  _goal_distance_pub.publish(curr_goal_distance_msg);
+  ////////////////////////////////////////////////////////////////////////////////
 
-  Action current_action = UNDEFINED;
+  /*!
+  send a 0 speed to the robot and exit program
+ \param param
+    the exit code returned
+*/
+  void stop_robot_and_exit(int param = 0) {
+    ROS_INFO_THROTTLE(1, "stop_robot_and_exit()");
+    stop_robot();
+    ros::shutdown();
+    exit(param);
+  }
 
-  // stop going forward if we are too close
-  if (curr_goal_distance < min_goal_distance) {
-    // not centered to goal => rotate on place
-    if (fabs(angle_to_goal) > max_goal_angle) {
-      ROS_INFO_THROTTLE
-          (1, "Close enough from goal (dist:%g < min_goal_distance:%g) "
-           "but need to rotate: fabs(angle_to_goal:%g) > max_goal_angle:%g",
-           curr_goal_distance, min_goal_distance,
-           fabs(angle_to_goal), max_goal_angle);
-      current_action = ROTATE_ON_PLACE;
+  ////////////////////////////////////////////////////////////////////////////////
+
+  //! cb when a stop order is received
+  void stop_tracking_order_cb(const std_msgs::EmptyConstPtr & msg) {
+    // first time we stop, say something
+    if (!_was_stopped) {
+      ROS_INFO_THROTTLE(1, "There is no valid goal. Stopping the robot.");
+      say_sentence("|en:There is no goal.");
     }
-    // centered to goal => stop
-    else {
-      ROS_INFO_THROTTLE(1, "Close enough from goal (dist:%g < min_goal_distance:%g), "
-                        " no need to rotate...",
-                        curr_goal_distance, min_goal_distance);
-      current_action = STOP;
-      if (!was_stopped){
-        ROS_INFO_THROTTLE(1, "Goal reached (dist:%g < min_goal_distance:%g) ! "
-                          "Stopping.",
-                          curr_goal_distance, min_goal_distance);
-      } // end if (!was_stopped)
-    } // end if (fabs(angle_to_goal) > max_goal_angle)
-  } // end if (goal_distance < min_goal_distance)
+    stop_robot();
+    _is_goal_active = false;
+  } // end stop_tracking_order_cb();
 
-  /*
+  ////////////////////////////////////////////////////////////////////////////////
+
+  /*!
+ Evaluate how good a speed order is for reaching the goal.
+ \param order
+    the possible speed order
+ \return float
+    the lower the better.
+    infinity if collision with the costmap,
+    otherwise: fabs(min_goal_distance - the L2 distance to the goal)
+*/
+  inline float traj_grade(const SpeedOrder & order) {
+    double goal_distance = costmap_utils::trajectory_mark<Pt2>
+                           (_current_robot_pose.position, // Pt2
+                            _current_robot_pose.yaw, // float
+                            _goal.position, // Pt2
+                            _local_costmap, // nav_msgs::GridCells
+                            _time_pred, DT,
+                            order.vel_lin, order.vel_ang,
+                            _traj_buffer);
+    return goal_distance;
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////
+
+  void recompute_speed() {
+    Timer timer;
+    //_speed_genetic_finder.run_algorithm();
+    //SpeedOrder best_order = _speed_genetic_finder.get_best_element().element;
+    run_algorithm();
+    SpeedOrder best_order = get_best_element().element;
+    ROS_INFO_THROTTLE(1, "Found the most suitable couple of speed in %g ms, "
+                         "with a grade %g:"
+                         "_vel_lin:%g, _vel_ang:%g",
+                      timer.getTimeMilliseconds(),
+                      //_speed_genetic_finder.get_best_element().grade,
+                      get_best_element().grade,
+                      best_order.vel_lin, best_order.vel_ang);
+    set_speed(best_order);
+  } // end recompute_speed();
+
+  ////////////////////////////////////////////////////////////////////////////////
+
+  void goal_cb(const geometry_msgs::PoseStampedConstPtr & pt3D) {
+    //ROS_INFO_THROTTLE(1, "goal_cb()");
+
+    // do nothing if the pt is empty
+    if (pt3D->header.frame_id != _static_frame_id) {
+      ROS_ERROR("The point frame_id '%s' is different from our static frame_id '%s'!",
+                pt3D->header.frame_id.c_str(), _static_frame_id.c_str());
+      stop_robot();
+    }
+
+    // reset the timer for the last time we saw a valid goal
+    _last_goal_timer.reset();
+
+    // make a copy of the goal
+    pt_utils::copy2(pt3D->pose.position, _goal.position);
+    _goal.yaw = tf::getYaw(pt3D->pose.orientation);
+    //_goal = *pt3D;
+
+    // get the position of the robot in the static frame
+    geometry_msgs::PoseStamped robot_pose_robot_frame, robot_pose_static_frame;
+    robot_pose_robot_frame.pose.orientation = tf::createQuaternionMsgFromYaw(0);
+    robot_pose_robot_frame.header.frame_id = _robot_frame_id;
+    //    robot_pose_robot_frame.header.stamp = ros::Time::now();
+    robot_pose_robot_frame.header.stamp = pt3D->header.stamp;
+    robot_pose_static_frame.header.frame_id = _static_frame_id;
+    robot_pose_static_frame.header.stamp = pt3D->header.stamp;
+    try {
+
+      //    _tf_listener.transformPose(_static_frame_id,  ros::Time(0),
+      //                                robot_pose_robot_frame,
+      //                                _static_frame_id,
+      //                                robot_pose_static_frame);
+
+      _tf_listener.transformPose(_static_frame_id,
+                                 robot_pose_robot_frame, robot_pose_static_frame);
+    } catch (tf::ExtrapolationException e) {
+      ROS_WARN_THROTTLE(2, "transform error:'%s'", e.what());
+      return;
+    }
+    pt_utils::copy2(robot_pose_static_frame.pose.position,
+                    _current_robot_pose.position);
+    _current_robot_pose.yaw = tf::getYaw(robot_pose_static_frame.pose.orientation);
+    //  ROS_INFO_THROTTLE(1, "Robot is in (%g, %g), yaw:%g in '%s'.",
+    //                    _current_robot_pose.position.x, _current_robot_pose.position.y,
+    //                    _current_robot_pose.yaw, _static_frame_id.c_str());
+
+
+    // determine if we have reached the goal - 2D distance
+    float curr_goal_distance =
+        //geometry_utils::distance_points
+        hausdorff_distances::dist_L2
+        (_current_robot_pose.position, _goal.position);
+    float vector_to_goal_yaw =
+        geometry_utils::oriented_angle_of_a_vector
+        (_goal.position - _current_robot_pose.position);
+    float angle_to_goal = vector_to_goal_yaw - _current_robot_pose.yaw;
+    if (angle_to_goal > M_PI)
+      angle_to_goal -= M_PI * 2;
+    else if (angle_to_goal < -M_PI)
+      angle_to_goal += M_PI * 2;
+    ROS_DEBUG_THROTTLE(1, "goal_distance:%g, angle_to_goal:%g degrees (%g -%g)",
+                       curr_goal_distance, angle_to_goal * RAD2DEG,
+                       vector_to_goal_yaw, _current_robot_pose.yaw);
+
+    // publish distance to goal
+    std_msgs::Float64 curr_goal_distance_msg;
+    curr_goal_distance_msg.data = curr_goal_distance;
+    _goal_distance_pub.publish(curr_goal_distance_msg);
+
+    Action current_action = UNDEFINED;
+
+    // stop going forward if we are too close
+    if (curr_goal_distance < _min_goal_distance) {
+      // not centered to goal => rotate on place
+      if (fabs(angle_to_goal) > _max_goal_angle) {
+        ROS_INFO_THROTTLE
+            (1, "Close enough from goal (dist:%g < min_goal_distance:%g) "
+                "but need to rotate: fabs(angle_to_goal:%g) > max_goal_angle:%g",
+             curr_goal_distance, _min_goal_distance,
+             fabs(angle_to_goal), _max_goal_angle);
+        current_action = ROTATE_ON_PLACE;
+      }
+      // centered to goal => stop
+      else {
+        ROS_INFO_THROTTLE(1, "Close enough from goal (dist:%g < min_goal_distance:%g), "
+                             " no need to rotate...",
+                          curr_goal_distance, _min_goal_distance);
+        current_action = STOP;
+        if (!_was_stopped){
+          ROS_INFO_THROTTLE(1, "Goal reached (dist:%g < min_goal_distance:%g) ! "
+                               "Stopping.",
+                            curr_goal_distance, _min_goal_distance);
+        } // end if (!_was_stopped)
+      } // end if (fabs(angle_to_goal) > max_goal_angle)
+    } // end if (goal_distance < min_goal_distance)
+
+    /*
    * determine if needed to recompute the trajectory
    */
-  // do not recmopute if the speed is pretty good
-  float curr_grade = traj_grade(_current_order);
+    // do not recmopute if the speed is pretty good
+    float curr_grade = traj_grade(_current_order);
 
-  // recompute if collision coming
-  if (current_action == UNDEFINED) {
-    if (curr_grade > 1E3) { // traj_grade() return infinity if collision
-      ROS_WARN_THROTTLE(1, "collision coming with this speed, recomputing speed.");
+    // recompute if collision coming
+    if (current_action == UNDEFINED) {
+      if (curr_grade > 1E3) { // traj_grade() return infinity if collision
+        ROS_WARN_THROTTLE(1, "collision coming with this speed, recomputing speed.");
+        current_action = RECOMPUTE_SPEED;
+      }
+    } // end if (current_action == UNDEFINED)
+
+    //  if (current_action == UNDEFINED) {
+    //    ROS_INFO_THROTTLE(1, "curr_grade:%f, min_goal_distance:%f",
+    //                      curr_grade, min_goal_distance);
+    //    if (curr_grade < 1.2 * min_goal_distance) {
+    //      ROS_INFO_THROTTLE(1, "this speed is good, not changing");
+    //      current_action = KEEP_SAME_SPEED;
+    //    } // end
+    //  } // end if (current_action == UNDEFINED)
+
+    // recompute speed if the last ones are too old
+    if (current_action == UNDEFINED) {
+      if (_last_order_timer.getTimeSeconds() >
+          _speed_recomputation_timeout) {
+        ROS_INFO_THROTTLE(1, "_last_order_timer timeout (%f > timeout:%f)",
+                          _last_order_timer.getTimeSeconds() ,
+                          _speed_recomputation_timeout);
+        current_action = RECOMPUTE_SPEED;
+      }
+      else {
+        ROS_INFO_THROTTLE(1, "no timeout for _last_order_timer (%f < timeout:%f)",
+                          _last_order_timer.getTimeSeconds() ,
+                          _speed_recomputation_timeout);
+        current_action = KEEP_SAME_SPEED;
+      }
+    } // end if (current_action == UNDEFINED)
+
+    // normally we should not arrive here,
+    // but in case of, recompute speed
+    if (current_action == UNDEFINED) {
+      ROS_WARN("Oh, oh, current_action == UNDEFINED. Decision tree uncomplete?");
       current_action = RECOMPUTE_SPEED;
     }
-  } // end if (current_action == UNDEFINED)
 
-  //  if (current_action == UNDEFINED) {
-  //    ROS_INFO_THROTTLE(1, "curr_grade:%f, min_goal_distance:%f",
-  //                      curr_grade, min_goal_distance);
-  //    if (curr_grade < 1.2 * min_goal_distance) {
-  //      ROS_INFO_THROTTLE(1, "this speed is good, not changing");
-  //      current_action = KEEP_SAME_SPEED;
-  //    } // end
-  //  } // end if (current_action == UNDEFINED)
-
-  // recompute speed if the last ones are too old
-  if (current_action == UNDEFINED) {
-    if (_last_order_timer.getTimeSeconds() >
-        _speed_recomputation_timeout) {
-      ROS_INFO_THROTTLE(1, "_last_order_timer timeout (%f > timeout:%f)",
-                        _last_order_timer.getTimeSeconds() ,
-                        _speed_recomputation_timeout);
-      current_action = RECOMPUTE_SPEED;
-    }
-    else {
-      ROS_INFO_THROTTLE(1, "no timeout for _last_order_timer (%f < timeout:%f)",
-                        _last_order_timer.getTimeSeconds() ,
-                        _speed_recomputation_timeout);
-      current_action = KEEP_SAME_SPEED;
-    }
-  } // end if (current_action == UNDEFINED)
-
-  // normally we should not arrive here,
-  // but in case of, recompute speed
-  if (current_action == UNDEFINED) {
-    ROS_WARN("Oh, oh, current_action == UNDEFINED. Decision tree uncomplete?");
-    current_action = RECOMPUTE_SPEED;
-  }
-
-  /*
+    /*
    * execute the current action
    */
-  //ROS_INFO_THROTTLE(1, "current_action:%i", current_action);
+    //ROS_INFO_THROTTLE(1, "current_action:%i", current_action);
 
-  if (current_action == STOP) {
-    if (!was_stopped) // say something when we stop
-      say_sentence("|en:Here I am.|es:He llegado.");
+    if (current_action == STOP) {
+      if (!_was_stopped) // say something when we stop
+        say_sentence("|en:Here I am.|es:He llegado.");
 
-    // if yes, stop and return
-    stop_robot();
-  } // end if (current_action == STOP)
+      // if yes, stop and return
+      stop_robot();
+    } // end if (current_action == STOP)
 
-  // rotate on place when needed
-  else if (current_action == ROTATE_ON_PLACE) {
-    if (fabs(angle_to_goal) > max_goal_angle) {
-      // angle
-      // (+) <--- 0 --> (-)
-      double rotation_speed = fmin
-          (_max_rotate_on_place_speed,
-           _min_rotate_on_place_speed * (1 + fabs(angle_to_goal) / max_goal_angle)) / 2.f;
-      if (angle_to_goal < 0)
-        set_speed(SpeedOrder(0, -rotation_speed));
-      else
-        set_speed(SpeedOrder(0, +rotation_speed));
-      return;
-    } // end if (fabs(angle_to_goal) > max_goal_angle)
-  } // end if (want_rotate_on_place)
+    // rotate on place when needed
+    else if (current_action == ROTATE_ON_PLACE) {
+      if (fabs(angle_to_goal) > _max_goal_angle) {
+        // angle
+        // (+) <--- 0 --> (-)
+        double rotation_speed = fmin
+                                (_max_rotate_on_place_speed,
+                                 _min_rotate_on_place_speed * (1 + fabs(angle_to_goal) / _max_goal_angle)) / 2.f;
+        if (angle_to_goal < 0)
+          set_speed(SpeedOrder(0, -rotation_speed));
+        else
+          set_speed(SpeedOrder(0, +rotation_speed));
+        return;
+      } // end if (fabs(angle_to_goal) > max_goal_angle)
+    } // end if (want_rotate_on_place)
 
-  // recompute speed when needed
-  else if (current_action == RECOMPUTE_SPEED) {
-    recompute_speed();
-  } // end if (current_action == RECOMPUTE_SPEED)
+    // recompute speed when needed
+    else if (current_action == RECOMPUTE_SPEED) {
+      recompute_speed();
+    } // end if (current_action == RECOMPUTE_SPEED)
 
-  else if (current_action == KEEP_SAME_SPEED)
-  {
-    ROS_INFO_THROTTLE(1, "We are happy with the speed _vel_lin:%g, _vel_ang:%g",
-                      _current_order.vel_lin, _current_order.vel_ang);
-  } // if (!current_action == KEEP_SAME_SPEED)
+    else if (current_action == KEEP_SAME_SPEED)
+    {
+      ROS_INFO_THROTTLE(1, "We are happy with the speed _vel_lin:%g, _vel_ang:%g",
+                        _current_order.vel_lin, _current_order.vel_ang);
+    } // if (!current_action == KEEP_SAME_SPEED)
 
-  // emit marker
-  std::vector<Pt2> traj_xy;
-  odom_utils::make_trajectory(_current_order.vel_lin, _current_order.vel_ang,
-                              traj_xy, _time_pred, DT, 0, 0, 0);
-  marker_utils::list_points2_as_primitives(_marker, traj_xy, "traj_xy",
-                                           0.1, 0.03, 1, 0, 0, 1, _robot_frame_id);
-  _marker.header.stamp = pt3D->header.stamp;
-  _marker_pub.publish(_marker);
-} // end goal_callback();
+    // emit marker
+    std::vector<Pt2> traj_xy;
+    odom_utils::make_trajectory(_current_order.vel_lin, _current_order.vel_ang,
+                                traj_xy, _time_pred, DT, 0, 0, 0);
+    marker_utils::list_points2_as_primitives(_marker, traj_xy, "traj_xy",
+                                             0.1, 0.03, 1, 0, 0, 1, _robot_frame_id);
+    _marker.header.stamp = pt3D->header.stamp;
+    _marker_pub.publish(_marker);
+  } // end goal_cb();
 
-////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
 
-void inflated_obstacles_callback(const nav_msgs::GridCellsConstPtr & msg) {
-  //ROS_INFO_THROTTLE(1, "msg.header.frame_id:'%s'", msg->header.frame_id.c_str());
-  if (msg->header.frame_id != _static_frame_id) {
-    ROS_FATAL("The costmap frame_id '%s' is different from our static frame_id '%s'!",
-              msg->header.frame_id.c_str(), _static_frame_id.c_str());
-    stop_robot_and_exit(-1);
-  }
+  void inflated_obstacles_cb(const nav_msgs::GridCellsConstPtr & msg) {
+    //ROS_INFO_THROTTLE(1, "msg.header.frame_id:'%s'", msg->header.frame_id.c_str());
+    if (msg->header.frame_id != _static_frame_id) {
+      ROS_FATAL("The costmap frame_id '%s' is different from our static frame_id '%s'!",
+                msg->header.frame_id.c_str(), _static_frame_id.c_str());
+      stop_robot_and_exit(-1);
+    }
 
-  // keep a copy of the costmap
-  _local_costmap = *msg;
+    // keep a copy of the costmap
+    _local_costmap = *msg;
 
 #ifdef EMIT_LOCAL_COSTMAP_MARKER
-  // publish cells centers
-  std::vector<geometry_msgs::Point> cell_centers;
-  for (unsigned int cell_idx = 0; cell_idx < msg->cells.size(); ++cell_idx) {
-    const geometry_msgs::Point & curr_cell = msg->cells[cell_idx];
-    cell_centers.push_back(geometry_msgs::Point(curr_cell.x, curr_cell.y));
-  } // end loop cell_idx
-  marker_utils::list_points2_as_primitives(_marker, cell_centers, "cell_centers",
-                                           0.1, 0.05, 0, 1, 0, 1, static_frame_id);
-  _marker_pub.publish(_marker);
+    // publish cells centers
+    std::vector<geometry_msgs::Point> cell_centers;
+    for (unsigned int cell_idx = 0; cell_idx < msg->cells.size(); ++cell_idx) {
+      const geometry_msgs::Point & curr_cell = msg->cells[cell_idx];
+      cell_centers.push_back(geometry_msgs::Point(curr_cell.x, curr_cell.y));
+    } // end loop cell_idx
+    marker_utils::list_points2_as_primitives(_marker, cell_centers, "cell_centers",
+                                             0.1, 0.05, 0, 1, 0, 1, static_frame_id);
+    _marker_pub.publish(_marker);
 #endif // EMIT_LOCAL_COSTMAP_MARKER
-} // end inflated_obstacles_callback();
+  } // end inflated_obstacles_cb();
 
+  //////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  //! the publishers
+  ros::Publisher _marker_pub, _vel_pub;
+  //! the vizu marker
+  visualization_msgs::Marker _marker;
+  ros::Subscriber _inflated_sub, _goal_sub, _stop_tracking_order_sub;
+
+
+  /*
+    * Parameters of the robot
+    */
+  std::string _static_frame_id, _robot_frame_id;
+  //! the maximal velocities, m/s or rad/s
+  double _min_vel_lin, _max_vel_lin, _max_vel_ang;
+  double _min_rotate_on_place_speed, _max_rotate_on_place_speed;
+
+  //! the current velocities, m/s or rad/s
+  //SpeedGeneticFinder _speed_genetic_finder;
+  SpeedOrder _current_order;
+  bool _was_stopped;
+  //! a flag to determine when to emit the speed orders
+  bool _is_goal_active;
+  //! the current pose of the robot
+  Pose2 _current_robot_pose;
+
+  // voice
+#ifdef USE_ETTS
+  NanoEttsApi _etts_api;
+#endif // USE_ETTS
+
+  //! the costmap receiving
+  std::string _inflated_obstacles_topic;
+  nav_msgs::GridCells _local_costmap;
+  //#define EMIT_LOCAL_COSTMAP_MARKER
+
+  //! where to get the goal
+  std::string _moving_goal_topic;
+  //! where to get the stop orders
+  std::string _stop_tracking_order_topic;
+  //! the current goal
+  Pose2 _goal;
+
+  /*! The minimum distance between the robot center and the goal center
+      When this distance is reached, the robot stops.
+      (do not forget that it includes the robot radius!) */
+  double _min_goal_distance, _max_goal_angle;
+  std::string _cmd_vel_topic;
+
+  //! where to get the goal distance
+  std::string _goal_distance_topic;
+  ros::Publisher _goal_distance_pub;
+
+  tf::TransformListener _tf_listener;
+  //! timer since last computed speed
+  Timer _last_order_timer;
+  //! maximum time before we choose some other speed when tracking
+  double _speed_recomputation_timeout;
+  //! timer since last goal seen
+  Timer _last_goal_timer;
+  /*! maximum time before stopping the robot when no new goal received
+    (should be higher than speed_recomputation_timeout) */
+  double _no_goal_timeout;
+
+  /*
+    * Parameters for the simulation
+    */
+  //! the forecast time in seconds
+  double _time_pred;
+  //! the number of tried trajectories
+  int _max_tries;
+  std::vector<Pt2> _traj_buffer;
+  geometry_msgs::Twist _out;
+}; // end class RobotWandererWithMovingGoal
+
+////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char** argv) {
   ros::init(argc, argv, "robot_wanderer_with_moving_goal");
-
-  // stop the robot if signal received
-  signal(SIGINT, stop_robot_and_exit);
-  signal(SIGTERM, stop_robot_and_exit);
-  signal(SIGKILL, stop_robot_and_exit);
-
-  //configure ROS
-  ros::NodeHandle nh_public, nh_private("~");
-  _tf_listener = new tf::TransformListener();
-
-  // get params
-  nh_private.param("robot_frame_id", _robot_frame_id, _robot_frame_id);
-  nh_private.param("static_frame_id", _static_frame_id, _static_frame_id);
-  nh_private.param("inflated_obstacles_topic",
-                   _inflated_obstacles_topic,
-                   _inflated_obstacles_topic);
-  nh_private.param("goal_pt_topic", _moving_goal_topic, _moving_goal_topic);
-  nh_private.param("stop_tracking_order_topic", _stop_tracking_order_topic, _stop_tracking_order_topic);
-  nh_private.param("cmd_vel_topic", cmd_vel_topic, cmd_vel_topic);
-  nh_private.param("min_vel_lin", _min_vel_lin, _min_vel_lin);
-  nh_private.param("max_vel_lin", _max_vel_lin, _max_vel_lin);
-  nh_private.param("max_vel_ang", _max_vel_ang, _max_vel_ang);
-  _min_rotate_on_place_speed = fabs(_max_vel_ang) * 2. / 3;
-  nh_private.param("min_rotate_on_place_speed",
-                   _min_rotate_on_place_speed, _min_rotate_on_place_speed);
-  _max_rotate_on_place_speed = fabs(_max_vel_ang);
-  nh_private.param("max_rotate_on_place_speed",
-                   _max_rotate_on_place_speed, _max_rotate_on_place_speed);
-  nh_private.param("min_goal_distance", min_goal_distance, min_goal_distance);
-  nh_private.param("max_goal_angle", max_goal_angle, max_goal_angle);
-  nh_private.param("speed_recomputation_timeout",
-                   _speed_recomputation_timeout, _speed_recomputation_timeout);
-  nh_private.param("no_goal_timeout", _no_goal_timeout, _no_goal_timeout);
-  nh_private.param("time_pred", _time_pred, _time_pred);
-  nh_private.param("max_tries", _max_tries, _max_tries);
-  nh_private.param("goal_distance_topic",
-                   _goal_distance_topic, _goal_distance_topic);
-
-  ROS_WARN("robot_wanderer_with_moving_goal: "
-           "Getting inflated obstacles from '%s', emitting speed to '%s'. "
-           "Recomputing speeds every %g s. Stopping if no goal during %g s",
-           _inflated_obstacles_topic.c_str(), cmd_vel_topic.c_str(),
-           _speed_recomputation_timeout, _no_goal_timeout);
-
-
-  // publishers
-  _marker_pub = nh_public.advertise<visualization_msgs::Marker>
-      ("robot_wanderer_traj", 1);
-  ros::Publisher _vel_pub = nh_public.advertise<geometry_msgs::Twist>
-      (cmd_vel_topic, 1);
-  _goal_distance_pub = nh_public.advertise<std_msgs::Float64>
-      (_goal_distance_topic, 1);
-   _etts_api.advertise();
-  // subscribers
-  ros::Subscriber inflated_sub = nh_public.subscribe
-      (_inflated_obstacles_topic, 1, inflated_obstacles_callback);
-  ros::Subscriber _goal_sub = nh_public.subscribe
-      (_moving_goal_topic, 1, goal_callback);
-  ros::Subscriber _stop_tracking_order_sub = nh_private.subscribe
-      (_stop_tracking_order_topic, 1, stop_tracking_order_callback);
-
-  // init timers
-  _last_order_timer.reset();
-  _last_goal_timer.reset();
-
+  RobotWandererWithMovingGoal node;
   // spin;
-  //ros::spin();
-  ros::AsyncSpinner spinner(1);
-  spinner.start();
   ros::Rate rate(5);
-  geometry_msgs::Twist out;
-
   while(ros::ok()) {
-    if (_is_goal_active) {
-      // determine if we need to keep on publishing orders
-      if (_last_goal_timer.getTimeSeconds() > _no_goal_timeout) {
-        ROS_INFO_THROTTLE(1, "_no_goal_timeout,  stopping emitting speed orders");
-        stop_robot();
-        _is_goal_active = false; // need to be after stop_robot();
-      } // end if (_last_goal_timer.getTimeSeconds() > _no_goal_timeout)
-
-      // publish the computed speed
-      out.linear.x = _current_order.vel_lin;
-      out.angular.z = _current_order.vel_ang;
-      ROS_INFO_THROTTLE(1, "robot_wanderer_with_moving_goal: "
-                        "Publishing _vel_lin:%g, _vel_ang:%g",
-                        _current_order.vel_lin, _current_order.vel_ang);
-      _vel_pub.publish(out);
-
-    } // end if (_need_emitting_speed_order)
+    node.refresh();
+    ros::spinOnce();
     rate.sleep();
   } // end while ok()
-
-
-  stop_robot_and_exit();
-  ros::shutdown();
   return 0;
 }
