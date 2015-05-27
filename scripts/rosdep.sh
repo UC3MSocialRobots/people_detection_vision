@@ -2,6 +2,8 @@
 #!/bin/sh
 # External, ROS and system package dependencies
 
+# not compile 'binutils-gold' beacuse cause broken ld program fail
+
 PACKAGES="ros-`rosversion -d`-openni-camera
           ros-`rosversion -d`-openni-tracker
           ros-`rosversion -d`-openni-launch
@@ -9,7 +11,6 @@ PACKAGES="ros-`rosversion -d`-openni-camera
           ros-`rosversion -d`-resource-retriever
           freeglut3
           freeglut3-dev
-      binutils-gold
           libgstreamer0.10-dev
           libv4l-dev"
 
@@ -32,7 +33,7 @@ else
 
     cd $ROS_WORKSPACE
     git clone -b catkin https://github.com/xqms/ar_tools src/ar_tools
-  catkin_make --only-pkg-with-deps artoolkit
-  catkin_make --only-pkg-with-deps ar_tools
+	catkin_make --only-pkg-with-deps artoolkit
+	catkin_make --only-pkg-with-deps ar_tools
 
 fi

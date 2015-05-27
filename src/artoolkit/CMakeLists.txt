@@ -5,10 +5,12 @@ add_custom_target(copy_artoolit_patterns ALL
     DEPENDS
 )
 
-add_executable(artoolkit_pplp.exe artoolkit_pplp.cpp artoolkit_utils.h)
-#add_dependencies(artoolkit_pplp.exe ${ar_pose_generate_messages_cpp}
-#                                    ${artoolkit_EXPORTED_TARGETS})
-target_link_libraries(artoolkit_pplp.exe ${catkin_LIBRARIES})
+add_executable(artoolkit_pplp.exe
+			   artoolkit_pplp.cpp artoolkit_utils.h)
+target_link_libraries(artoolkit_pplp.exe
+					  ${catkin_LIBRARIES})
+add_dependencies(artoolkit_pplp.exe
+                 ${people_msgs_EXPORTED_TARGETS})
 
 add_executable(artoolkit_img2patt.exe artoolkit_img2patt.cpp)
 target_link_libraries(artoolkit_img2patt.exe string_utils ${catkin_LIBRARIES})

@@ -13,10 +13,18 @@
   <build_depend>roscpp</build_depend>
   <build_depend>openni_camera</build_depend>
   <build_depend>openni</build_depend>
+  <build_depend>openni-tracker</build_depend>
+  <build_depend>openni-launch</build_depend>
   <build_depend>pcl_conversions</build_depend>
   <build_depend>cv_bridge</build_depend>
   <build_depend>ar_pose</build_depend>
   <build_depend>libpcl-all-dev</build_depend>
+  <build_depend>libgmp-dev</build_depend>
+  <build_depend>resource-retriever</build_depend>
+  <build_depend>freeglut3</build_depend>
+  <build_depend>freeglut3-dev</build_depend>
+  <build_depend>libgstreamer0.10-dev</build_depend>
+  <build_depend>libv4l-dev</build_depend>
 
   <build_depend>people_msgs</build_depend>
   <build_depend>people_utils</build_depend>
