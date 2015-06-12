@@ -27,6 +27,6 @@ else
 
 
     cd $ROS_WORKSPACE
-    git clone https://github.com/ar-tools/ar_tools.git
+    git clone https://github.com/ar-tools/ar_tools.git ../../ar_tools
 
 fi
