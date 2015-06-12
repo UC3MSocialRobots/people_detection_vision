@@ -25,15 +25,8 @@ if [ -z $ROS_WORKSPACE ]; then
     echo ""
 else
 
-  echo ""
-    echo "###########################################################"
-    echo 'WARNING. This script will delete your build folder'
-    echo "###########################################################"
-    echo ""
 
     cd $ROS_WORKSPACE
-    git clone -b catkin https://github.com/xqms/ar_tools src/ar_tools
-	catkin_make --only-pkg-with-deps artoolkit
-	catkin_make --only-pkg-with-deps ar_tools
+    git clone https://github.com/ar-tools/ar_tools.git
 
 fi
