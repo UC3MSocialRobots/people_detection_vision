@@ -29,7 +29,6 @@
   <build_depend>people_msgs</build_depend>
   <build_depend>people_utils</build_depend>
   <build_depend>camera</build_depend>
-  <build_depend>followme_laser</build_depend>
   <build_depend>utils</build_depend>
   <build_depend>vision_utils</build_depend>
 
