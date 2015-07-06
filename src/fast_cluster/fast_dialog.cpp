@@ -65,9 +65,6 @@ ________________________________________________________________________________
 
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
-#include <followme_laser/TrackingStatus.h>
-#include <followme_laser/SetTrackingSeed.h>
-using namespace followme_laser;
 // fast_cluster_functions
 #include "fast_cluster_functions.h"
 
