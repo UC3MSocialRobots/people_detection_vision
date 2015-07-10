@@ -27,6 +27,8 @@ else
 
 
     cd $ROS_WORKSPACE
-    git clone https://github.com/ar-tools/ar_tools.git ../../ar_tools
+    git clone https://github.com/ar-tools/ar_tools.git src/
+    catkin_make --only-pkg-with-deps artoolkit
+    catkin_make -DCATKIN_WHITELIST_PACKAGES=""
 
 fi
