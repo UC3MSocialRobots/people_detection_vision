@@ -2,49 +2,37 @@
 <package format="2">
   <name>people_detection_vision</name>
   <version>0.0.0</version>
-  <description>people_detection_vision is a stack for finding people around a
-  robot.</description>
+  <description>
+    people_detection_vision is a stack for finding people around a
+    robot.
+  </description>
   <maintainer email="arnaud.a.ramey@gmail.com">Arnaud Ramey</maintainer>
   <license>LGPLv3</license>
   <url type="website">http://ros.org/wiki/people_detection_vision</url>
   <buildtool_depend>catkin</buildtool_depend>
 
   <!-- dependencies -->
-  <build_depend>roscpp</build_depend>
-  <build_depend>openni_camera</build_depend>
-  <build_depend>openni</build_depend>
-  <build_depend>openni-tracker</build_depend>
-  <build_depend>openni-launch</build_depend>
-  <build_depend>pcl_conversions</build_depend>
-  <build_depend>cv_bridge</build_depend>
-  <build_depend>ar_pose</build_depend>
-  <build_depend>libpcl-all-dev</build_depend>
-  <build_depend>libgmp-dev</build_depend>
-  <build_depend>resource-retriever</build_depend>
-  <build_depend>freeglut3</build_depend>
-  <build_depend>freeglut3-dev</build_depend>
-  <build_depend>libgstreamer0.10-dev</build_depend>
-  <build_depend>libv4l-dev</build_depend>
+  <depend>ar_pose</depend>
+  <depend>cv_bridge</depend>
+  <depend>glut</depend>
+  <depend>libgmp</depend>
+  <depend>libgstreamer0.10-dev</depend>
+  <depend>libpcl-all-dev</depend>
+  <depend>libv4l-dev</depend>
+  <depend>openni_camera</depend>
+  <depend>libopenni-dev</depend>
+  <depend>openni_launch</depend>
+  <depend>openni_tracker</depend>
+  <depend>pcl_conversions</depend>
+  <depend>resource_retriever</depend>
+  <depend>roscpp</depend>
 
-  <build_depend>people_msgs</build_depend>
-  <build_depend>people_utils</build_depend>
-  <build_depend>camera</build_depend>
-  <build_depend>utils</build_depend>
-  <build_depend>vision_utils</build_depend>
-
-  <exec_depend>roscpp</exec_depend>
-  <exec_depend>openni_camera</exec_depend>
-  <exec_depend>openni</exec_depend>
-  <exec_depend>pcl_conversions</exec_depend>
-  <exec_depend>cv_bridge</exec_depend>
-  <exec_depend>ar_pose</exec_depend>
-  <exec_depend>libpcl-all-dev</exec_depend>
-
-  <exec_depend>people_msgs</exec_depend>
-  <exec_depend>people_utils</exec_depend>
-  <exec_depend>camera</exec_depend>
-  <exec_depend>utils</exec_depend>
-  <exec_depend>vision_utils</exec_depend>
+  <!-- AD -->
+  <depend>people_msgs</depend>
+  <depend>people_utils</depend>
+  <depend>camera</depend>
+  <depend>utils</depend>
+  <depend>vision_utils</depend>
 
   <export>
     <nodelet plugin="${prefix}/nodelets.xml" />
