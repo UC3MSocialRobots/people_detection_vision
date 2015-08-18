@@ -26,7 +26,7 @@ ROS_NAMESPACE=kinect_only rosrun people_msgs ppm_pplp.exe --activate
 
  */
 #if 0
-#include "ppm_pplp.h"
+#include "people_detection_vision/ppm_pplp.h"
 #include "skill_templates/ros_vision_skill.h"
 
 class PpmSkill: public VisionSkill {
@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
 
 #endif
 
-#include "ppm_pplp.h"
+#include "people_detection_vision/ppm_pplp.h"
 int main(int argc, char** argv) {
   ros::init(argc, argv, "Ppm");
   Ppm skill;

@@ -27,10 +27,10 @@ Some tests for
 //#define DISPLAY
 
 #include <ros_utils/rosmaster_alive.h>
-#include "templates/pplp_testing.h"
+#include "people_utils/pplp_testing.h"
 // people_msgs
 #include "vision_utils/test_person_histogram_set_variables.h"
-#include "depth_people_detector/nite_user_mask_pplp.h"
+#include "people_detection_vision/nite_user_mask_pplp.h"
 // opencv
 #include <opencv2/highgui/highgui.hpp>
 

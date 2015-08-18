@@ -1,5 +1,5 @@
 #include "debug/debug_utils.h"
-#include "connected_components_matcher.h"
+#include "people_detection_vision/connected_components_matcher.h"
 #include "vision_utils/drawing_utils.h"
 #include "vision_utils/color_utils.h"
 

@@ -54,7 +54,7 @@ Publishes the former in ROS LaserScans and the latter in PPL messages.
 #include <sensor_msgs/LaserScan.h>
 #include <tf/transform_datatypes.h>
 // people_msgs
-#include <templates/pplp_template.h>
+#include "people_utils/pplp_template.h"
 // utils
 #include <string/file_io.h>
 #include <string/string_split.h>

@@ -22,7 +22,7 @@ ________________________________________________________________________________
 
 \todo Description of the file
  */
-#include "nite_user_mask_pplp.h"
+#include "people_detection_vision/nite_user_mask_pplp.h"
 
 int main(int argc, char** argv) {
   ros::init(argc, argv, "nite_user_mask_pplp");

@@ -15,13 +15,13 @@ find_package(OpenCV REQUIRED)
 # Nothing in this package
 ### 6 - Specify package build info export (catkin_package())
 catkin_package(
-  INCLUDE_DIRS src
+  INCLUDE_DIRS include
   CATKIN_DEPENDS roscpp cv_bridge
   DEPENDS people_msgs people_utils utils vision_utils
 )
 ### 7 - Libraries/Executables to build (add_library()/add_executable()/target_link_libraries())
 include_directories(
-  include src
+  include
   ${catkin_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}

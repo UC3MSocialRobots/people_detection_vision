@@ -32,7 +32,7 @@ Parameters:
  */
 // #define USE_BACKGROUND_SUBSTRACTION
 #ifdef USE_BACKGROUND_SUBSTRACTION
-#include "bg_substractor_pplp.h"
+#include "people_detection_vision/bg_substractor_pplp.h"
 #include "vision_utils/nite_subscriber_template.h"
 #include "vision_utils/io.h"
 

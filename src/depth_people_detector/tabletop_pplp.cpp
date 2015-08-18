@@ -22,7 +22,7 @@ ________________________________________________________________________________
 
 A short launcher for TabletopPPLP.
  */
-#include "tabletop_pplp.h"
+#include "people_detection_vision/tabletop_pplp.h"
 int main(int argc, char** argv) {
   ros::init(argc, argv, "tabletop_pplp");
   TabletopPPLP skill;

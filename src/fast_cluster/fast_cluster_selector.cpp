@@ -45,7 +45,7 @@
 #include <debug/debug_utils.h>
 #include <time/timer.h>
 // people_msgs
-#include "fast_cluster_functions.h"
+#include "people_detection_vision/fast_cluster_functions.h"
 
 cv_bridge::CvImageConstPtr object_bridge_img;
 bool bridge_img_ptr_reset = false;

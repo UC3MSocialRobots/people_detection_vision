@@ -69,7 +69,7 @@ ________________________________________________________________________________
 #include <followme_laser/SetTrackingSeed.h>
 using namespace followme_laser;
 // fast_cluster_functions
-#include "fast_cluster_functions.h"
+#include "people_detection_vision/fast_cluster_functions.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 

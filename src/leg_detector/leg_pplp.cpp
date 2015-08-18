@@ -64,7 +64,7 @@ Systems, Man, and Cybernetics, Part B:  …, 2009.
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
 // people_msgs
-#include <templates/pplp_template.h>
+#include "people_utils/pplp_template.h"
 // utils
 #include <ros_utils/pt_utils.h>
 #include <data_filters/local_minimization_operator.h>

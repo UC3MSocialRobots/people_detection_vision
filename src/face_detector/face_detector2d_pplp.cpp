@@ -43,7 +43,7 @@ ________________________________________________________________________________
 #include "vision_utils/opencv_face_detector.h"
 #include "vision_utils/rgb_skill.h"
 // people_msgs
-#include "ppl_utils/images2ppl.h"
+#include "people_utils/images2ppl.h"
 
 class FaceDetector2DPPLP : public RgbSkill {
 public:

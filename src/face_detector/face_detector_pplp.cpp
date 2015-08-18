@@ -21,7 +21,7 @@
   ______________________________________________________________________________
 */
 
-#include "face_detector_pplp.h"
+#include "people_detection_vision/face_detector_pplp.h"
 
 int main(int argc, char** argv) {
   ros::init(argc, argv, "FaceDetectorPPLP");

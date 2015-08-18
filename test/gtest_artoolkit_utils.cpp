@@ -40,7 +40,7 @@ ________________________________________________________________________________
  */
 // Bring in gtest
 #include <gtest/gtest.h>
-#include "artoolkit/artoolkit_utils.h"
+#include "people_detection_vision/artoolkit_utils.h"
 #include <long_term_memory/ltm_path.h>
 #define ART_TEST_DIR  LONG_TERM_MEMORY_DIR "artoolkit/tests/"
 

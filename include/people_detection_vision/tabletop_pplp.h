@@ -67,8 +67,8 @@ such as a minimum size for the blobs.
 #define TABLETOP_PPLP_H
 
 // people_msgs
-#include <templates/rgb_depth_pplp_template.h>
-#include "ppl_utils/images2ppl.h"
+#include "people_utils/rgb_depth_pplp_template.h"
+#include "people_utils/images2ppl.h"
 #include "vision_utils/color_utils.h"
 #include "vision_utils/blob_segmenter.h"
 #include "vision_utils/content_processing.h"

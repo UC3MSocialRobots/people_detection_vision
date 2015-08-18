@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ________________________________________________________________________________
 
  */
-#include "hog_pplp.h"
+#include "people_detection_vision/hog_pplp.h"
 int main(int argc, char** argv) {
   ros::init(argc, argv, "HogPPLP");
   HogPPLP skill;

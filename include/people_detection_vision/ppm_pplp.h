@@ -37,8 +37,8 @@ Dynamic Environments"
 #include "vision_utils/disjoint_sets2.h"
 #include "vision_utils/drawing_utils.h"
 // people_msgs
-#include "templates/rgb_depth_pplp_template.h"
-#include "ppl_utils/images2ppl.h"
+#include "people_utils/rgb_depth_pplp_template.h"
+#include "people_utils/images2ppl.h"
 
 class Ppm : public RgbDepthPPLPublisherTemplate {
 public:

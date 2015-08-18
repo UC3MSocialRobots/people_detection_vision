@@ -1,4 +1,4 @@
-add_executable(ppm_pplp.exe ppm_pplp.cpp ppm_pplp.h)
+add_executable(ppm_pplp.exe ppm_pplp.cpp )
 target_link_libraries(ppm_pplp.exe disjoint_sets2)
 
 add_executable(nite_user_mask_pplp.exe nite_user_mask_pplp.cpp)

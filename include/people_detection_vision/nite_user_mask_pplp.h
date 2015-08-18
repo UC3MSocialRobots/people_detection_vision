@@ -68,9 +68,9 @@ in the user mask.
 // AD
 #include <map/map_utils.h>
 #include <time/timer.h>
-#include <templates/pplp_template.h>
+#include "people_utils/pplp_template.h"
 // people_msgs
-#include <ppl_utils/images2ppl.h>
+#include "people_utils/images2ppl.h"
 
 #define DEBUG_PRINT(...)   {}
 //#define DEBUG_PRINT(...)   ROS_INFO_THROTTLE(5, __VA_ARGS__)

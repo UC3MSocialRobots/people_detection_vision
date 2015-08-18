@@ -7,15 +7,15 @@
 ################################################################################
 
 add_executable(fast_cluster_detector.exe fast_cluster_detector.cpp
-                                         fast_cluster_functions.h)
+                                         )
 target_link_libraries(fast_cluster_detector.exe disjoint_sets2 ${catkin_LIBRARIES})
 
 add_executable(fast_cluster_selector.exe fast_cluster_selector.cpp
-                                         fast_cluster_functions.h)
+                                         )
 target_link_libraries(fast_cluster_selector.exe ${catkin_LIBRARIES})
 
 add_executable(fast_cluster_joy_control.exe fast_cluster_joy_control.cpp
-                                            fast_cluster_functions.h)
+                                            )
 target_link_libraries(fast_cluster_joy_control.exe ${catkin_LIBRARIES})
 
 add_executable(fast_dialog.exe fast_dialog.cpp)
@@ -25,7 +25,7 @@ target_link_libraries(fast_dialog.exe ${catkin_LIBRARIES})
 
 add_executable(test_connected_components_matcher.exe  
 			   test_connected_components_matcher.cpp
-                           connected_components_matcher.h)
+                           )
 target_link_libraries(test_connected_components_matcher.exe disjoint_sets2 ${catkin_LIBRARIES})
 
 ### rules for PedestrianDetectionClustering

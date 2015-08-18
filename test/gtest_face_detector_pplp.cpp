@@ -25,10 +25,10 @@ ________________________________________________________________________________
 //#define DISPLAY
 
 #include <ros_utils/rosmaster_alive.h>
-#include "templates/pplp_testing.h"
+#include "people_utils/pplp_testing.h"
 // people_msgs
 #include "vision_utils/test_person_histogram_set_variables.h"
-#include "face_detector/face_detector_pplp.h"
+#include "people_detection_vision/face_detector_pplp.h"
 // opencv
 #include <opencv2/highgui/highgui.hpp>
 

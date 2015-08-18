@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ________________________________________________________________________________
 
  */
-#include "bg_substractor_pplp.h"
+#include "people_detection_vision/bg_substractor_pplp.h"
 int main(int argc, char** argv) {
   ros::init(argc, argv, "BackgroundSubstractorPPLP");
   BackgroundSubstractorPPLP skill;

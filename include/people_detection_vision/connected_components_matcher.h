@@ -3,7 +3,7 @@
 
 #include "vision_utils/disjoint_sets2.h"
 #include "vision_utils/content_processing.h"
-//#include <recognition_conflict_solver.h>
+//#include "people_detection_vision/recognition_conflict_solver.h"
 #include "vision_utils/content_processing.h"
 #include "geom/hausdorff_distances.h"
 #include "time/timer.h"

@@ -110,8 +110,8 @@
 // people_msgs
 #include "vision_utils/cv_conversion_float_uchar.h"
 
-#include "connected_components_matcher.h"
-#include "fast_cluster_functions.h"
+#include "people_detection_vision/connected_components_matcher.h"
+#include "people_detection_vision/fast_cluster_functions.h"
 #include "ros_utils/marker_utils.h"
 
 //#define TIMER_ON
