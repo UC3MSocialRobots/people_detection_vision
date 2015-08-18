@@ -70,9 +70,9 @@ It consists of two steps:
 #include <geom/Rect3.h>
 #include <time/timer.h>
 #include <ros_utils/pt_utils.h>
-#include <image_utils/opencv_face_detector.h>
-#include <point_clouds/blob_segmenter.h>
-#include <color/color_utils.h>
+#include "vision_utils/opencv_face_detector.h"
+#include "vision_utils/blob_segmenter.h"
+#include "vision_utils/color_utils.h"
 // people_msgs
 #include "templates/rgb_depth_pplp_template.h"
 #include "ppl_utils/images2ppl.h"

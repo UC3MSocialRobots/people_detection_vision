@@ -34,8 +34,8 @@ Dynamic Environments"
 // kinect
 #include "kinect/kinect_openni_utils.h"
 // vision_utils
-#include <connected_comp/disjoint_sets2.h>
-#include <image_utils/drawing_utils.h>
+#include "vision_utils/disjoint_sets2.h"
+#include "vision_utils/drawing_utils.h"
 // people_msgs
 #include "templates/rgb_depth_pplp_template.h"
 #include "ppl_utils/images2ppl.h"

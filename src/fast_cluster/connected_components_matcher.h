@@ -1,10 +1,10 @@
 #ifndef CONNECTED_COMPONENTS_MATCHER_H
 #define CONNECTED_COMPONENTS_MATCHER_H
 
-#include <connected_comp/disjoint_sets2.h>
-#include <image_utils/content_processing.h>
+#include "vision_utils/disjoint_sets2.h"
+#include "vision_utils/content_processing.h"
 //#include <recognition_conflict_solver.h>
-#include "image_utils/content_processing.h"
+#include "vision_utils/content_processing.h"
 #include "geom/hausdorff_distances.h"
 #include "time/timer.h"
 #include "ros/ros.h"

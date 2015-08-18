@@ -40,8 +40,8 @@ ________________________________________________________________________________
 // AD
 #include <time/timer.h>
 #include <ros_utils/pt_utils.h>
-#include <image_utils/opencv_face_detector.h>
-#include <skill_templates/rgb_skill.h>
+#include "vision_utils/opencv_face_detector.h"
+#include "vision_utils/rgb_skill.h"
 // people_msgs
 #include "ppl_utils/images2ppl.h"
 

@@ -29,7 +29,7 @@ Some tests for
 #include <ros_utils/rosmaster_alive.h>
 #include "templates/pplp_testing.h"
 // people_msgs
-#include <databases_io/test_person_histogram_set_variables.h>
+#include "vision_utils/test_person_histogram_set_variables.h"
 #include "depth_people_detector/nite_user_mask_pplp.h"
 // opencv
 #include <opencv2/highgui/highgui.hpp>

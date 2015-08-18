@@ -32,7 +32,7 @@ This program can transform color or BW images into ARToolkit patterns.
  */
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <image_utils/border_remover.h>
+#include "vision_utils/border_remover.h"
 #include <string/filename_handling.h>
 #include <string/file_io.h>
 

@@ -7,8 +7,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 // vision
-#include "image_utils/drawing_utils.h"
-#include "color/color_utils.h"
+#include "vision_utils/drawing_utils.h"
+#include "vision_utils/color_utils.h"
 
 namespace fast_cluster_functions {
 

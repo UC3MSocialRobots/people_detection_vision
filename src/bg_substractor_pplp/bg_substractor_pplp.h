@@ -77,16 +77,16 @@ this can be useful to discriminate between users and other objects for instance.
 #define BG_SUBSTRACTOR_PPLP_H
 
 // AD
-#include "compressed_rounded_image_transport/cv_conversion_float_uchar.h"
+#include "vision_utils/cv_conversion_float_uchar.h"
 
 #include "kinect/kinect_openni_utils.h"
 #include <ros_utils/pt_utils.h>
 #include <string/timestamp.h>
-#include <color/color_utils.h>
-#include <connected_comp/disjoint_sets2.h>
-#include <image_utils/depth_canny.h>
-#include <image_utils/drawing_utils.h>
-#include <image_utils/head_finder.h>
+#include "vision_utils/color_utils.h"
+#include "vision_utils/disjoint_sets2.h"
+#include "vision_utils/depth_canny.h"
+#include "vision_utils/drawing_utils.h"
+#include "vision_utils/head_finder.h"
 // people_msgs
 #include "templates/rgb_depth_pplp_template.h"
 #include "ppl_utils/images2ppl.h"

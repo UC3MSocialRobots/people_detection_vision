@@ -51,10 +51,10 @@ http://experienceopencv.blogspot.com/2011/02/hog-descriptor.html
 #define HOG_PPLP_H
 
 // AD
-#include "point_clouds/image_clusterer.h"
+#include "vision_utils/image_clusterer.h"
 #include <geom/Rect3.h>
 #include <time/timer.h>
-#include "image_utils/io.h"
+#include "vision_utils/io.h"
 // people_msgs
 #include "templates/rgb_depth_pplp_template.h"
 #include "ppl_utils/images2ppl.h"

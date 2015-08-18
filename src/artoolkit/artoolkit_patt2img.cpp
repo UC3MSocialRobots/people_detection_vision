@@ -32,7 +32,7 @@ This program can transform ARToolKit patterns into images for visualizing them.
 */
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <image_utils/border_remover.h>
+#include "vision_utils/border_remover.h"
 #include <string/find_and_replace.h>
 #include <string/string_split.h>
 #include <string/filename_handling.h>

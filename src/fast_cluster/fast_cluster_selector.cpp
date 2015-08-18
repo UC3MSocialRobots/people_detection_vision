@@ -40,7 +40,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <cv_bridge/cv_bridge.h>
-#include "image_utils/io.h"
+#include "vision_utils/io.h"
 // AD
 #include <debug/debug_utils.h>
 #include <time/timer.h>

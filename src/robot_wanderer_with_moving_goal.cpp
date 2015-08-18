@@ -160,7 +160,7 @@
 #include <genetic/genetic.h>
 
 #ifdef USE_ETTS
-#include <skill_templates/nano_etts_api.h>
+#include "vision_utils/nano_etts_api.h"
 #endif // USE_ETTS
 
 ////////////////////////////////////////////////////////////////////////////////

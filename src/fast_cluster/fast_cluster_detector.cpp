@@ -100,15 +100,15 @@
 // AD
 #include <debug/debug_utils.h>
 #include <time/timer.h>
-#include <connected_comp/disjoint_sets2.h>
-#include <image_utils/border_remover.h>
-#include <color/color_utils.h>
-#include <image_utils/drawing_utils.h>
-#include <image_utils/value_remover.h>
+#include "vision_utils/disjoint_sets2.h"
+#include "vision_utils/border_remover.h"
+#include "vision_utils/color_utils.h"
+#include "vision_utils/drawing_utils.h"
+#include "vision_utils/value_remover.h"
 #include <followme_laser/TrackingStatus.h>
 #include <followme_laser/SetTrackingSeed.h>
 // people_msgs
-#include "compressed_rounded_image_transport/cv_conversion_float_uchar.h"
+#include "vision_utils/cv_conversion_float_uchar.h"
 
 #include "connected_components_matcher.h"
 #include "fast_cluster_functions.h"

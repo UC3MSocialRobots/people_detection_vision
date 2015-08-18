@@ -33,8 +33,8 @@ Parameters:
 // #define USE_BACKGROUND_SUBSTRACTION
 #ifdef USE_BACKGROUND_SUBSTRACTION
 #include "bg_substractor_pplp.h"
-#include <skill_templates/nite/nite_subscriber_template.h>
-#include <image_utils/io.h>
+#include "vision_utils/nite_subscriber_template.h"
+#include "vision_utils/io.h"
 
 class RLPDGrabber : public NiteSubscriberTemplate, public BackgroundSubstractorPPLP
 {
@@ -61,8 +61,8 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 #else // no USE_BACKGROUND_SUBSTRACTION
 ////////////////////////////////////////////////////////////////////////////////
-#include <skill_templates/rgb_depth_user_skill.h>
-#include <image_utils/io.h>
+#include "vision_utils/rgb_depth_user_skill.h"
+#include "vision_utils/io.h"
 
 class RLPDGrabber : public RgbDepthUserSkill {
 public:
