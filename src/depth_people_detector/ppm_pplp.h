@@ -32,7 +32,7 @@ Dynamic Environments"
 #include <geom/Rect3.h>
 #include <ros_utils/pt_utils.h>
 // kinect
-#include <kinect_utils/kinect_openni_utils.h>
+#include "kinect/kinect_openni_utils.h"
 // vision_utils
 #include <connected_comp/disjoint_sets2.h>
 #include <image_utils/drawing_utils.h>

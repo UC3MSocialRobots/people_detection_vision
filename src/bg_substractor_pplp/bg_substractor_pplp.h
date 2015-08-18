@@ -79,7 +79,7 @@ this can be useful to discriminate between users and other objects for instance.
 // AD
 #include "compressed_rounded_image_transport/cv_conversion_float_uchar.h"
 
-#include <kinect_utils/kinect_openni_utils.h>
+#include "kinect/kinect_openni_utils.h"
 #include <ros_utils/pt_utils.h>
 #include <string/timestamp.h>
 #include <color/color_utils.h>
