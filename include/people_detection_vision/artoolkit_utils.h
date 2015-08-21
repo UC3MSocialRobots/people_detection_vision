@@ -31,8 +31,8 @@ ARToolkit in ROS (http://wiki.ros.org/ar_pose)
 #include <ar_pose/ARMarker.h>
 #include <ar_pose/ARMarkers.h>
 // AD
-#include <map/map_utils.h>
-#include <string/StringUtils.h>
+#include "vision_utils/utils/map_utils.h"
+#include "vision_utils/utils/StringUtils.h"
 
 namespace artoolkit_utils {
 

@@ -6,7 +6,7 @@ project(people_detection_vision)
 find_package(catkin REQUIRED COMPONENTS
   roscpp cv_bridge # ar_pose
   # AD
-  people_msgs people_utils utils vision_utils)
+  people_msgs vision_utils kinect vision_utils)
 find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
 ### 4 - Message/Service/Action Generators (add_message_files(), add_service_files(), add_action_files())
@@ -17,7 +17,7 @@ find_package(OpenCV REQUIRED)
 catkin_package(
   INCLUDE_DIRS include
   CATKIN_DEPENDS roscpp cv_bridge
-  DEPENDS people_msgs people_utils utils vision_utils
+  DEPENDS people_msgs vision_utils vision_utils kinect
 )
 ### 7 - Libraries/Executables to build (add_library()/add_executable()/target_link_libraries())
 include_directories(

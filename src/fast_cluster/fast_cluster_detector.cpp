@@ -79,7 +79,7 @@
 
 */
 
-#include "debug/error.h"
+#include "vision_utils/utils/error.h"
 
 // ROS
 #include <ros/ros.h>
@@ -98,8 +98,8 @@
 #endif // CV_MAJOR_VERSION == 2 && CV_MINOR_VERSION >= 4
 #include <cv_bridge/cv_bridge.h>
 // AD
-#include <debug/debug_utils.h>
-#include <time/timer.h>
+#include "vision_utils/utils/debug_utils.h"
+#include "vision_utils/utils/timer.h"
 #include "vision_utils/disjoint_sets2.h"
 #include "vision_utils/border_remover.h"
 #include "vision_utils/color_utils.h"
@@ -112,7 +112,7 @@
 
 #include "people_detection_vision/connected_components_matcher.h"
 #include "people_detection_vision/fast_cluster_functions.h"
-#include "ros_utils/marker_utils.h"
+#include "vision_utils/utils/marker_utils.h"
 
 //#define TIMER_ON
 

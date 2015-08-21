@@ -79,17 +79,17 @@ this can be useful to discriminate between users and other objects for instance.
 // AD
 #include "vision_utils/cv_conversion_float_uchar.h"
 
-#include "kinect/kinect_openni_utils.h"
-#include <ros_utils/pt_utils.h>
-#include <string/timestamp.h>
+#include "vision_utils/kinect_openni_utils.h"
+#include "vision_utils/utils/pt_utils.h"
+#include "vision_utils/utils/timestamp.h"
 #include "vision_utils/color_utils.h"
 #include "vision_utils/disjoint_sets2.h"
 #include "vision_utils/depth_canny.h"
 #include "vision_utils/drawing_utils.h"
 #include "vision_utils/head_finder.h"
 // people_msgs
-#include "people_utils/rgb_depth_pplp_template.h"
-#include "people_utils/images2ppl.h"
+#include "vision_utils/rgb_depth_pplp_template.h"
+#include "vision_utils/images2ppl.h"
 // ROS
 #include <tf/transform_datatypes.h>
 #include <tf/transform_listener.h>

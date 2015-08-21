@@ -63,9 +63,9 @@ based on ARToolkit tags.
 #include <sensor_msgs/CameraInfo.h>
 // AD
 #include <people_msgs/PeoplePoseList.h>
-#include "people_utils/pplp_template.h"
-#include <system/system_utils.h>
-#include <stats/stats_utils.h>
+#include "vision_utils/pplp_template.h"
+#include "vision_utils/utils/system_utils.h"
+#include "vision_utils/utils/stats_utils.h"
 #include "people_detection_vision/artoolkit_utils.h"
 
 class ARToolkitPPLP : public PPLPublisherTemplate {

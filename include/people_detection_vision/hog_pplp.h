@@ -52,12 +52,12 @@ http://experienceopencv.blogspot.com/2011/02/hog-descriptor.html
 
 // AD
 #include "vision_utils/image_clusterer.h"
-#include <geom/Rect3.h>
-#include <time/timer.h>
+#include "vision_utils/utils/Rect3.h"
+#include "vision_utils/utils/timer.h"
 #include "vision_utils/io.h"
 // people_msgs
-#include "people_utils/rgb_depth_pplp_template.h"
-#include "people_utils/images2ppl.h"
+#include "vision_utils/rgb_depth_pplp_template.h"
+#include "vision_utils/images2ppl.h"
 // OpenCV
 #include "opencv2/objdetect/objdetect.hpp"
 

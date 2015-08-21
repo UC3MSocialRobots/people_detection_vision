@@ -76,8 +76,8 @@ or another without odometry.
 
 // utils
 #include "vision_utils/io.h"
-#include <ros_utils/pt_utils.h>
-#include <string/StringUtils.h>
+#include "vision_utils/utils/pt_utils.h"
+#include "vision_utils/utils/StringUtils.h"
 // ROS
 #include <ros/ros.h>
 #include <message_filters/subscriber.h>

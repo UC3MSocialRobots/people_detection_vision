@@ -28,17 +28,17 @@ Dynamic Environments"
  */
 
 // utils
-#include <time/timer.h>
-#include <geom/Rect3.h>
-#include <ros_utils/pt_utils.h>
+#include "vision_utils/utils/timer.h"
+#include "vision_utils/utils/Rect3.h"
+#include "vision_utils/utils/pt_utils.h"
 // kinect
-#include "kinect/kinect_openni_utils.h"
+#include "vision_utils/kinect_openni_utils.h"
 // vision_utils
 #include "vision_utils/disjoint_sets2.h"
 #include "vision_utils/drawing_utils.h"
 // people_msgs
-#include "people_utils/rgb_depth_pplp_template.h"
-#include "people_utils/images2ppl.h"
+#include "vision_utils/rgb_depth_pplp_template.h"
+#include "vision_utils/images2ppl.h"
 
 class Ppm : public RgbDepthPPLPublisherTemplate {
 public:

@@ -33,8 +33,8 @@ This program can transform color or BW images into ARToolkit patterns.
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include "vision_utils/border_remover.h"
-#include <string/filename_handling.h>
-#include <string/file_io.h>
+#include "vision_utils/utils/filename_handling.h"
+#include "vision_utils/utils/file_io.h"
 
 bool img2pat(const std::string & imgfilein,
              const std::string & patfileout,

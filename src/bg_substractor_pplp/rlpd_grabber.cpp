@@ -33,7 +33,7 @@ Parameters:
 // #define USE_BACKGROUND_SUBSTRACTION
 #ifdef USE_BACKGROUND_SUBSTRACTION
 #include "people_detection_vision/bg_substractor_pplp.h"
-#include "vision_utils/nite_subscriber_template.h"
+#include "kinect/nite_subscriber_template.h"
 #include "vision_utils/io.h"
 
 class RLPDGrabber : public NiteSubscriberTemplate, public BackgroundSubstractorPPLP

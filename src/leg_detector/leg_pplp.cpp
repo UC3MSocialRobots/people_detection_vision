@@ -64,16 +64,16 @@ Systems, Man, and Cybernetics, Part B:  …, 2009.
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
 // people_msgs
-#include "people_utils/pplp_template.h"
+#include "vision_utils/pplp_template.h"
 // utils
-#include <ros_utils/pt_utils.h>
-#include <data_filters/local_minimization_operator.h>
-#include <geom/geometry_utils.h>
-#include <geom/foo_point.h>
-#include <string/string_casts.h>
-#include <time/timer.h>
+#include "vision_utils/utils/pt_utils.h"
+#include "vision_utils/utils/local_minimization_operator.h"
+#include "vision_utils/utils/geometry_utils.h"
+#include "vision_utils/utils/foo_point.h"
+#include "vision_utils/utils/string_casts.h"
+#include "vision_utils/utils/timer.h"
 #ifdef PUBLISH_MARKER
-#include "ros_utils/marker_utils.h"
+#include "vision_utils/utils/marker_utils.h"
 #endif // PUBLISH_MARKER
 
 class LegPPLP : public PPLPublisherTemplate {

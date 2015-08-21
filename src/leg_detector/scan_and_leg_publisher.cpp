@@ -54,11 +54,11 @@ Publishes the former in ROS LaserScans and the latter in PPL messages.
 #include <sensor_msgs/LaserScan.h>
 #include <tf/transform_datatypes.h>
 // people_msgs
-#include "people_utils/pplp_template.h"
+#include "vision_utils/pplp_template.h"
 // utils
-#include <string/file_io.h>
-#include <string/string_split.h>
-#include <geom/foo_point.h>
+#include "vision_utils/utils/file_io.h"
+#include "vision_utils/utils/string_split.h"
+#include "vision_utils/utils/foo_point.h"
 
 #define DEG2RAD 0.01745329251994329577
 #define RAD2DEG 57.2957795130823208768

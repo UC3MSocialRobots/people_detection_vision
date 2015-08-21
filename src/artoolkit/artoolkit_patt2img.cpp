@@ -33,10 +33,10 @@ This program can transform ARToolKit patterns into images for visualizing them.
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include "vision_utils/border_remover.h"
-#include <string/find_and_replace.h>
-#include <string/string_split.h>
-#include <string/filename_handling.h>
-#include <string/file_io.h>
+#include "vision_utils/utils/find_and_replace.h"
+#include "vision_utils/utils/string_split.h"
+#include "vision_utils/utils/filename_handling.h"
+#include "vision_utils/utils/file_io.h"
 
 inline void clean_line(std::string & line) {
   StringUtils::remove_beginning_spaces(line);

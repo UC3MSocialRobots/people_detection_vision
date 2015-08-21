@@ -67,13 +67,13 @@ such as a minimum size for the blobs.
 #define TABLETOP_PPLP_H
 
 // people_msgs
-#include "people_utils/rgb_depth_pplp_template.h"
-#include "people_utils/images2ppl.h"
+#include "vision_utils/rgb_depth_pplp_template.h"
+#include "vision_utils/images2ppl.h"
 #include "vision_utils/color_utils.h"
 #include "vision_utils/blob_segmenter.h"
 #include "vision_utils/content_processing.h"
 #include "vision_utils/drawing_utils.h"
-#include <ros_utils/pt_utils.h>
+#include "vision_utils/utils/pt_utils.h"
 
 class TabletopPPLP : public RgbDepthPPLPublisherTemplate {
 public:

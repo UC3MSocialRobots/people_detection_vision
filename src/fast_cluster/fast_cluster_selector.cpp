@@ -42,8 +42,8 @@
 #include <cv_bridge/cv_bridge.h>
 #include "vision_utils/io.h"
 // AD
-#include <debug/debug_utils.h>
-#include <time/timer.h>
+#include "vision_utils/utils/debug_utils.h"
+#include "vision_utils/utils/timer.h"
 // people_msgs
 #include "people_detection_vision/fast_cluster_functions.h"
 
