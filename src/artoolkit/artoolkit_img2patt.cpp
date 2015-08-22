@@ -79,7 +79,7 @@ bool img2pat(const std::string & imgfilein,
     out << std::endl;
   } // end loop rotate_idx
 
-  StringUtils::save_file(patfileout, out.str());
+  string_utils::save_file(patfileout, out.str());
   printf("Written file '%s'\n", patfileout.c_str());
   return true;
 }
@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
   }
   std::string imgfilein = argv[1];
   std::string patfileout = (argc >= 3 ? argv[2] :
-                            StringUtils::change_filename_extension(imgfilein,  ".patt"));
+                            string_utils::change_filename_extension(imgfilein,  ".patt"));
   int cols = (argc >= 4 ? atoi(argv[3]) : 16);
   bool ok = img2pat(imgfilein, patfileout, cols);
   return (ok ? 0 : -1);

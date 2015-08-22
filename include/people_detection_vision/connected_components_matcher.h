@@ -258,7 +258,7 @@ public:
       std::sort(to_recompute_D22.begin(), to_recompute_D22.end(),
                 compare_marks);
       maggieDebug3("to_recompute_D22(size:%i) : '%s'", to_recompute_D22.size(),
-                   StringUtils::accessible_to_string(to_recompute_D22).c_str());
+                   string_utils::accessible_to_string(to_recompute_D22).c_str());
 
       // now compare with, in order, all the points of to_recompute_D22
       curr_comp_best_mark.object_frame_idx = -1;

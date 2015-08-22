@@ -477,7 +477,7 @@ connect edges that are adjacent one to the other,
     for (unsigned int head_idx = 0; head_idx < n_people; ++head_idx) {
       people_msgs::PeoplePose people_pose;
       people_pose.header = _ppl.header; // copy header
-      people_pose.person_name = StringUtils::cast_to_string(head_idx);
+      people_pose.person_name = string_utils::cast_to_string(head_idx);
       people_pose.confidence = 1;
       people_pose.std_dev = .1;
       // set pose

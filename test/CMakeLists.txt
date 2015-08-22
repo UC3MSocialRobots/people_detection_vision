@@ -1,17 +1,17 @@
 catkin_add_gtest(gtest_ppm
   gtest_ppm.cpp
   )
-target_link_libraries(gtest_ppm string_utils disjoint_sets2 ${catkin_LIBRARIES})
+target_link_libraries(gtest_ppm  disjoint_sets2 ${catkin_LIBRARIES})
 
 catkin_add_gtest(gtest_face_detector_pplp
   gtest_face_detector_pplp.cpp
   )
-target_link_libraries(gtest_face_detector_pplp string_utils disjoint_sets2 ${catkin_LIBRARIES})
+target_link_libraries(gtest_face_detector_pplp  disjoint_sets2 ${catkin_LIBRARIES})
 
 catkin_add_gtest(gtest_artoolkit_utils
   gtest_artoolkit_utils.cpp
   )
-target_link_libraries(gtest_artoolkit_utils string_utils ${catkin_LIBRARIES})
+target_link_libraries(gtest_artoolkit_utils  ${catkin_LIBRARIES})
 
 catkin_add_gtest(gtest_hog_pplp
   gtest_hog_pplp.cpp

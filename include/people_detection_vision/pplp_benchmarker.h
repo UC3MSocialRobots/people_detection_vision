@@ -131,7 +131,7 @@ public:
       ++e_it;
     }
     if (!_results_filename.empty())
-      StringUtils::save_file(_results_filename, ans.str());
+      string_utils::save_file(_results_filename, ans.str());
     printf("PPLBenchmarker: results: %s\n", ans.str().c_str());
   } // end save_and_display_results();
 
@@ -212,7 +212,7 @@ public:
       }
     } // end loop match_idx
 
-    e->truth2track = StringUtils::map_to_string(*method_name_map);
+    e->truth2track = string_utils::map_to_string(*method_name_map);
     // only count one swap per full match
     if (has_swapped_ids)
       e->id_swaps++;

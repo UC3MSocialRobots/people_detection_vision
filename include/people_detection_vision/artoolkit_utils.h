@@ -31,8 +31,11 @@ ARToolkit in ROS (http://wiki.ros.org/ar_pose)
 #include <ar_pose/ARMarker.h>
 #include <ar_pose/ARMarkers.h>
 // AD
+#include "vision_utils/utils/string_casts_stl.h"
+#include "vision_utils/utils/string_casts.h"
 #include "vision_utils/utils/map_utils.h"
-#include "vision_utils/utils/StringUtils.h"
+#include "vision_utils/utils/file_io.h"
+#include "vision_utils/utils/find_and_replace.h"
 
 namespace artoolkit_utils {
 
@@ -62,11 +65,11 @@ public:
     _map.clear();
     // read file
     std::vector<std::string> lines;
-    StringUtils::retrieve_file_split(filepath, lines);
+    string_utils::retrieve_file_split(filepath, lines);
     // remove comments, empty spaces, etc.
     for (unsigned int line_idx = 0; line_idx < lines.size(); ++line_idx) {
-      StringUtils::remove_trailing_spaces(lines[line_idx]);
-      StringUtils::remove_beginning_spaces(lines[line_idx]);
+      string_utils::remove_trailing_spaces(lines[line_idx]);
+      string_utils::remove_beginning_spaces(lines[line_idx]);
       // remove comments
       if (lines[line_idx].size() > 0 && lines[line_idx][0] == '#') // comment
         lines[line_idx] = "";
@@ -83,7 +86,7 @@ public:
     }
 
     // get number of blocks
-    int nlines = lines.size(), nblocks = StringUtils::cast_from_string<int>(lines[0]);
+    int nlines = lines.size(), nblocks = string_utils::cast_from_string<int>(lines[0]);
     if (nblocks < 0 || nblocks > 100) {
       ROS_WARN("parse('%s'): incorrect nb of blocks:%i\n", filepath.c_str(), nblocks);
       return false;
@@ -112,7 +115,7 @@ public:
   //////////////////////////////////////////////////////////////////////////////
 
   //! \return a string representation of the map
-  inline std::string to_string() const { return StringUtils::map_to_string(_map); }
+  inline std::string to_string() const { return string_utils::map_to_string(_map); }
 
   //////////////////////////////////////////////////////////////////////////////
 

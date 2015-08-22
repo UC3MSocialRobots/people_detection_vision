@@ -41,7 +41,7 @@ inline void test_given_patterns(ConnectedComponentsMatcher & matcher,
       }
       image_utils::drawListOfPoints
           (illus, comps[comp_idx], color_utils::color<cv::Vec3b>(obj_name));
-      cv::putText(illus, StringUtils::cast_to_string(obj_name), bboxes[comp_idx].tl(),
+      cv::putText(illus, string_utils::cast_to_string(obj_name), bboxes[comp_idx].tl(),
                   CV_FONT_HERSHEY_PLAIN, 2, color_utils::color_scalar<cv::Scalar>(obj_name));
     } // end loop comp_idx
     cv::imshow("illus", illus);
@@ -88,7 +88,7 @@ inline void test_moving_numbers(bool display) {
         directions[comp_idx].y = -std::abs(directions[comp_idx].y);
       // generate the img
       cv::putText(patterns,
-                  StringUtils::cast_to_string<char>('A' + comp_idx),
+                  string_utils::cast_to_string<char>('A' + comp_idx),
                   centers[comp_idx],
                   CV_FONT_HERSHEY_PLAIN, 3 + drand48() / 2, cv::Scalar::all(255),
                   3);
@@ -111,7 +111,7 @@ inline void test_increasing_numbers(bool display) {
     patterns = 0;
     for (unsigned int comp_idx = 0; comp_idx < n_comp - 1; ++comp_idx) {
       // generate the img
-      std::string text = StringUtils::cast_to_string<int>(comp_idx);
+      std::string text = string_utils::cast_to_string<int>(comp_idx);
       cv::putText(patterns,
                   text,
                   cv::Point(40 + 40 * comp_idx, 100 + 20 * cos(t)),

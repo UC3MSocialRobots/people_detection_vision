@@ -303,7 +303,7 @@ public:
     for (unsigned int user_idx = 0; user_idx < nfaces; ++user_idx) {
       people_msgs::PeoplePose* pp = &(_ppl.poses[user_idx]);
       pp->header = _ppl.header; // copy header
-      // pp->person_name = StringUtils::cast_to_string(user_idx);
+      // pp->person_name = string_utils::cast_to_string(user_idx);
       pp->person_name = people_msgs::PeoplePose::NO_RECOGNITION_MADE;
       pp->confidence = 1;
 
@@ -355,7 +355,7 @@ public:
     char c = cv::waitKey(25);
     if (c == 's') {
       std::ostringstream prefix;
-      prefix << "BackgroundSubstractorPPLP_" << StringUtils::timestamp();
+      prefix << "BackgroundSubstractorPPLP_" << string_utils::timestamp();
       image_utils::write_rgb_and_depth_image_to_image_file
           (prefix.str(), NULL, &_background);
     }

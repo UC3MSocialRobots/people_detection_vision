@@ -77,7 +77,7 @@ or another without odometry.
 // utils
 #include "vision_utils/io.h"
 #include "vision_utils/utils/pt_utils.h"
-#include "vision_utils/utils/StringUtils.h"
+#include "vision_utils/utils/timestamp.h"
 // ROS
 #include <ros/ros.h>
 #include <message_filters/subscriber.h>
@@ -183,7 +183,7 @@ bool save_last_odom_as_yaml(const std::string & filename_prefix) {
 
 void rgb_depth_cb(const sensor_msgs::ImageConstPtr& rgb_msg,
                   const sensor_msgs::ImageConstPtr& depth_msg) {
-  std::string filename_prefix = _output_folder + std::string("/") + StringUtils::timestamp();
+  std::string filename_prefix = _output_folder + std::string("/") + string_utils::timestamp();
   ROS_INFO_THROTTLE(1, " %.2f Hz (%g s, %i frames), rgb_depth_cb('%s')",
                     freq_get(), time(), _frames_grabbed, filename_prefix.c_str());
   freq_reset();
@@ -210,7 +210,7 @@ void rgb_depth_cb(const sensor_msgs::ImageConstPtr& rgb_msg,
 ////////////////////////////////////////////////////////////////////////////////
 
 void depth_cb(const sensor_msgs::ImageConstPtr& depth_msg) {
-  std::string filename_prefix = _output_folder + std::string("/") + StringUtils::timestamp();
+  std::string filename_prefix = _output_folder + std::string("/") + string_utils::timestamp();
   ROS_INFO_THROTTLE(1, " %.2f Hz (%i frames), depth_cb('%s')",
                     freq_get(), _frames_grabbed, filename_prefix.c_str());
   freq_reset();
@@ -233,7 +233,7 @@ void depth_cb(const sensor_msgs::ImageConstPtr& depth_msg) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void rgb_cb(const sensor_msgs::ImageConstPtr& rgb_msg) {
-  std::string filename_prefix = _output_folder + std::string("/") + StringUtils::timestamp();
+  std::string filename_prefix = _output_folder + std::string("/") + string_utils::timestamp();
   ROS_INFO_THROTTLE(1, " %.2f Hz (%i frames), rgb_cb('%s')",
                     freq_get(), _frames_grabbed, filename_prefix.c_str());
   freq_reset();
@@ -261,7 +261,7 @@ void odom_cb(const OdomMsg::ConstPtr & odom_msg) {
   // keep a copy
   _last_odom = *odom_msg;
   if (!_subscribe_depth && !_subscribe_rgb) { // save odometry if wanted
-    std::string filename_prefix = _output_folder + std::string("/") + StringUtils::timestamp();
+    std::string filename_prefix = _output_folder + std::string("/") + string_utils::timestamp();
     save_last_odom_as_yaml(filename_prefix);
   }
 } // end odom_cb();
@@ -277,7 +277,7 @@ int main(int argc, char** argv) {
   nh_private.param("depth_topic", depth_topic, depth_topic);
   std::string odom_topic = "";
   nh_private.param("odom_topic", odom_topic, odom_topic);
-  _output_folder = std::string("/tmp/robot_info_grabber_") + StringUtils::timestamp();
+  _output_folder = std::string("/tmp/robot_info_grabber_") + string_utils::timestamp();
   nh_private.param("output_folder", _output_folder, _output_folder);
   nh_private.param("save_images_png", _save_images_png, _save_images_png);
   nh_private.param("save_images_yaml", _save_images_yaml, _save_images_yaml);

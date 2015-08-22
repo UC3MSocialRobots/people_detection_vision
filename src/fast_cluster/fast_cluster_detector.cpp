@@ -799,7 +799,7 @@ public:
           continue;
         image_utils::draw_text_centered
             (_components_illus,
-             StringUtils::cast_to_string(obj_name),
+             string_utils::cast_to_string(obj_name),
              .5 *(_bounding_boxes[cluster_idx].tl() + _bounding_boxes[cluster_idx].br()),
              CV_FONT_HERSHEY_PLAIN, 1, CV_RGB(255, 255, 255), 2);
       } // end loop cluster_idx
@@ -833,7 +833,7 @@ public:
           (_img_gui_rgb_buffer, _img_gui,
            1 *img_uchar.cols, 0 *img_uchar.rows, 0,
            std::string("img_uchar_with_no_nan: m") +
-           StringUtils::cast_to_string(_nan_removal_method));
+           string_utils::cast_to_string(_nan_removal_method));
       cv::cvtColor(edges_inverted, _img_gui_rgb_buffer, cv::COLOR_GRAY2RGB);
       image_utils::paste_img(_img_gui_rgb_buffer, _img_gui,
                              2 *img_uchar.cols, 0 *img_uchar.rows, 0, "edges_inverted");

@@ -149,7 +149,7 @@ public:
       DEBUG_PRINT("Time for filter_outliers_with_depth(): %g ms, "
                  "after filtering, %i faces: %s\n",
                  timer.time(), _faces_filtered.size(),
-                 StringUtils::accessible_to_string(_faces_centers_3d).c_str());
+                 string_utils::accessible_to_string(_faces_centers_3d).c_str());
     build_ppl_message(rgb, depth);
 
     DEBUG_PRINT("time for process_rgb_depth(): %g ms\n", timer.time());
@@ -173,7 +173,7 @@ public:
     for (unsigned int user_idx = 0; user_idx < n_faces; ++user_idx) {
       people_msgs::PeoplePose* pp = &(_ppl.poses[user_idx]);
       pp->header = _ppl.header; // copy header
-      // people_pose.person_name = StringUtils::cast_to_string(user_idx);
+      // people_pose.person_name = string_utils::cast_to_string(user_idx);
       pp->person_name = people_msgs::PeoplePose::NO_RECOGNITION_MADE;
       pp->confidence = 1;
       pp->std_dev = .1;

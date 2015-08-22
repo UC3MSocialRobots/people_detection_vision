@@ -56,7 +56,7 @@ ________________________________________________________________________________
 #include "vision_utils/utils/timer.h"
 #include "vision_utils/utils/foo_point.h"
 #include "vision_utils/utils/combinatorics_utils.h"
-#include "vision_utils/utils/StringUtils.h"
+#include "vision_utils/utils/string_split.h"
 
 typedef geometry_utils::FooPoint3f Point3;
 
@@ -85,10 +85,10 @@ int main(int argc, char** argv) {
   // parse the params
   std::vector<std::string> people_head_str_list;
   std::vector<Point3> people_heads;
-  StringUtils::StringSplit(people_heads_str, ";", &people_head_str_list);
+  string_utils::StringSplit(people_heads_str, ";", &people_head_str_list);
   for (unsigned int face_idx = 0; face_idx < people_head_str_list.size(); ++face_idx) {
     std::vector<double> head_coordinates;
-    StringUtils::StringSplit_<double>
+    string_utils::StringSplit_<double>
         (people_head_str_list[face_idx], ",", &head_coordinates);
     if (head_coordinates.size() != 3) {
       ROS_WARN("The string '%s' is not a valid 3D point! Skipping it.",
@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
   unsigned int n_people = people_heads.size();
   ROS_INFO("fake_face_detector_pplp: emitting %i faces (%s), gaussian_error_sigma:%f",
            n_people,
-           StringUtils::accessible_to_string(people_heads).c_str(),
+           string_utils::accessible_to_string(people_heads).c_str(),
            gaussian_error_sigma);
 
   // build message for the first time
@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
     people_msgs::PeoplePose people_pose;
     // the header will be set in the update loop
     // the position and orientation will be set in the update loop
-    people_pose.person_name = StringUtils::cast_to_string(face_idx);
+    people_pose.person_name = string_utils::cast_to_string(face_idx);
     people_pose.confidence = 1;
     people_pose.std_dev = .1;
     ppl.poses.push_back(people_pose);

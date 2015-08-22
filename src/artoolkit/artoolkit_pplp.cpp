@@ -61,11 +61,13 @@ based on ARToolkit tags.
 
 // ROS
 #include <sensor_msgs/CameraInfo.h>
+#include <ros/topic.h>
 // AD
 #include <people_msgs/PeoplePoseList.h>
 #include "vision_utils/pplp_template.h"
 #include "vision_utils/utils/system_utils.h"
 #include "vision_utils/utils/stats_utils.h"
+#include "vision_utils/utils/map_utils.h"
 #include "people_detection_vision/artoolkit_utils.h"
 
 class ARToolkitPPLP : public PPLPublisherTemplate {
@@ -165,7 +167,7 @@ public:
       if (_pattern_map.direct_lookup(marker.id, name)) // conversion id -> name
         pp.person_name = name;
       else // keep id
-        pp.person_name = StringUtils::cast_to_string(marker.id);
+        pp.person_name = string_utils::cast_to_string(marker.id);
       pp.head_pose = marker.pose.pose;
       // http://en.wikipedia.org/wiki/Covariance_and_correlation
       // The covariance of a variable with itself (i.e. \sigma_{XX})

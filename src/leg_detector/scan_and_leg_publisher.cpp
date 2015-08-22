@@ -101,7 +101,7 @@ public:
     _laser_pub = _nh_public.advertise<sensor_msgs::LaserScan>(laser_topic, 1);
 
     // parse file
-    if (!StringUtils::retrieve_file_split(csv_filename, _lines, false, true)) {
+    if (!string_utils::retrieve_file_split(csv_filename, _lines, false, true)) {
       printf("Could not read CSV '%s'!\n", csv_filename.c_str());
     }
 
@@ -125,7 +125,7 @@ public:
       return false;
     }
     // read scan
-    StringUtils::StringSplit_<float>(_lines[_curr_line+1], ",", &_scan.ranges);
+    string_utils::StringSplit_<float>(_lines[_curr_line+1], ",", &_scan.ranges);
     if (fabs(_scan_unit2meters - 1) > 1E-3)
       //_scan.ranges *= _scan_unit2meters;
       std::transform(_scan.ranges.begin(), _scan.ranges.end(), _scan.ranges.begin(),
@@ -142,7 +142,7 @@ public:
 
     // read user pos
     std::vector<float> users_positions;
-    StringUtils::StringSplit_<float>(_lines[_curr_line+2], ",", &users_positions);
+    string_utils::StringSplit_<float>(_lines[_curr_line+2], ",", &users_positions);
     unsigned int nusers = users_positions.size() / 3;
     // build new message
     _ppl.header = _scan.header;
@@ -152,7 +152,7 @@ public:
     for (unsigned int user_idx = 0; user_idx < nusers; ++user_idx) {
       people_msgs::PeoplePose people_pose;
       people_pose.header = _ppl.header; // copy header
-      people_pose.person_name = StringUtils::cast_to_string(user_idx);
+      people_pose.person_name = string_utils::cast_to_string(user_idx);
       people_pose.confidence = 1;
       people_pose.std_dev = 0;
       // set pose

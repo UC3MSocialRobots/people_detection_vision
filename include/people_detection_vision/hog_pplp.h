@@ -250,7 +250,7 @@ public:
     for (unsigned int user_idx = 0; user_idx < n_faces; ++user_idx) {
       people_msgs::PeoplePose* pp = &(_ppl.poses[user_idx]);
       pp->header = _ppl.header; // copy header
-      // pp->person_name = StringUtils::cast_to_string(user_idx);
+      // pp->person_name = string_utils::cast_to_string(user_idx);
       pp->person_name = people_msgs::PeoplePose::NO_RECOGNITION_MADE;
       pp->confidence = 1;
 

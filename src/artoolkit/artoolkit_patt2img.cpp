@@ -39,10 +39,10 @@ This program can transform ARToolKit patterns into images for visualizing them.
 #include "vision_utils/utils/file_io.h"
 
 inline void clean_line(std::string & line) {
-  StringUtils::remove_beginning_spaces(line);
-  StringUtils::remove_trailing_spaces(line);
+  string_utils::remove_beginning_spaces(line);
+  string_utils::remove_trailing_spaces(line);
   // remove double spaces
-  while (StringUtils::find_and_replace(line, "  ", " ")) {}
+  while (string_utils::find_and_replace(line, "  ", " ")) {}
 } // end clean_line();
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,9 +56,9 @@ bool read_line(const std::vector<std::string> & lines,
   clean_line(rline);
   clean_line(gline);
   clean_line(bline);
-  StringUtils::StringSplit_<int>(rline, " ", &r);
-  StringUtils::StringSplit_<int>(gline, " ", &g);
-  StringUtils::StringSplit_<int>(bline, " ", &b);
+  string_utils::StringSplit_<int>(rline, " ", &r);
+  string_utils::StringSplit_<int>(gline, " ", &g);
+  string_utils::StringSplit_<int>(bline, " ", &b);
   if (r.size() != nrows || g.size() != nrows || b.size() != nrows) {
     printf("Nb of values for row %i: r:%i, g:%i b:%i,  and not %i!\n",
            row, r.size(), g.size(), b.size(), nrows);
@@ -72,7 +72,7 @@ bool read_line(const std::vector<std::string> & lines,
 bool pat2img(const std::string & patfilein,
              const std::string & imgfileout) {
   std::vector<std::string> lines;
-  StringUtils::retrieve_file_split(patfilein, lines);
+  string_utils::retrieve_file_split(patfilein, lines);
   unsigned int nlines = lines.size(), row = 0;
   if (nlines == 0) {
     printf("Cant read '%s', file non existing or empty.\n", patfilein.c_str());
@@ -120,7 +120,7 @@ int main(int argc, char** argv) {
   }
   std::string patfilein = argv[1];
   std::string imgfileout = (argc >= 3 ? argv[2] :
-                            StringUtils::change_filename_extension(patfilein,  "_viz.png"));
+                            string_utils::change_filename_extension(patfilein,  "_viz.png"));
   bool ok = pat2img(patfilein, imgfileout);
   return (ok ? 0 : -1);
 }
