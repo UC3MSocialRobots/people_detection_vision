@@ -3,7 +3,7 @@
   <name>people_detection_vision</name>
   <version>0.0.0</version>
   <description>
-    people_detection_vision is a stack for finding people around a
+    people_detection_vision is a package for finding people around a
     robot.
   </description>
   <maintainer email="arnaud.a.ramey@gmail.com">Arnaud Ramey</maintainer>
