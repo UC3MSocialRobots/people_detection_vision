@@ -11,7 +11,7 @@ PACKAGES="ros-`rosversion -d`-openni-camera
           libv4l-dev"
 
 sudo apt-get install $PACKAGES
-exit
+#~ exit
 
 # ar_pose
 source /opt/ros/indigo/setup.bash
