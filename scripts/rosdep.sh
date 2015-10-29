@@ -14,11 +14,17 @@ sudo apt-get install $PACKAGES
 #~ exit
 
 # ar_pose
-source /opt/ros/indigo/setup.bash
-source /home/arnaud/catkin_ws/devel/setup.bash
-roscd
-cd ../src/
-git clone https://github.com/ar-tools/ar_tools.git
-cd ..
-catkin_make --only-pkg-with-deps artoolkit
-#~ catkin_make -DCATKIN_WHITELIST_PACKAGES=""
+if [ -z $ROS_WORKSPACE ]; then
+    echo ""
+    echo "###########################################################"
+    echo 'ERROR. $ROS_WORKSPACE missing, check .bashrc file. Exiting.'
+    echo "###########################################################"
+    echo ""
+else
+    source $ROS_WORKSPACE/devel/setup.bash
+    cd $ROS_WORKSPACE/src/
+    git clone https://github.com/ar-tools/ar_tools.git
+    cd $ROS_WORKSPACE
+    catkin_make --only-pkg-with-deps artoolkit
+    #~ catkin_make -DCATKIN_WHITELIST_PACKAGES=""
+fi
