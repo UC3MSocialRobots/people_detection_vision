@@ -162,8 +162,8 @@ public:
     bool can_pixe2world = true;
     if (!can_pixe2world) {
       ROS_WARN("Cannot convert the found rectangles to 3D, "
-                  "can_pixe2world:%i, depth.empty():%i",
-                  can_pixe2world, depth.empty());
+               "can_pixe2world:%i, depth.empty():%i",
+               can_pixe2world, depth.empty());
     } // end if (!can_pixe2world)
     else { // can_pixe2world
       for (unsigned int user_idx = 0; user_idx < nusers; ++user_idx) {
@@ -284,13 +284,13 @@ public:
     for(unsigned int user_idx = 0; user_idx < _found_rectangles_filtered.size(); user_idx++) {
       cv::Rect roi = _found_rectangles_filtered[user_idx];
       // paint the masks
-      img_out(roi).setTo(cv::Vec3b(255, 0, 0), _user_cuts[user_idx]);
+      img_out(roi).setTo(cv::Vec3b(0, 255, 255), _user_cuts[user_idx]);
       // paint the found rectangles
-      cv::rectangle(img_out, roi, CV_RGB(255,0,0), 3);
+      cv::rectangle(img_out, roi, CV_RGB(0,255,0), 3);
       // paint the faces centers
-      //  cv::circle(img_out, world2pixel_depth(_faces_centers3d[user_idx]),
-      //             8, CV_RGB(255, 0, 0), -1);
-    }
+      //cv::circle(img_out, world2pixel_depth(_faces_centers3d[user_idx]),
+      //           8, CV_RGB(0, 0, 0), -1);
+    } // end for user_idx
 
     cv::imshow("HogPPLP", img_out);
     int key_code = (char) cv::waitKey(1);
