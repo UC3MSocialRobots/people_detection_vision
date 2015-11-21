@@ -69,23 +69,26 @@ public:
     rois(rgb, depth, _default_depth_camera_model,
          _comps_points, _comps_images, comps_bboxes);
     unsigned int npeople = _comps_images.size();
-    // build PPL message
-    Timer timer;
-    _ppl.header = _images_header; // reuse the header of the last frame
-    _ppl.method = "ppm";
-    _ppl.poses.resize(npeople);
-    for (unsigned int people_idx = 0; people_idx < npeople; ++people_idx) {
-      people_msgs::PeoplePose* pp = &(_ppl.poses[people_idx]);
-      pp->header = _images_header;
-      pp->person_name = people_msgs::PeoplePose::NO_RECOGNITION_MADE;
-      pt_utils::copy3(comps_bboxes[people_idx].centroid<Pt3f>(),
-                      pp->head_pose.position);
-      pp->std_dev = 1; // TODO improve that
-      pp->confidence = 1; // TODO improve that
-      _images2pp.rgb2user_and_convert(*pp, &_comps_images[people_idx], &depth, true);
-    } // end for people_idx
-    DEBUG_PRINT("Time for PPL creation:%g ms, %i users\n", timer.time(), npeople);
-    publish_PPL(_ppl);
+
+    if (get_ppl_num_subscribers() > 0) { // build PPL message
+      Timer timer;
+      _ppl.header = _images_header; // reuse the header of the last frame
+      _ppl.method = "ppm";
+      _ppl.poses.resize(npeople);
+      for (unsigned int people_idx = 0; people_idx < npeople; ++people_idx) {
+        people_msgs::PeoplePose* pp = &(_ppl.poses[people_idx]);
+        pp->header = _images_header;
+        pp->person_name = people_msgs::PeoplePose::NO_RECOGNITION_MADE;
+        pt_utils::copy3(comps_bboxes[people_idx].centroid<Pt3f>(),
+                        pp->head_pose.position);
+        pp->std_dev = 1; // TODO improve that
+        pp->confidence = 1; // TODO improve that
+        _images2pp.rgb2user_and_convert(*pp, &_comps_images[people_idx], &depth, true);
+      } // end for people_idx
+      DEBUG_PRINT("Time for PPL creation:%g ms, %i users\n", timer.time(), npeople);
+      publish_PPL(_ppl);
+    }
+    if (_display) display(rgb, depth);
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -163,7 +166,7 @@ public:
     // get connect components
     _set.process_image(_ppm_thres);
     DEBUG_PRINT("Time for DisjointSets2 creation:%g ms, nb_comp:%i\n",
-               timer.time(), _set.nb_components());
+                timer.time(), _set.nb_components());
 
 #if 0 // ///////////////////////////////////////////////////////////////////////
 
@@ -257,7 +260,7 @@ public:
           || curr_comp_bbox.depth < MIN_USER_DEPTH
           || curr_comp_bbox.depth > MAX_USER_DEPTH) {
         DEBUG_PRINT("comp #%i: comp_bbox '%s' out of bounds\n",
-                   comp_idx+1, curr_comp_bbox.to_string().c_str());
+                    comp_idx+1, curr_comp_bbox.to_string().c_str());
         continue;
       }
       DEBUG_PRINT("comp #%i: comp_bbox '%s' in bounds\n", comp_idx+1, curr_comp_bbox.to_string().c_str());
@@ -312,7 +315,7 @@ public:
           || curr_comp_bbox->depth < MIN_USER_DEPTH
           || curr_comp_bbox->depth > MAX_USER_DEPTH) {
         DEBUG_PRINT("comp #%i: comp_bbox '%s' out of bounds\n",
-                   bbox_idx+1, curr_comp_bbox->to_string().c_str());
+                    bbox_idx+1, curr_comp_bbox->to_string().c_str());
         continue;
       }
       DEBUG_PRINT("comp #%i: comp_bbox '%s' in bounds\n", bbox_idx+1, curr_comp_bbox->to_string().c_str());
@@ -321,7 +324,7 @@ public:
       ngood_comps++;
     } // end for bbox_idx
     DEBUG_PRINT("Time for bboxes filtering:%g ms, nb_good_comps:%i, bgr:(%i, %i)\n",
-               timer.time(), ngood_comps, bgr.cols, bgr.rows);
+                timer.time(), ngood_comps, bgr.cols, bgr.rows);
 
     // now fetch the comps
     comps_points.clear();

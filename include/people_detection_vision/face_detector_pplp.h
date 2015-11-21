@@ -114,9 +114,9 @@ public:
     kinect_openni_utils::read_camera_model_files
         (DEFAULT_KINECT_SERIAL(), _default_depth_camera_model, rgb_camera_model);
     printf("FaceDetectorPPLP: getting rgb on '%s', depth on '%s', "
-           "publish PeoplePoseList results on '%s'\n",
+           "publish PeoplePoseList results on '%s', _display:%i\n",
            get_rgb_topic().c_str(), get_depth_topic().c_str(),
-           get_ppl_topic().c_str());
+           get_ppl_topic().c_str(), _display);
   }
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -136,21 +136,24 @@ public:
          _resize_max_width, _resize_max_height, _scale_factor,
          _min_neighbors, _min_width);
     DEBUG_PRINT("time for detect_with_opencv(): %g ms, %i faces\n",
-               timer.time(), _faces_not_filtered.size());
+                timer.time(), _faces_not_filtered.size());
 
     // remove including faces
     std::vector< cv::Rect > faces_not_filtered_orig = _faces_not_filtered;
     geometry_utils::remove_including_rectangles
         (faces_not_filtered_orig, _faces_not_filtered);
     DEBUG_PRINT("time for remove_including_rectangles(): %g ms, %i faces\n",
-               timer.time(), _faces_not_filtered.size());
+                timer.time(), _faces_not_filtered.size());
 
-      filter_outliers_with_depth(depth);
-      DEBUG_PRINT("Time for filter_outliers_with_depth(): %g ms, "
-                 "after filtering, %i faces: %s\n",
-                 timer.time(), _faces_filtered.size(),
-                 string_utils::accessible_to_string(_faces_centers_3d).c_str());
-    build_ppl_message(rgb, depth);
+    filter_outliers_with_depth(depth);
+    DEBUG_PRINT("Time for filter_outliers_with_depth(): %g ms, "
+                "after filtering, %i faces: %s\n",
+                timer.time(), _faces_filtered.size(),
+                string_utils::accessible_to_string(_faces_centers_3d).c_str());
+    if (get_ppl_num_subscribers() > 0)
+      build_ppl_message(rgb, depth);
+    if (_display)
+      display(rgb, depth);
 
     DEBUG_PRINT("time for process_rgb_depth(): %g ms\n", timer.time());
   } // end process_rgb_depth();
@@ -160,7 +163,7 @@ public:
   /*! share the poses of the detected users in a
    *  people_msgs::PeoplePoseList msg */
   void build_ppl_message(const cv::Mat3b & rgb,
-                                      const cv::Mat1f & depth) {
+                         const cv::Mat1f & depth) {
     // printf("build_ppl_message()\n");
     // share the poses
     unsigned int n_faces = _faces_centers_3d.size();
@@ -186,6 +189,7 @@ public:
       if (!_images2pp.convert(*pp, &rgb, &depth, &(_users[user_idx]), true))
         continue;
     } // end loop user_idx
+
     publish_PPL(_ppl);
   } // end build_ppl_message()
 
@@ -207,7 +211,7 @@ public:
         if (image_utils::bbox_full(_users[prev_user_idx]).contains(user_mask_seed)
             && _users[prev_user_idx](user_mask_seed) > 0) {
           DEBUG_PRINT("Face %i: blob at seed (%i, %i) already seen before \n",
-                     prev_user_idx, user_mask_seed.x, user_mask_seed.y);
+                      prev_user_idx, user_mask_seed.x, user_mask_seed.y);
           continue;
         }
       } // end for prev_user_idx
@@ -222,9 +226,9 @@ public:
                                   curr_face_shrunk.y + rand() % curr_face_shrunk.height);
         // reproject it
         Pt3d curr_face_pt3d = //pixel2world_rgb(curr_face_pt2d);
-                              kinect_openni_utils::pixel2world_depth<Pt3d>
-                              (curr_face_pt2d, _default_depth_camera_model,
-                               depth);
+            kinect_openni_utils::pixel2world_depth<Pt3d>
+            (curr_face_pt2d, _default_depth_camera_model,
+             depth);
         // dismiss the NaN points
         if (isnan(curr_face_pt3d.x) || isnan(curr_face_pt3d.y) || isnan(curr_face_pt3d.z))
           continue;
@@ -247,12 +251,12 @@ public:
       // tests on the geometry of the bounding box
       if (bbox.depth > _max_sample_depth) {
         DEBUG_PRINT("Face %i: bbox.depth=%g > _max_sample_depth=%g: skipping\n",
-                   user_idx, bbox.depth, _max_sample_depth);
+                    user_idx, bbox.depth, _max_sample_depth);
         continue;
       }
       if (bbox.width > _max_sample_width) {
         DEBUG_PRINT("Face %i: bbox.width=%g > _max_sample_width=%g: skipping\n",
-                   user_idx, bbox.width, _max_sample_width);
+                    user_idx, bbox.width, _max_sample_width);
         continue;
       }
 
@@ -316,12 +320,12 @@ public:
     //    cv::imshow("users_collage", users_collage);
     //  }
 
-    cv::imshow("rgb", rgb);
-    cv::imshow("depth", image_utils::depth2viz(depth, image_utils::FULL_RGB_STRETCHED));
+    //cv::imshow("rgb", rgb);
+    //cv::imshow("depth", image_utils::depth2viz(depth, image_utils::FULL_RGB_STRETCHED));
     cv::imshow("FaceDetectorPPLP", _img_out);
     int key_code = (char) cv::waitKey(1);
     if (key_code == 27)
-      exit(-1);
+      ros::shutdown();
   }
 
   //////////////////////////////////////////////////////////////////////////////

@@ -111,44 +111,46 @@ public:
                               min_dist_m, max_dist_m,
                               max_blobs_nb, min_blob_size_pix,
                               ground_recompute_plane);
-    // build PPL message
-    int nusers = _components_pts.size();
-    curr_user_mask.create(depth.size());
-    curr_user_mask.setTo(0);
-    _ppl.header = _images_header; // reuse the header of the last frame
-    _ppl.method = "tabletop_pplp";
-    _ppl.poses.resize(nusers);
-    for (int user_idx = 0; user_idx < nusers; ++user_idx) {
-      people_msgs::PeoplePose* pp = &(_ppl.poses[user_idx]);
-      cv::Rect curr_roi = boundingBoxes[user_idx];
-      pp->header = _ppl.header; // copy header
-      pp->person_name = people_msgs::PeoplePose::NO_RECOGNITION_MADE;
-      pp->confidence = 1;
+    if (get_ppl_num_subscribers() > 0) { // build PPL message
+      int nusers = _components_pts.size();
+      curr_user_mask.create(depth.size());
+      curr_user_mask.setTo(0);
+      _ppl.header = _images_header; // reuse the header of the last frame
+      _ppl.method = "tabletop_pplp";
+      _ppl.poses.resize(nusers);
+      for (int user_idx = 0; user_idx < nusers; ++user_idx) {
+        people_msgs::PeoplePose* pp = &(_ppl.poses[user_idx]);
+        cv::Rect curr_roi = boundingBoxes[user_idx];
+        pp->header = _ppl.header; // copy header
+        pp->person_name = people_msgs::PeoplePose::NO_RECOGNITION_MADE;
+        pp->confidence = 1;
 
-      // image
-      image_utils::drawListOfPoints(curr_user_mask, _components_pts[user_idx], (uchar) 255);
-      cv::Mat3b curr_rgb_roi = rgb(curr_roi);
-      cv::Mat1f curr_depth_roi = depth(curr_roi);
-      cv::Mat1b curr_user_roi = curr_user_mask(curr_roi);
-      _images2pp.convert(*pp, &curr_rgb_roi, &curr_depth_roi, &curr_user_roi, false);
+        // image
+        image_utils::drawListOfPoints(curr_user_mask, _components_pts[user_idx], (uchar) 255);
+        cv::Mat3b curr_rgb_roi = rgb(curr_roi);
+        cv::Mat1f curr_depth_roi = depth(curr_roi);
+        cv::Mat1b curr_user_roi = curr_user_mask(curr_roi);
+        _images2pp.convert(*pp, &curr_rgb_roi, &curr_depth_roi, &curr_user_roi, false);
 
-      // pose - need to be done after image for the use of curr_user_mask
-      cv::Point2d user_center2d = geometry_utils::rect_center<cv::Rect, cv::Point>(curr_roi);
-      user_center2d = _roi_center2user_mask.find(curr_user_mask, user_center2d);
-      if (user_center2d.x < 0) {
-        printf("TabletopPPLP:user %i: cant find a user point in the mask!\n",
-               user_idx);
-        //continue;
-      }
-      cv::Point3d user_center3d = kinect_openni_utils::pixel2world_depth<cv::Point3d>
-                                  (user_center2d, _default_depth_camera_model, depth);
-      pt_utils::copy3(user_center3d, pp->head_pose.position);
-      pp->head_pose.orientation = tf::createQuaternionMsgFromYaw(0);
-      pp->std_dev = .1;
+        // pose - need to be done after image for the use of curr_user_mask
+        cv::Point2d user_center2d = geometry_utils::rect_center<cv::Rect, cv::Point>(curr_roi);
+        user_center2d = _roi_center2user_mask.find(curr_user_mask, user_center2d);
+        if (user_center2d.x < 0) {
+          printf("TabletopPPLP:user %i: cant find a user point in the mask!\n",
+                 user_idx);
+          //continue;
+        }
+        cv::Point3d user_center3d = kinect_openni_utils::pixel2world_depth<cv::Point3d>
+            (user_center2d, _default_depth_camera_model, depth);
+        pt_utils::copy3(user_center3d, pp->head_pose.position);
+        pp->head_pose.orientation = tf::createQuaternionMsgFromYaw(0);
+        pp->std_dev = .1;
 
-      curr_user_roi.setTo(0); // clean curr_user_mask only where needed
-    } // end loop user_idx
-    publish_PPL(_ppl);
+        curr_user_roi.setTo(0); // clean curr_user_mask only where needed
+      } // end loop user_idx
+      publish_PPL(_ppl);
+    } // end if (get_ppl_num_subscribers() > 0)
+    if (_display) display(rgb, depth);
   } // end process_rgb_depth();
 
   //////////////////////////////////////////////////////////////////////////////

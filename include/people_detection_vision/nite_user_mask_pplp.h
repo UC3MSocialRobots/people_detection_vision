@@ -88,6 +88,7 @@ public:
   NiteUserMask2Ppl()
     : PPLPublisherTemplate("NITE_USER_MASK_PPLP_START", "NITE_USER_MASK_PPLP_STOP"),
       _it(_nh_public) {
+    _nh_private.param("display", _display, false);
   } // end ctor
 
   //////////////////////////////////////////////////////////////////////////////
@@ -127,7 +128,7 @@ public:
     // ApproximateTime takes a queue size as its constructor argument, hence MySyncPolicy(10)
     //policy.setMaxIntervalDuration (ros::Duration(30.f / 1000)); // max package of 30ms
     _sync =  new message_filters::Synchronizer<MySyncPolicy>
-             (MySyncPolicy(QUEUE_SIZE), *_rgb_sub, *_depth_sub, *_user_sub);
+        (MySyncPolicy(QUEUE_SIZE), *_rgb_sub, *_depth_sub, *_user_sub);
     _sync->registerCallback(boost::bind(&NiteUserMask2Ppl::rgb_depth_user_cb, this, _1, _2, _3));
 
     printf("NiteUserMask2Ppl: subscribing to '%s', '%s', '%s', "
@@ -188,9 +189,12 @@ public:
     if (!_ppl_conv.convert(rgb, depth, user_mask, NULL, &_images_header)) {
       return;
     }
-    PPL* ppl = &(_ppl_conv.get_ppl());
-    ppl->method = "nite_user_mask_pplp";
-    publish_PPL(*ppl);
+    if (get_ppl_num_subscribers() > 0) {
+      PPL* ppl = &(_ppl_conv.get_ppl());
+      ppl->method = "nite_user_mask_pplp";
+      publish_PPL(*ppl);
+    }
+    if (_display) display(rgb, depth, user_mask);
     //  printf("NiteUserMask2Ppl::process(): %g ms, publishing a PPL of %i people\n",
     //                    timer.time(), _ppl_conv.nusers());
   } // end process();
@@ -198,6 +202,7 @@ public:
   //////////////////////////////////////////////////////////////////////////////
 
 protected:
+  bool _display;
   std_msgs::Header _images_header; //!< the header of the last received frame
   cv::Mat3b user_illus;
 

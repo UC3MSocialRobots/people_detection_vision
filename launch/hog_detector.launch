@@ -2,6 +2,8 @@
 <arg name="robot"/>
 <!-- autostart: true to start the PPLP at startup -->
 <arg name="autostart" default="false"/>
+<!-- display: true to show images -->
+<arg name="display" default="false"/>
 <!-- eventgui: true to create a GUI that allows to start the PPLP -->
 <arg name="eventgui"  default="false"/>
 <!-- marker: true to create a node converting the published PPL into a Vizualisation marker -->
@@ -12,15 +14,17 @@
       ROS_NAMESPACE=alz rosrun people_detection_vision hog_pplp.exe -activate -display _data_acquisition_by_wait_for_message:=false
     -->
   <node pkg="people_detection_vision" type="hog_pplp.exe" name="hog_pplp"
-        output="screen" args="--display
-                              _resize_scale:=1
+        output="screen" args="_resize_scale:=1
                               _hog_hitThreshold:=0
                               _data_acquisition_want_depth:=true
-                              _data_acquisition_by_wait_for_message:=true">
-    <!-- autostart param - must be before the XML tag of the skill (node) -->
-    <param if="$(arg autostart)" name="autostart" value="true"/>
+                              ">
+    <!-- autostart param -->
+    <param name="autostart" value="$(arg autostart)"/>
+    <!-- display param -->
+    <param name="display" value="$(arg display)"/>
   </node>
 <!--
+                              _data_acquisition_by_wait_for_message:=true
                               _resize_scale:=0.4
                               _hog_hitThreshold:=2.0
 -->

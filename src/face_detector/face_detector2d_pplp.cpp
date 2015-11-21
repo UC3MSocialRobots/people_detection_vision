@@ -120,7 +120,10 @@ public:
                                    (center, _default_depth_camera_model, depth);
     }
 
-    build_ppl_message(rgb);
+    if (_ppl_pub.getNumSubscribers() > 0)
+      build_ppl_message(rgb);
+    //if (_display)
+      //display(rgb, depth);
 
     DEBUG_PRINT("time for process_rgb(): %g ms\n", timer.time());
   } // end process_rgb();

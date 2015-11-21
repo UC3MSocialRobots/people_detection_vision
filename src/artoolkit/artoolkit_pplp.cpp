@@ -143,6 +143,8 @@ public:
   void markers_cb(const ar_pose::ARMarkers::ConstPtr & msg) {
     unsigned int nmarkers = msg->markers.size();
     ROS_INFO_THROTTLE(1, "markers_cb(%i markers)",nmarkers);
+    if (get_ppl_num_subscribers() == 0)
+      return;
     // convert to PPL
     // prepare the message
     people_msgs::PeoplePoseList ppl_msg;

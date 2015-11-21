@@ -413,6 +413,8 @@ connect edges that are adjacent one to the other,
 
   void scan_callback(const sensor_msgs::LaserScanConstPtr & scan_ptr) {
     // ROS_INFO_THROTTLE(1, "scan_callback()");
+    if (get_ppl_num_subscribers() == 0)
+      return;
 
     // 1) data preprocessing
     scan_preprocessed = *scan_ptr;

@@ -2,6 +2,8 @@
 <arg name="robot"/>
 <!-- autostart: true to start the PPLP at startup -->
 <arg name="autostart" default="false"/>
+<!-- display: true to show images -->
+<arg name="display" default="false"/>
 <!-- eventgui: true to create a GUI that allows to start the PPLP -->
 <arg name="eventgui"  default="false"/>
 <!-- marker: true to create a node converting the published PPL into a Vizualisation marker -->
@@ -11,8 +13,10 @@
   <node pkg="people_detection_vision" type="face_detector_pplp.exe"
     name="face_detector_pplp"  output="screen"
     args="">
-    <!-- autostart param - must be before the XML tag of the skill (node) -->
-    <param if="$(arg autostart)" name="autostart" value="true"/>
+    <!-- autostart param -->
+    <param name="autostart" value="$(arg autostart)"/>
+    <!-- display param -->
+    <param name="display" value="$(arg display)"/>
   </node>
 
   <!-- conversion to ROS rviz marker -->

@@ -84,12 +84,13 @@ public:
     kinect_openni_utils::read_camera_model_files
         (DEFAULT_KINECT_SERIAL(), _default_depth_camera_model, rgb_camera_model);
 
-    DEBUG_PRINT("HogPPLP: started with '%s' and stopped with '%s', "
-                "subscribing to '%s', '%s', "
-                "publish PeoplePoseList results on '%s'\n",
-                get_start_stopic().c_str(), get_stop_stopic().c_str(),
-                get_rgb_topic().c_str(), get_depth_topic().c_str(),
-                get_ppl_topic().c_str());
+    ROS_INFO("HogPPLP: started with '%s' and stopped with '%s', display:%i, "
+             "subscribing to '%s', '%s', "
+             "publish PeoplePoseList results on '%s'\n",
+             get_start_stopic().c_str(), get_stop_stopic().c_str(),
+             _display,
+             get_rgb_topic().c_str(), get_depth_topic().c_str(),
+             get_ppl_topic().c_str());
   } // end ctor
 
   //////////////////////////////////////////////////////////////////////////////
@@ -160,7 +161,7 @@ public:
     _faces_centers3d.reserve(nusers);
     bool can_pixe2world = true;
     if (!can_pixe2world) {
-      DEBUG_PRINT("Cannot convert the found rectangles to 3D, "
+      ROS_WARN("Cannot convert the found rectangles to 3D, "
                   "can_pixe2world:%i, depth.empty():%i",
                   can_pixe2world, depth.empty());
     } // end if (!can_pixe2world)
@@ -181,8 +182,10 @@ public:
       }
       DEBUG_PRINT("Time for clusterer.cluster():%g ms\n", timer.time());
 
-      build_ppl_message();
+      if (get_ppl_num_subscribers() > 0)
+        build_ppl_message();
     } // end if (can_pixe2world)
+    if (_display) display(rgb, depth);
 
     DEBUG_PRINT("Time for process_rgb_depth():%g m, %i users\n", timer.time(), nusers);
   } // end process_rgb_depth();
@@ -274,8 +277,8 @@ public:
 
   virtual void display(const cv::Mat3b & rgb,
                        const cv::Mat1f & depth) {
-    cv::imshow("rgb", rgb);
-    cv::imshow("depth", image_utils::depth2viz(depth, image_utils::FULL_RGB_STRETCHED));
+    //cv::imshow("rgb", rgb);
+    //cv::imshow("depth", image_utils::depth2viz(depth, image_utils::FULL_RGB_STRETCHED));
     rgb.copyTo(img_out);
 
     for(unsigned int user_idx = 0; user_idx < _found_rectangles_filtered.size(); user_idx++) {
@@ -290,6 +293,9 @@ public:
     }
 
     cv::imshow("HogPPLP", img_out);
+    int key_code = (char) cv::waitKey(1);
+    if (key_code == 27)
+      ros::shutdown();
   } // end display();
 
   //////////////////////////////////////////////////////////////////////////////

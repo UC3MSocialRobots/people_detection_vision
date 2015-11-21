@@ -279,7 +279,8 @@ public:
     } // end for bbox_idx
 
     unsigned int nusers = _faces_centers2d3d.size();
-    build_ppl_message();
+    if (get_ppl_num_subscribers() > 0)
+      build_ppl_message();
     DEBUG_PRINT("Time for process_rgb_depth():%g ms, %i users\n", timer.time(), nusers);
     if (_display) display(rgb, depth);
   } // end process_rgb_depth();
