@@ -66,6 +66,9 @@ It consists of two steps:
 #ifndef FACE_DETECTOR_PPLP_PPL_H
 #define FACE_DETECTOR_PPLP_PPL_H
 
+// dynamic_reconfigure
+#include <dynamic_reconfigure/server.h>
+#include <people_detection_vision/ViolaConfig.h>
 // AD
 #include "vision_utils/utils/Rect3.h"
 #include "vision_utils/utils/timer.h"
@@ -108,6 +111,8 @@ public:
     _nh_private.param("scale_factor", _scale_factor, 1.2);
     _nh_private.param("min_neighbors", _min_neighbors, 1);
     _nh_private.param("min_width", _min_width, 10);
+    f = boost::bind(&FaceDetectorPPLP::config_callback, this, _1, _2);
+    server.setCallback(f);
 
     // get camera model
     image_geometry::PinholeCameraModel rgb_camera_model;
@@ -332,6 +337,18 @@ public:
 
 
 private:
+
+  void config_callback(people_detection_vision::ViolaConfig &config, uint32_t level) {
+    ROS_INFO("config_callback()");
+    _resize_max_width = config.resize_max_width;
+    _resize_max_height = config.resize_max_height;
+    _scale_factor = config.scale_factor;
+    _min_neighbors = config.min_neighbors;
+    _min_width = config.min_width;
+    _max_sample_depth = config.max_sample_depth;
+    _max_sample_width = config.max_sample_width;
+  }
+
   /* face detection */
   //! the redim image
   cv::Mat3b _small_img;
@@ -362,6 +379,9 @@ private:
   // PPL
   people_msgs::PeoplePoseList _ppl;
   ppl_utils::Images2PP _images2pp;
+
+  dynamic_reconfigure::Server<people_detection_vision::ViolaConfig> server;
+  dynamic_reconfigure::Server<people_detection_vision::ViolaConfig>::CallbackType f;
 }; // end class FaceDetectorPPLP
 
 #endif // FACE_DETECTOR_PPLP_PPL_H

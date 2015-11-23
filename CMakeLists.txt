@@ -4,13 +4,17 @@ cmake_minimum_required(VERSION 2.8.3)
 project(people_detection_vision)
 ### 3 - Find other CMake/Catkin packages needed for build
 find_package(catkin REQUIRED COMPONENTS
-  roscpp cv_bridge # ar_pose
+  roscpp cv_bridge dynamic_reconfigure
   # AD
   people_msgs vision_utils kinect vision_utils)
 find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
 ### 4 - Message/Service/Action Generators (add_message_files(), add_service_files(), add_action_files())
-# Nothing in this package
+#add dynamic reconfigure api
+#find_package(catkin REQUIRED dynamic_reconfigure)
+generate_dynamic_reconfigure_options(
+  cfg/Viola.cfg
+)
 ### 5 - Invoke message/service/action generation (generate_messages())
 # Nothing in this package
 ### 6 - Specify package build info export (catkin_package())
