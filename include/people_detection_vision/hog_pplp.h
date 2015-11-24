@@ -28,7 +28,7 @@ http://experienceopencv.blogspot.com/2011/02/hog-descriptor.html
 </a>
 
 \section Parameters
-  - \b hog_resize_scale
+  - \b preprocess_resize_scale
     [double] (default: 0.4)
     The scaling to make on the frame, to make HOG computation faster.
 
@@ -50,6 +50,9 @@ http://experienceopencv.blogspot.com/2011/02/hog-descriptor.html
 #ifndef HOG_PPLP_H
 #define HOG_PPLP_H
 
+// dynamic_reconfigure
+#include <dynamic_reconfigure/server.h>
+#include <people_detection_vision/HOGConfig.h>
 // AD
 #include "vision_utils/image_clusterer.h"
 #include "vision_utils/utils/Rect3.h"
@@ -73,11 +76,14 @@ public:
     //_hog.setSVMDetector(cv::HOGDescriptor::getDaimlerPeopleDetector());
 
     // parameters
-    _nh_private.param("hog_resize_scale", _hog_resize_scale, 0.4);
+    _nh_private.param("preprocess_resize_scale", _preprocess_resize_scale, 0.4);
     _nh_private.param("hog_scale_step", _hog_scale_step, 1.05);
     _nh_private.param("hog_hitThreshold", _hog_hitThreshold, 2.0);
     _nh_private.param("hog_finalThreshold", _hog_finalThreshold, 2.0);
     _nh_private.param("clusterer_data_skip", _clusterer_data_skip, 10);
+    _nh_private.param("hog_useMeanshiftGrouping", _hog_useMeanshiftGrouping, false);
+    f = boost::bind(&HogPPLP::config_callback, this, _1, _2);
+    server.setCallback(f);
 
     // get camera model
     image_geometry::PinholeCameraModel rgb_camera_model;
@@ -110,7 +116,7 @@ public:
 
     // prepare the small image
     cv::resize(rgb, _small_img_color, cv::Size(0, 0),
-               _hog_resize_scale, _hog_resize_scale, cv::INTER_NEAREST);
+               _preprocess_resize_scale, _preprocess_resize_scale, cv::INTER_NEAREST);
     cv::cvtColor(_small_img_color, _small_img_bw, CV_BGR2GRAY);
 
     // run the detector with default parameters.
@@ -124,8 +130,8 @@ public:
                           cv::Size(8,8), // Size winStride=Size()
                           cv::Size(32,32), // Size padding=Size()
                           _hog_scale_step, // double scale=1.05
-                          _hog_finalThreshold // double finalThreshold=2.0
-                          );
+                          _hog_finalThreshold, // double finalThreshold=2.0
+                          _hog_useMeanshiftGrouping);
     DEBUG_PRINT("Time for _hog.detectMultiScale():%g ms\n", timer.time());
 
     // filter the rectangles
@@ -136,10 +142,10 @@ public:
     // rescale found faces
     for (unsigned int user_idx = 0; user_idx < nusers; ++user_idx) {
       cv::Rect* r = &(_found_rectangles_filtered[user_idx]);
-      r->x /= _hog_resize_scale;
-      r->y /= _hog_resize_scale;
-      r->width /= _hog_resize_scale;
-      r->height /= _hog_resize_scale;
+      r->x /= _preprocess_resize_scale;
+      r->y /= _preprocess_resize_scale;
+      r->width /= _preprocess_resize_scale;
+      r->height /= _preprocess_resize_scale;
       // the HOG detector returns slightly larger rectangles than the real objects.
       // so we slightly shrink the rectangles to get a nicer output.
       //*r = geometry_utils::shrink_rec(*r, 0.8);
@@ -185,9 +191,10 @@ public:
       if (get_ppl_num_subscribers() > 0)
         build_ppl_message();
     } // end if (can_pixe2world)
-    if (_display) display(rgb, depth);
+    _last_time = timer.time();
+    DEBUG_PRINT("Time for process_rgb_depth():%g m, %i users\n", _last_time, nusers);
 
-    DEBUG_PRINT("Time for process_rgb_depth():%g m, %i users\n", timer.time(), nusers);
+    if (_display) display(rgb, depth);
   } // end process_rgb_depth();
 
   //////////////////////////////////////////////////////////////////////////////
@@ -280,6 +287,9 @@ public:
     //cv::imshow("rgb", rgb);
     //cv::imshow("depth", image_utils::depth2viz(depth, image_utils::FULL_RGB_STRETCHED));
     rgb.copyTo(img_out);
+    std::ostringstream txt; txt << (int) _last_time << " ms";
+    cv::putText(img_out, txt.str(), cv::Point(10, 30),
+                CV_FONT_HERSHEY_DUPLEX, 1.0f, CV_RGB(0, 0, 255));
 
     for(unsigned int user_idx = 0; user_idx < _found_rectangles_filtered.size(); user_idx++) {
       cv::Rect roi = _found_rectangles_filtered[user_idx];
@@ -301,6 +311,18 @@ public:
   //////////////////////////////////////////////////////////////////////////////
 
 private:
+
+  void config_callback(people_detection_vision::HOGConfig &config, uint32_t level) {
+    ROS_INFO("config_callback()");
+    _preprocess_resize_scale = config.preprocess_resize_scale;
+    _hog_scale_step = config.hog_scale_step;
+    _hog_hitThreshold = config.hog_hitThreshold;
+    _hog_finalThreshold = config.hog_finalThreshold;
+    _clusterer_data_skip = config.clusterer_data_skip;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+
   //! the redim image
   cv::Mat3b _small_img_color;
   cv::Mat1b _small_img_bw;
@@ -310,8 +332,10 @@ private:
   //! the hog finder
   cv::HOGDescriptor _hog;
   //! the scale reduction factor of the RGB image for face detection
-  double _hog_resize_scale, _hog_scale_step, _hog_hitThreshold, _hog_finalThreshold;
+  double _preprocess_resize_scale, _hog_scale_step, _hog_hitThreshold, _hog_finalThreshold;
+  bool _hog_useMeanshiftGrouping;
   std::vector<cv::Rect> _found_rectangles_filtered;
+  double _last_time;
 
   //! the list of faces, with ROS orientation, in RGB frame
   std::vector< cv::Point > _cuts_offsets;
@@ -330,6 +354,9 @@ private:
   //! information sharing
   people_msgs::PeoplePoseList _ppl;
   ppl_utils::Images2PP _images2pp;
+
+  dynamic_reconfigure::Server<people_detection_vision::HOGConfig> server;
+  dynamic_reconfigure::Server<people_detection_vision::HOGConfig>::CallbackType f;
 }; // end class HogPPLP
 
 #endif // HOG_PPLP_H

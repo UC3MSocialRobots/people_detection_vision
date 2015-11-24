@@ -13,6 +13,7 @@ find_package(OpenCV REQUIRED)
 #add dynamic reconfigure api
 #find_package(catkin REQUIRED dynamic_reconfigure)
 generate_dynamic_reconfigure_options(
+  cfg/HOG.cfg
   cfg/Viola.cfg
 )
 ### 5 - Invoke message/service/action generation (generate_messages())

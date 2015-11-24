@@ -157,10 +157,11 @@ public:
                 string_utils::accessible_to_string(_faces_centers_3d).c_str());
     if (get_ppl_num_subscribers() > 0)
       build_ppl_message(rgb, depth);
+    _last_time = timer.time();
+    DEBUG_PRINT("Time for process_rgb_depth():%g m, %i users\n", _last_time, nusers);
+
     if (_display)
       display(rgb, depth);
-
-    DEBUG_PRINT("time for process_rgb_depth(): %g ms\n", timer.time());
   } // end process_rgb_depth();
 
   //////////////////////////////////////////////////////////////////////////////
@@ -294,6 +295,9 @@ public:
   virtual void display(const cv::Mat3b & rgb,
                        const cv::Mat1f & depth) {
     rgb.copyTo(_img_out);
+    std::ostringstream txt; txt << (int) _last_time << " ms";
+    cv::putText(_img_out, txt.str(), cv::Point(10, 30),
+                CV_FONT_HERSHEY_DUPLEX, 1.0f, CV_RGB(0, 0, 255));
     // convert the depth to an RGB image for display
     //    image_utils::convert_float_to_uchar(depth, depth_color_to_uchar,
     //                                        alpha_trans, beta_trans);
@@ -375,6 +379,7 @@ private:
   /* visu */
   //! an image for drawing stuff
   cv::Mat3b _img_out;
+  double _last_time;
 
   // PPL
   people_msgs::PeoplePoseList _ppl;

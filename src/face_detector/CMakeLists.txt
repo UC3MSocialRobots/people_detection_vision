@@ -1,7 +1,6 @@
 add_executable       (face_detector_pplp.exe face_detector_pplp.cpp)
 target_link_libraries(face_detector_pplp.exe disjoint_sets2)
-add_dependencies     (face_detector_pplp.exe ${catkin_EXPORTED_TARGETS})
-add_dependencies     (face_detector_pplp.exe ${PROJECT_NAME}_gencfg)
+add_dependencies     (face_detector_pplp.exe ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
 
 add_executable(face_detector2d_pplp.exe face_detector2d_pplp.cpp)
 target_link_libraries(face_detector2d_pplp.exe ${catkin_LIBRARIES})
