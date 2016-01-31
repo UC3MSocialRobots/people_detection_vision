@@ -26,7 +26,6 @@ ADD_SUBDIRECTORY(bg_substractor_pplp)
 ADD_SUBDIRECTORY(depth_people_detector)
 ADD_SUBDIRECTORY(face_detector)
 #ADD_SUBDIRECTORY(fast_cluster)
-ADD_SUBDIRECTORY(hog_pplp) 
+ADD_SUBDIRECTORY(hog_pplp)
 ADD_SUBDIRECTORY(leg_detector)
-ADD_SUBDIRECTORY(ppl_benchmarking)
 
