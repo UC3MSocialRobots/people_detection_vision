@@ -19,7 +19,7 @@
 
 <!-- input data and truth PPL publisher -->
 <include  if="$(arg input_use_rlpd)"
-          file="$(find people_utils)/launch/database_player.launch">
+          file="$(find vision_utils)/launch/database_player.launch">
   <arg name="display" value="false" />
   <arg name="rate" value="$(arg rate)"/>
 </include>
@@ -45,7 +45,7 @@
           _results_filename:=$(find people_detection_vision)/pplp_benchmarker_results.txt" />
 
   <!-- PPL viewer -->
-  <node if="$(arg viewer)" pkg="people_utils" type="ppl_viewer.exe"
+  <node if="$(arg viewer)" pkg="vision_utils" type="ppl_viewer.exe"
     name="ppl_viewer"  output="screen"
     args="_ppl_topics:='ground_truth_ppl;$(arg ppl_topics)'
           _width:=480 _height:=800

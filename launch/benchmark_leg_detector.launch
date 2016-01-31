@@ -28,7 +28,7 @@
           _results_filename:=$(find people_detection_vision)/leg_benchmarker_results.txt" />
 
   <!-- PPL viewer -->
-  <node if="$(arg viewer)" pkg="people_utils" type="ppl_viewer.exe"
+  <node if="$(arg viewer)" pkg="vision_utils" type="ppl_viewer.exe"
     name="ppl_viewer"  output="screen"
     args="_ppl_topics:='scan_and_leg_publisher/ppl;leg_pplp/ppl'
           _scan_topic:=scan

@@ -20,7 +20,7 @@
   </node>
 
   <!-- conversion to ROS rviz marker -->
-  <node if="$(arg marker)" pkg="people_utils" type="ppl2marker.exe"
+  <node if="$(arg marker)" pkg="vision_utils" type="ppl2marker.exe"
         output="screen" name="face_detector2d_pplp_ppl2marker"
         args="_red:=1 _green:=0 _blue:=0 _input_topic:=face_detector2d_pplp/ppl" />
 
@@ -32,7 +32,7 @@
                           |FACE_DETECTOR2D_PPLP_STOP;FACE_DETECTOR2D_PPLP_STOP;0"'/>
 
   <!-- PPL viewer -->
-  <node if="$(arg viewer)" pkg="people_utils" type="ppl_viewer.exe"
+  <node if="$(arg viewer)" pkg="vision_utils" type="ppl_viewer.exe"
     name="ppl_viewer"  output="screen"
     args="_ppl_topics:='face_detector2d_pplp/ppl'
           _reprojection_mode:=xz

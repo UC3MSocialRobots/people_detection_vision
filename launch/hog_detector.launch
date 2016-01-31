@@ -30,7 +30,7 @@
 -->
 
   <!-- conversion to ROS rviz marker -->
-  <node if="$(arg marker)" pkg="people_utils" type="ppl2marker.exe"
+  <node if="$(arg marker)" pkg="vision_utils" type="ppl2marker.exe"
         output="screen" name="ppl2marker_people_hog_pplp"
         args="_red:=0 _green:=0 _blue:=1 _input_topic:=hog_pplp/ppl" />
 
