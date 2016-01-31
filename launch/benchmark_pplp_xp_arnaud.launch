@@ -25,7 +25,7 @@
 </include>
 <group ns="$(arg robot)">
   <node if="$(arg input_use_dgait)"
-    pkg="people_detection_vision" type="dgait2ppl.exe"
+    pkg="vision_utils" type="dgait2ppl.exe"
     name="dgait2ppl"  output="screen" required="true"
     args="/home/user/Downloads/0datasets/DGaitDB/*.oni" />
   <!--
@@ -38,11 +38,11 @@
   <arg name="ppl_topics" default="nite_user_mask_pplp/ppl;hog_pplp/ppl;tabletop_pplp/ppl;ppm_pplp/ppl;face_detector_pplp/ppl;artoolkit_pplp/ppl;leg_pplp/ppl"/>
 
   <!-- PPL benchmarker -->
-  <node pkg="people_detection_vision" type="pplp_benchmarker.exe"
+  <node pkg="vision_utils" type="pplp_benchmarker.exe"
     name="pplp_benchmarker"  output="screen"
     args="_ppl_topics:=$(arg ppl_topics)
           _errors_display_timeout:=15
-          _results_filename:=$(find people_detection_vision)/pplp_benchmarker_results.txt" />
+          _results_filename:=$(find vision_utils)/pplp_benchmarker_results.txt" />
 
   <!-- PPL viewer -->
   <node if="$(arg viewer)" pkg="vision_utils" type="ppl_viewer.exe"

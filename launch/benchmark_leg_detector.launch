@@ -20,7 +20,7 @@
         args="pub LEG_PPLP_START std_msgs/Int16 '{data: 0}' -l  -1"/>
 
   <!-- PPL benchmarker -->
-  <node pkg="people_detection_vision" type="pplp_benchmarker.exe"
+  <node pkg="vision_utils" type="pplp_benchmarker.exe"
     name="pplp_benchmarker"  output="screen"
     args="_ground_truth_ppl_topic:=scan_and_leg_publisher/ppl
           _ppl_topics:=leg_pplp/ppl
