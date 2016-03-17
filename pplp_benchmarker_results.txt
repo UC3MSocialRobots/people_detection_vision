@@ -1,6 +1,0 @@
-5 methods:
- * face_detector:	 259-truepos(hit), 63-trueneg(correct rejection),0-falsepos(false alarm),1131-falseneg(miss), avg_pp_dist2truth:0.171 hitrate(recall):0.186 accuracy:0.222 0 id_swaps of 198 PPLs
- * hog_pplp:	 66-truepos(hit), 63-trueneg(correct rejection),0-falsepos(false alarm),1322-falseneg(miss), avg_pp_dist2truth:0.291 hitrate(recall):0.0476 accuracy:0.0889 0 id_swaps of 58 PPLs
- * nite_user_mask_pplp:	 1255-truepos(hit), 63-trueneg(correct rejection),3-falsepos(false alarm),130-falseneg(miss), avg_pp_dist2truth:0.00322 hitrate(recall):0.906 accuracy:0.908 19 id_swaps of 565 PPLs
- * ppm:	 166-truepos(hit), 62-trueneg(correct rejection),4-falsepos(false alarm),1222-falseneg(miss), avg_pp_dist2truth:0.0492 hitrate(recall):0.12 accuracy:0.157 0 id_swaps of 153 PPLs
- * tabletop_pplp:	 581-truepos(hit), 0-trueneg(correct rejection),63-falsepos(false alarm),807-falseneg(miss), avg_pp_dist2truth:3.05 hitrate(recall):0.419 accuracy:0.4 0 id_swaps of 581 PPLs
