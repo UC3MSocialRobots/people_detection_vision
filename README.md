@@ -71,27 +71,27 @@ Use the following BiB entry
 References
 ==========
 
-[Berliner and Hendel, 2007]
+* [Berliner and Hendel, 2007]
 Berliner, T. and Hendel, Z. (2007). Modeling Of Humanoid Forms From Depth
 Maps. United States Patent Application 20100034457.
 
-[Blodow and Rusu, 2009]
+* [Blodow and Rusu, 2009]
 Blodow, N. and Rusu, R. (2009). Partial view modeling and validation in 3D
 laser scans for grasping. Humanoid Robots, 2009.
 
-[Dalal and Triggs, 2005]
+* [Dalal and Triggs, 2005]
 Dalal, N. and Triggs, B. (2005). Histograms of
 oriented gradients for human detection. Computer Vision and Pattern
 Recognition, 2005. CVPR 2005. IEEE Computer Society Conference on
 (Volume:1 ).
 
-[Howard and Matthies, 2007].
+* [Howard and Matthies, 2007].
 Howard, A. and Matthies, L. (2007). Detect- ing pedestrians with stereo
 vision: safe operation of autonomous ground vehicles in dynamic
 environments. In Kaneko, Makoto; Nakamura, Y., editor, Proceedings of the
 13th Int. Symp. of Robotics Research, Hiroshima, Japan.
 
-[Viola and Jones, 2001]
+* [Viola and Jones, 2001]
 Viola, P. and Jones, M. (2001). Rapid object detection using a boosted
 cascade of simple features. In Computer Vision and Pattern Recognition, IEEE
 Computer Society Conference on
