@@ -1,4 +1,4 @@
-# people_detection_vision
+# `people_detection_vision`
 
 <p align="center">
 <img src="https://6aaedb30-a-62cb3a1a-s-sites.googlegroups.com/site/rameyarnaud/research/phd/divulgacion.png"
