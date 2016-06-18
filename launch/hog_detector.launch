@@ -13,7 +13,7 @@
   <!-- HOG people detector
       ROS_NAMESPACE=alz rosrun people_detection_vision hog_pplp.exe -activate -display _data_acquisition_by_wait_for_message:=false
     -->
-  <node pkg="people_detection_vision" type="hog_pplp.exe" name="hog_pplp"
+  <node pkg="people_detection_vision" type="hog_pplp.exe" name="hog_pplp" respawn="true"
         output="screen" args="_resize_scale:=1
                               _hog_hitThreshold:=0
                               _data_acquisition_want_depth:=true

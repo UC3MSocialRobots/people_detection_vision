@@ -1,6 +1,5 @@
-
 #!/bin/sh
-# External, ROS and system package dependencies
+# External, ROS and system package dependencies for the "people_detection_vision" package
 
 # not compile 'binutils-gold' beacuse cause broken ld program fail
 
