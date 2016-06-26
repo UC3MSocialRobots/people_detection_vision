@@ -1,4 +1,7 @@
 - git:
+    local-name: artoolkit
+    uri: https://github.com/ar-tools/ar_tools.git
+- git:
     local-name: ar_pose
     uri: https://github.com/ar-tools/ar_tools.git
 - git:
