@@ -10,8 +10,11 @@
   <license>LGPLv3</license>
   <url type="website">http://ros.org/wiki/people_detection_vision</url>
   <buildtool_depend>catkin</buildtool_depend>
-  <!-- dependencies -->
-  <depend>ar_pose</depend>
+  <!-- Ubuntu packages dependencies -->
+  <depend>libv4l-dev</depend>
+  <!-- ROS dependencies -->
+  <depend>dynamic_reconfigure</depend>
+<!--
   <depend>cv_bridge</depend>
   <depend>glut</depend>
   <depend>libgmp</depend>
@@ -25,7 +28,10 @@
   <depend>pcl_conversions</depend>
   <depend>resource_retriever</depend>
   <depend>roscpp</depend>
+-->
 
+  <!-- third party sources -->
+  <depend>ar_pose</depend>
   <!-- AD -->
   <depend>kinect</depend>
   <depend>people_msgs</depend>

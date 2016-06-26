@@ -41,11 +41,12 @@ For more information, check out
 How to install
 ==============
 
-Dependencies: please run the ```rosdep.sh``` script:
+Please run the [rosdep](http://docs.ros.org/independent/api/rosdep/html/) utility:
 
 ```bash
-$ roscd people_detection_vision
-$ sudo sh rosdep.sh
+$ sudo apt-get install python-rosdep
+$ sudo rosdep init
+$ rosdep install people_detection_vision
 ```
 
 How to cite this work

@@ -1,0 +1,13 @@
+- git:
+    local-name: ar_pose
+    uri: https://github.com/ar-tools/ar_tools.git
+- git:
+    local-name: kinect
+    uri: https://github.com/UC3MSocialRobots/kinect.git
+- git:
+    local-name: people_msgs
+    uri: https://github.com/UC3MSocialRobots/people_msgs.git
+- git:
+    local-name: vision_utils
+    uri: https://github.com/UC3MSocialRobots/vision_utils.git
+
