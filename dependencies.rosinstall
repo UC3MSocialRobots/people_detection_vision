@@ -1,8 +1,5 @@
 - git:
-    local-name: artoolkit
-    uri: https://github.com/ar-tools/ar_tools.git
-- git:
-    local-name: ar_pose
+    local-name: ar_tools
     uri: https://github.com/ar-tools/ar_tools.git
 - git:
     local-name: kinect
