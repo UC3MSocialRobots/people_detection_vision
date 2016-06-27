@@ -38,6 +38,5 @@
   <depend>vision_utils</depend>
 
   <export>
-    <nodelet plugin="${prefix}/nodelets.xml" />
   </export>
 </package>
