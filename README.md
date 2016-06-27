@@ -66,6 +66,16 @@ $ sudo rosdep init
 $ rosdep install people_detection_vision --ignore-src
 ```
 
+## 3. Compile
+
+Use [catkin_make](http://wiki.ros.org/catkin/commands/catkin_make):
+
+```bash
+$ roscd
+$ catkin_make
+```
+
+
 How to cite this work
 =====================
 
