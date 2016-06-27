@@ -5,7 +5,7 @@ project(people_detection_vision)
 ### 3 - Find other CMake/Catkin packages needed for build
 SET(ROSDEPS dynamic_reconfigure
   # AD
-  kinect people_msgs vision_utils)
+  kinect vision_utils)
 find_package(catkin REQUIRED COMPONENTS ${ROSDEPS})
 ### 4 - Message/Service/Action Generators (add_message_files(), add_service_files(), add_action_files())
 generate_dynamic_reconfigure_options(

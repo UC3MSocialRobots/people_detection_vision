@@ -20,7 +20,6 @@
   <depend>ar_pose</depend>
   <!-- AD -->
   <depend>kinect</depend>
-  <depend>people_msgs</depend>
   <depend>vision_utils</depend>
 
   <export>
