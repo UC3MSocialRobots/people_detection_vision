@@ -38,8 +38,8 @@ before_script: # Use this to prepare your build for testing e.g. copy database c
 
 script: # compile
   # refresh package list
-  - source /opt/ros/$ROS_DISTRO/setup.bash
-  - export ROS_PACKAGE_PATH="$ROS_PACKAGE_PATH:~/catkin_ws/src"
-  - rospack profile
   - cd ~/catkin_ws
+  - source /opt/ros/$ROS_DISTRO/setup.bash
+  - export ROS_PACKAGE_PATH="$ROS_PACKAGE_PATH:$(pwd)/src"
+  - rospack profile
   - catkin_make
