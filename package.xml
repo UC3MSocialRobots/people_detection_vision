@@ -10,11 +10,13 @@
   <license>LGPLv3</license>
   <url type="website">http://ros.org/wiki/people_detection_vision</url>
   <buildtool_depend>catkin</buildtool_depend>
-  <!-- Ubuntu packages dependencies -->
+  <!-- Ubuntu packages dependencies:
+       get the keys using "rosdep db"  -->
   <depend>libv4l-dev</depend>
   <!-- ROS dependencies -->
   <depend>dynamic_reconfigure</depend>
-  <!-- third party sources -->
+  <!-- third party sources:
+        these should be in the dependencies.rosinstall of the package -->
   <depend>ar_pose</depend>
   <!-- AD -->
   <depend>kinect</depend>
@@ -22,5 +24,6 @@
   <depend>vision_utils</depend>
 
   <export>
+    <rosdoc config="rosdoc.yaml" />
   </export>
 </package>
