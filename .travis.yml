@@ -35,9 +35,9 @@ before_script: # Use this to prepare your build for testing e.g. copy database c
   # package depdencies: install using rosdep.
   - cd ~/catkin_ws
   - rosdep install -y --from-paths src --ignore-src
-  # refresh package list
-  - rospack profile
 
 script: # compile
+  # refresh package list
+  - source /opt/ros/$ROS_DISTRO/setup.bash
   - cd ~/catkin_ws
   - catkin_make
