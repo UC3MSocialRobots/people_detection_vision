@@ -8,7 +8,9 @@ add_custom_target(copy_artoolkit_patterns ALL
 add_executable(artoolkit_pplp.exe
          artoolkit_pplp.cpp )
 target_link_libraries(artoolkit_pplp.exe ${catkin_LIBRARIES})
-add_dependencies(artoolkit_pplp.exe ${people_msgs_EXPORTED_TARGETS})
+add_dependencies(artoolkit_pplp.exe
+  ${ar_pose_EXPORTED_TARGETS}
+  ${people_msgs_EXPORTED_TARGETS})
 
 add_executable(artoolkit_img2patt.exe artoolkit_img2patt.cpp)
 target_link_libraries(artoolkit_img2patt.exe ${catkin_LIBRARIES})
