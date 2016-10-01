@@ -50,9 +50,9 @@ Run the following instructions:
 
 ```bash
 $ sudo apt-get install python-wstool
-$ sudo wstool init
-$ wstool merge `rospack find people_detection_vision`/dependencies.rosinstall
 $ roscd ; cd src
+$ wstool init
+$ wstool merge `rospack find people_detection_vision`/dependencies.rosinstall
 $ wstool update
 ```
 
