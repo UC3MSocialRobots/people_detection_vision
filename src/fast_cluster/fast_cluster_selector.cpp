@@ -44,7 +44,7 @@
 // AD
 #include "vision_utils/utils/debug_utils.h"
 #include "vision_utils/utils/timer.h"
-// people_msgs
+// people_msgs_rl
 #include "people_detection_vision/fast_cluster_functions.h"
 
 cv_bridge::CvImageConstPtr object_bridge_img;

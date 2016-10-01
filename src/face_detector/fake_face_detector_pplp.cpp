@@ -45,13 +45,13 @@ ________________________________________________________________________________
 
 \section Publications
   - \b "~ppl"
-        [people_msgs::PeoplePoseList]
+        [people_msgs_rl::PeoplePoseList]
         The wanted people heads
 
  */
 #include <ros/ros.h>
 #include <tf/tf.h>
-#include <people_msgs/PeoplePoseList.h>
+#include <people_msgs_rl/PeoplePoseList.h>
 #include "vision_utils/utils/pt_utils.h"
 #include "vision_utils/utils/timer.h"
 #include "vision_utils/utils/foo_point.h"
@@ -107,14 +107,14 @@ int main(int argc, char** argv) {
            gaussian_error_sigma);
 
   // build message for the first time
-  people_msgs::PeoplePoseList ppl;
+  people_msgs_rl::PeoplePoseList ppl;
   ppl.header.frame_id = frame_id;
   // the stamp will be set in the update loop
   ppl.poses.clear();
   ppl.method = "fake_face_detector_pplp";
   ppl.poses.reserve(n_people);
   for (unsigned int face_idx = 0; face_idx < n_people; ++face_idx) {
-    people_msgs::PeoplePose people_pose;
+    people_msgs_rl::PeoplePose people_pose;
     // the header will be set in the update loop
     // the position and orientation will be set in the update loop
     people_pose.person_name = string_utils::cast_to_string(face_idx);
@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
   } // end loop face_idx
 
   ros::Publisher ppl_pub = nh_private.advertise
-      <people_msgs::PeoplePoseList>("ppl", 1);
+      <people_msgs_rl::PeoplePoseList>("ppl", 1);
 
   // emit it periodically
   ros::Rate rate(15);

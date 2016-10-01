@@ -25,7 +25,7 @@ Tests for \file ppm_pplp.h
  */
 #include <ros_utils/rosmaster_alive.h>
 #include "vision_utils/pplp_testing.h"
-// people_msgs
+// people_msgs_rl
 #include "vision_utils/test_person_histogram_set_variables.h"
 #include "people_detection_vision/ppm_pplp.h"
 // opencv

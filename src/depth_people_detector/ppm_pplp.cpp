@@ -22,7 +22,7 @@ ________________________________________________________________________________
 
 Tests for \file ppm_pplp.h
 rosparam set /kinect_only/kinect_serial_number A00365A10630110A
-ROS_NAMESPACE=kinect_only rosrun people_msgs ppm_pplp.exe --activate
+ROS_NAMESPACE=kinect_only rosrun people_msgs_rl ppm_pplp.exe --activate
 
  */
 #if 0

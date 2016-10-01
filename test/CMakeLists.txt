@@ -8,7 +8,7 @@ catkin_add_gtest(gtest_artoolkit_utils gtest_artoolkit_utils.cpp)
 target_link_libraries(gtest_artoolkit_utils  ${catkin_LIBRARIES})
 add_dependencies(gtest_artoolkit_utils
   ${ar_pose_EXPORTED_TARGETS}
-  ${people_msgs_EXPORTED_TARGETS})
+  ${people_msgs_rl_EXPORTED_TARGETS})
 
 catkin_add_gtest(gtest_hog_pplp gtest_hog_pplp.cpp)
 

@@ -25,7 +25,7 @@ the NITE middleware:
 * RGB stream,
 * depth stream,
 * user mask stream,
-and converts them into a people_msgs::PeoplePoseList message
+and converts them into a people_msgs_rl::PeoplePoseList message
 that contains both the 3D position of the users and
 their color and depth masks.
 
@@ -49,7 +49,7 @@ in the user mask.
 
 \section Publications
   - \b "~ppl"
-        [people_msgs::PeoplePoseList]
+        [people_msgs_rl::PeoplePoseList]
         The detected users in the mask
 
  */
@@ -69,7 +69,7 @@ in the user mask.
 #include "vision_utils/utils/map_utils.h"
 #include "vision_utils/utils/timer.h"
 #include "vision_utils/pplp_template.h"
-// people_msgs
+// people_msgs_rl
 #include "vision_utils/images2ppl.h"
 
 #define DEBUG_PRINT(...)   {}

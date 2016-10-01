@@ -27,7 +27,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Twist.h>
 #include <signal.h>
-// people_msgs
+// people_msgs_rl
 #include "vision_utils/utils/marker_utils.h"
 #include "vision_utils/utils/odom_utils.h"
 #include "vision_utils/utils/laser_utils.h"

@@ -46,14 +46,14 @@ Publishes the former in ROS LaserScans and the latter in PPL messages.
         The laser scans read from the file.
 
   - \b "~ppl"
-        [people_msgs::PeoplePoseList]
+        [people_msgs_rl::PeoplePoseList]
         The poses of the found people.
  */
 // ROS
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
 #include <tf/transform_datatypes.h>
-// people_msgs
+// people_msgs_rl
 #include "vision_utils/pplp_template.h"
 // utils
 #include "vision_utils/utils/file_io.h"
@@ -150,7 +150,7 @@ public:
     _ppl.poses.clear();
     _ppl.poses.reserve(nusers);
     for (unsigned int user_idx = 0; user_idx < nusers; ++user_idx) {
-      people_msgs::PeoplePose people_pose;
+      people_msgs_rl::PeoplePose people_pose;
       people_pose.header = _ppl.header; // copy header
       people_pose.person_name = string_utils::cast_to_string(user_idx);
       people_pose.confidence = 1;
@@ -175,7 +175,7 @@ public:
   //////////////////////////////////////////////////////////////////////////////
 
   //! ROS message to share results
-  people_msgs::PeoplePoseList _ppl;
+  people_msgs_rl::PeoplePoseList _ppl;
   ros::Publisher _laser_pub;
   double _angle_min, _angle_max, _scan_unit2meters;
   std::vector<std::string> _lines;

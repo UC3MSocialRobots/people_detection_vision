@@ -36,7 +36,7 @@ Dynamic Environments"
 // vision_utils
 #include "vision_utils/disjoint_sets2.h"
 #include "vision_utils/drawing_utils.h"
-// people_msgs
+// people_msgs_rl
 #include "vision_utils/rgb_depth_pplp_template.h"
 #include "vision_utils/images2ppl.h"
 
@@ -76,9 +76,9 @@ public:
       _ppl.method = "ppm";
       _ppl.poses.resize(npeople);
       for (unsigned int people_idx = 0; people_idx < npeople; ++people_idx) {
-        people_msgs::PeoplePose* pp = &(_ppl.poses[people_idx]);
+        people_msgs_rl::PeoplePose* pp = &(_ppl.poses[people_idx]);
         pp->header = _images_header;
-        pp->person_name = people_msgs::PeoplePose::NO_RECOGNITION_MADE;
+        pp->person_name = people_msgs_rl::PeoplePose::NO_RECOGNITION_MADE;
         pt_utils::copy3(comps_bboxes[people_idx].centroid<Pt3f>(),
                         pp->head_pose.position);
         pp->std_dev = 1; // TODO improve that
@@ -470,7 +470,7 @@ private:
   // conversion to PPL
   std::vector<std::vector<cv::Point3f> > _comps_points;
   std::vector<cv::Mat3b> _comps_images;
-  people_msgs::PeoplePoseList _ppl;
+  people_msgs_rl::PeoplePoseList _ppl;
   ppl_utils::Images2PP _images2pp;
 
   // viz

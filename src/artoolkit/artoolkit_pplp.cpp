@@ -20,7 +20,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ________________________________________________________________________________
 
-A people detector and people_msgs::PeoplePoseList publisher
+A people detector and people_msgs_rl::PeoplePoseList publisher
 based on ARToolkit tags.
 
 \section Parameters
@@ -55,7 +55,7 @@ based on ARToolkit tags.
         The camera info that activates the 'ar_pose' node.
 
   - \b "~ppl"
-        [people_msgs::PeoplePoseList]
+        [people_msgs_rl::PeoplePoseList]
         The detected users in the mask
  */
 
@@ -63,7 +63,7 @@ based on ARToolkit tags.
 #include <sensor_msgs/CameraInfo.h>
 #include <ros/topic.h>
 // AD
-#include <people_msgs/PeoplePoseList.h>
+#include <people_msgs_rl/PeoplePoseList.h>
 #include "vision_utils/pplp_template.h"
 #include "vision_utils/utils/system_utils.h"
 #include "vision_utils/utils/stats_utils.h"
@@ -147,7 +147,7 @@ public:
       return;
     // convert to PPL
     // prepare the message
-    people_msgs::PeoplePoseList ppl_msg;
+    people_msgs_rl::PeoplePoseList ppl_msg;
     // ppl_msg.header = msg->header;
     // the header of the marker list is empty but not the header of each marker
     if (nmarkers >= 1)
@@ -163,7 +163,7 @@ public:
     for (unsigned int marker_idx = 0; marker_idx < nmarkers; ++marker_idx) {
       ar_pose::ARMarker marker = msg->markers[marker_idx];
       // shape a PeoplePose
-      people_msgs::PeoplePose pp;
+      people_msgs_rl::PeoplePose pp;
       pp.header = ppl_msg.header;
       std::string name;
       if (_pattern_map.direct_lookup(marker.id, name)) // conversion id -> name

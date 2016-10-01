@@ -70,7 +70,7 @@ this can be useful to discriminate between users and other objects for instance.
 
 \section Publications
   - \b "~ppl"
-        [people_msgs::PeoplePoseList]
+        [people_msgs_rl::PeoplePoseList]
         The detected users, \see PPLPublisherTemplate.
  */
 #ifndef BG_SUBSTRACTOR_PPLP_H
@@ -87,7 +87,7 @@ this can be useful to discriminate between users and other objects for instance.
 #include "vision_utils/depth_canny.h"
 #include "vision_utils/drawing_utils.h"
 #include "vision_utils/head_finder.h"
-// people_msgs
+// people_msgs_rl
 #include "vision_utils/rgb_depth_pplp_template.h"
 #include "vision_utils/images2ppl.h"
 // ROS
@@ -288,7 +288,7 @@ public:
   //////////////////////////////////////////////////////////////////////////////
 
   /*! share the poses of the detected users in a
-   *  people_msgs::PeoplePoseList msg */
+   *  people_msgs_rl::PeoplePoseList msg */
   void build_ppl_message() {
     // share the poses
     unsigned int nfaces = _faces_centers2d3d.size();
@@ -302,10 +302,10 @@ public:
 
     // build the PeoplePose
     for (unsigned int user_idx = 0; user_idx < nfaces; ++user_idx) {
-      people_msgs::PeoplePose* pp = &(_ppl.poses[user_idx]);
+      people_msgs_rl::PeoplePose* pp = &(_ppl.poses[user_idx]);
       pp->header = _ppl.header; // copy header
       // pp->person_name = string_utils::cast_to_string(user_idx);
-      pp->person_name = people_msgs::PeoplePose::NO_RECOGNITION_MADE;
+      pp->person_name = people_msgs_rl::PeoplePose::NO_RECOGNITION_MADE;
       pp->confidence = 1;
 
       // pose
@@ -400,7 +400,7 @@ private:
   image_geometry::PinholeCameraModel _default_depth_camera_model;
 
   //! information sharing
-  people_msgs::PeoplePoseList _ppl;
+  people_msgs_rl::PeoplePoseList _ppl;
   ppl_utils::Images2PP _images2pp;
 
   //! an image for drawing stuff

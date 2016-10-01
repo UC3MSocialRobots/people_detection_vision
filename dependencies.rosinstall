@@ -5,8 +5,8 @@
     local-name: kinect
     uri: https://github.com/UC3MSocialRobots/kinect.git
 - git:
-    local-name: people_msgs
-    uri: https://github.com/UC3MSocialRobots/people_msgs.git
+    local-name: people_msgs_rl
+    uri: https://github.com/UC3MSocialRobots/people_msgs_rl.git
 - git:
     local-name: vision_utils
     uri: https://github.com/UC3MSocialRobots/vision_utils.git

@@ -59,14 +59,14 @@ such as a minimum size for the blobs.
 
 \section Publications
   - \b "~ppl"
-        [people_msgs::PeoplePoseList]
+        [people_msgs_rl::PeoplePoseList]
         The detected users, \see PPLPublisherTemplate.
  */
 
 #ifndef TABLETOP_PPLP_H
 #define TABLETOP_PPLP_H
 
-// people_msgs
+// people_msgs_rl
 #include "vision_utils/rgb_depth_pplp_template.h"
 #include "vision_utils/images2ppl.h"
 #include "vision_utils/color_utils.h"
@@ -119,10 +119,10 @@ public:
       _ppl.method = "tabletop_pplp";
       _ppl.poses.resize(nusers);
       for (int user_idx = 0; user_idx < nusers; ++user_idx) {
-        people_msgs::PeoplePose* pp = &(_ppl.poses[user_idx]);
+        people_msgs_rl::PeoplePose* pp = &(_ppl.poses[user_idx]);
         cv::Rect curr_roi = boundingBoxes[user_idx];
         pp->header = _ppl.header; // copy header
-        pp->person_name = people_msgs::PeoplePose::NO_RECOGNITION_MADE;
+        pp->person_name = people_msgs_rl::PeoplePose::NO_RECOGNITION_MADE;
         pp->confidence = 1;
 
         // image
@@ -203,7 +203,7 @@ public:
   int max_blobs_nb, min_blob_size_pix;
 
   //! information sharing
-  people_msgs::PeoplePoseList _ppl;
+  people_msgs_rl::PeoplePoseList _ppl;
   ppl_utils::Images2PP _images2pp;
   image_utils::ClosestPointInMask2<uchar> _roi_center2user_mask;
   cv::Mat1b curr_user_mask;

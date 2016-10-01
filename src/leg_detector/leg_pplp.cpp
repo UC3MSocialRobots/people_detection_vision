@@ -48,7 +48,7 @@ Systems, Man, and Cybernetics, Part B:  …, 2009.
 
 \section Publications
   - \b "~ppl"
-        [people_msgs::PeoplePoseList]
+        [people_msgs_rl::PeoplePoseList]
         The poses of the found people.
 
   - \b "~marker"
@@ -63,7 +63,7 @@ Systems, Man, and Cybernetics, Part B:  …, 2009.
 // ROS
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
-// people_msgs
+// people_msgs_rl
 #include "vision_utils/pplp_template.h"
 // utils
 #include "vision_utils/utils/pt_utils.h"
@@ -477,7 +477,7 @@ connect edges that are adjacent one to the other,
     _ppl.poses.clear();
     _ppl.poses.reserve(n_people);
     for (unsigned int head_idx = 0; head_idx < n_people; ++head_idx) {
-      people_msgs::PeoplePose people_pose;
+      people_msgs_rl::PeoplePose people_pose;
       people_pose.header = _ppl.header; // copy header
       people_pose.person_name = string_utils::cast_to_string(head_idx);
       people_pose.confidence = 1;
@@ -549,7 +549,7 @@ private:
 #endif // PUBLISH_MARKER
 
   //! ROS message to share results
-  people_msgs::PeoplePoseList _ppl;
+  people_msgs_rl::PeoplePoseList _ppl;
 }; // end class LegPPLP
 
 

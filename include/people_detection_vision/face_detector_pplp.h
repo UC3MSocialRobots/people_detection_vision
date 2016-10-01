@@ -58,7 +58,7 @@ It consists of two steps:
 
 \section Publications
   - \b "~ppl"
-        [people_msgs::PeoplePoseList]
+        [people_msgs_rl::PeoplePoseList]
         The found people heads
 
 */
@@ -76,7 +76,7 @@ It consists of two steps:
 #include "vision_utils/opencv_face_detector.h"
 #include "vision_utils/blob_segmenter.h"
 #include "vision_utils/color_utils.h"
-// people_msgs
+// people_msgs_rl
 #include "vision_utils/rgb_depth_pplp_template.h"
 #include "vision_utils/images2ppl.h"
 
@@ -167,7 +167,7 @@ public:
   //////////////////////////////////////////////////////////////////////////////
 
   /*! share the poses of the detected users in a
-   *  people_msgs::PeoplePoseList msg */
+   *  people_msgs_rl::PeoplePoseList msg */
   void build_ppl_message(const cv::Mat3b & rgb,
                          const cv::Mat1f & depth) {
     // printf("build_ppl_message()\n");
@@ -180,10 +180,10 @@ public:
 
     // build the PeoplePose
     for (unsigned int user_idx = 0; user_idx < n_faces; ++user_idx) {
-      people_msgs::PeoplePose* pp = &(_ppl.poses[user_idx]);
+      people_msgs_rl::PeoplePose* pp = &(_ppl.poses[user_idx]);
       pp->header = _ppl.header; // copy header
       // people_pose.person_name = string_utils::cast_to_string(user_idx);
-      pp->person_name = people_msgs::PeoplePose::NO_RECOGNITION_MADE;
+      pp->person_name = people_msgs_rl::PeoplePose::NO_RECOGNITION_MADE;
       pp->confidence = 1;
       pp->std_dev = .1;
 
@@ -382,7 +382,7 @@ private:
   double _last_time;
 
   // PPL
-  people_msgs::PeoplePoseList _ppl;
+  people_msgs_rl::PeoplePoseList _ppl;
   ppl_utils::Images2PP _images2pp;
 
   dynamic_reconfigure::Server<people_detection_vision::ViolaConfig> server;

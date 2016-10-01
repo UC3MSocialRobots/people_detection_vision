@@ -107,7 +107,7 @@
 #include "vision_utils/value_remover.h"
 #include <followme_laser/TrackingStatus.h>
 #include <followme_laser/SetTrackingSeed.h>
-// people_msgs
+// people_msgs_rl
 #include "vision_utils/cv_conversion_float_uchar.h"
 
 #include "people_detection_vision/connected_components_matcher.h"
