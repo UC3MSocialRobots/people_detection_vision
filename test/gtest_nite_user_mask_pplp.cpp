@@ -26,7 +26,7 @@ Some tests for
  */
 //#define DISPLAY
 
-#include <ros_utils/rosmaster_alive.h>
+#include <vision_utils/utils/rosmaster_alive.h>
 #include "vision_utils/pplp_testing.h"
 // people_msgs_rl
 #include "vision_utils/test_person_histogram_set_variables.h"
