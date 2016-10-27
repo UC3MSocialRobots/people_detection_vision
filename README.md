@@ -40,6 +40,43 @@ it would for objects on a table.
 For more information, check out
 [Arnaud Ramey's PhD](https://sites.google.com/site/rameyarnaud/research/phd).
 
+Transition people_msgs_rl -> people_msgs
+========================================
+
+```bash
+$ rosmsg show people_msgs/People
+std_msgs/Header header
+people_msgs/Person[] people
+  string name
+  geometry_msgs/Point position
+  geometry_msgs/Point velocity
+  float64 reliability
+  string[] tagnames
+  string[] tags
+
+$ rosmsg show people_msgs_rl/PeoplePoseList
+std_msgs/Header header                  --> "header"
+string method                           --> tagsnames: "method",tags: "XXX"
+people_msgs_rl/PeoplePose[] poses       --> "poses"
+  string NO_RECOGNITION_MADE=NOREC      --> "NOREC"
+  string RECOGNITION_FAILED=RECFAIL     --> "RECFAIL"
+  std_msgs/Header header                --> parent.header
+  geometry_msgs/Pose head_pose          --> "position", tagsnames: "yaw",tags: "123"
+  float32 std_dev                       --> DROPPED
+  string person_name                    --> "name"
+  float32 confidence                    --> "reliability"
+  sensor_msgs/Image rgb                 --> tagsnames: "rgbfile",  tags: "/tmp/XXX.png"
+  sensor_msgs/Image depth               --> tagsnames: "depthfile",tags: "/tmp/XXX.png"
+  sensor_msgs/Image user                --> tagsnames: "userfile", tags: "/tmp/XXX.png"
+  int16 images_offsetx                  --> tagsnames: "offsetx",tags: "123"
+  int16 images_offsety                  --> tagsnames: "offsety",tags: "123"
+  people_msgs_rl/PeoplePoseAttributes attributes
+    string[] names                      --> parent.tagnames
+    string[] values                     --> parent.tags
+
+people_msgs_rl/MatchPPL.srv --> people_recognition_vision/MatchPPL.srv
+```
+
 How to install
 ==============
 
