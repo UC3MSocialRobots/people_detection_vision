@@ -11,8 +11,10 @@ add_dependencies(gtest_artoolkit_utils
   ${people_msgs_rl_EXPORTED_TARGETS})
 
 catkin_add_gtest(gtest_hog_pplp gtest_hog_pplp.cpp)
+target_link_libraries(gtest_hog_pplp  ${catkin_LIBRARIES})
 
 catkin_add_gtest(gtest_nite_user_mask_pplp gtest_nite_user_mask_pplp.cpp)
+target_link_libraries(gtest_nite_user_mask_pplp  ${catkin_LIBRARIES})
 
 catkin_add_gtest(gtest_tabletop_pplp  gtest_tabletop_pplp.cpp)
 target_link_libraries(gtest_tabletop_pplp disjoint_sets2)

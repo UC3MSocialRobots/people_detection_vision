@@ -3,7 +3,7 @@
   \author      Arnaud Ramey <arnaud.a.ramey@gmail.com>
                 -- Robotics Lab, University Carlos III of Madrid
   \date        2013/10/10
-  
+
 ________________________________________________________________________________
 
 This program is free software: you can redistribute it and/or modify
@@ -26,22 +26,22 @@ ________________________________________________________________________________
   - \b "foo"
         [string] (default: "bar")
         Description of the parameter.
-        
+
 \section Subscriptions
   - \b "/foo"
         [xxx]
         Descrption of the subscription
-        
+
 \section Publications
   - \b "~foo"
         [xxx]
         Descrption of the publication
-        
+
  */
 // Bring in gtest
 #include <gtest/gtest.h>
 #include "people_detection_vision/artoolkit_utils.h"
-#include <long_term_memory/ltm_path.h>
+#include <vision_utils/img_path.h>
 #define ART_TEST_DIR  LONG_TERM_MEMORY_DIR "artoolkit/tests/"
 
 ////////////////////////////////////////////////////////////////////////////////

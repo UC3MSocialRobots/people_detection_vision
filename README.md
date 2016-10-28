@@ -61,8 +61,8 @@ people_msgs_rl/PeoplePose[] poses       --> "poses"
   string NO_RECOGNITION_MADE=NOREC      --> "NOREC"
   string RECOGNITION_FAILED=RECFAIL     --> "RECFAIL"
   std_msgs/Header header                --> parent.header
-  geometry_msgs/Pose head_pose          --> "position", tagsnames: "yaw",tags: "123"
-  float32 std_dev                       --> DROPPED
+  geometry_msgs/Pose head_pose          --> "position", tagsnames: "yaw",tags: ".1"
+  float32 std_dev                       --> tagsnames: "std_dev",tags: ".1"
   string person_name                    --> "name"
   float32 confidence                    --> "reliability"
   sensor_msgs/Image rgb                 --> tagsnames: "rgbfile",  tags: "/tmp/XXX.png"
@@ -75,6 +75,14 @@ people_msgs_rl/PeoplePose[] poses       --> "poses"
     string[] values                     --> parent.tags
 
 people_msgs_rl/MatchPPL.srv --> people_recognition_vision/MatchPPL.srv
+
+$ rospack depends-on people_msgs_rl
+vision_utils
+games_vision
+people_detection_vision
+mip_calibrate
+people_recognition_vision
+
 ```
 
 How to install
