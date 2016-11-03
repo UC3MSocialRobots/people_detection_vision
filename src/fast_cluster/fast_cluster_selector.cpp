@@ -40,11 +40,10 @@
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <cv_bridge/cv_bridge.h>
-#include "vision_utils/io.h"
+
 // AD
-#include "vision_utils/utils/debug_utils.h"
-#include "vision_utils/utils/timer.h"
-// people_msgs_rl
+#include "vision_utils/timer.h"
+// people_msgs
 #include "people_detection_vision/fast_cluster_functions.h"
 
 cv_bridge::CvImageConstPtr object_bridge_img;
@@ -70,13 +69,13 @@ void mouse_callback(int event, int x, int y, int, void*) {
   _obj_name = object_bridge_img->image.at<int>(comp_pos);
 
   if (_obj_name == fast_cluster_functions::NO_OBJECT) {
-    maggiePrint("The user clicked on a non object point. Stopping to track.");
+    ROS_WARN("The user clicked on a non object point. Stopping to track.");
   } else {
-    maggiePrint("Starting to track object %i.", _obj_name);
+    ROS_WARN("Starting to track object %i.", _obj_name);
   }
 #else // just send coordinates
   _obj_name = comp_pos.y * object_bridge_img->image.cols + comp_pos.x;
-  maggiePrint("Publishing %i (%i, %i).", _obj_name, comp_pos.x, comp_pos.y);
+  ROS_WARN("Publishing %i (%i, %i).", _obj_name, comp_pos.x, comp_pos.y);
 #endif
   msg.data = _obj_name;
   _obj_coordinates_pub.publish(msg);
@@ -108,7 +107,7 @@ void convert() {
 
 void image_callback(const sensor_msgs::ImageConstPtr& msg) {
   ROS_INFO_THROTTLE(5, "fast_cluster_selector:image_callback()");
-  // Timer timer;
+  // vision_utils::Timer timer;
   try {
     object_bridge_img = cv_bridge::toCvShare(msg);
   } catch (cv_bridge::Exception& e) {

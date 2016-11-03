@@ -28,15 +28,15 @@ Dynamic Environments"
  */
 
 // utils
-#include "vision_utils/utils/timer.h"
-#include "vision_utils/utils/Rect3.h"
-#include "vision_utils/utils/pt_utils.h"
+#include "vision_utils/timer.h"
+#include "vision_utils/Rect3.h"
+
 // kinect
-#include "vision_utils/kinect_openni_utils.h"
+
 // vision_utils
 #include "vision_utils/disjoint_sets2.h"
-#include "vision_utils/drawing_utils.h"
-// people_msgs_rl
+
+// people_msgs
 #include "vision_utils/rgb_depth_pplp_template.h"
 #include "vision_utils/images2ppl.h"
 
@@ -57,7 +57,7 @@ public:
   Ppm() : RgbDepthPPLPublisherTemplate("PPM_PPLP_START", "PPM_PPLP_STOP") {
     // get camera model
     image_geometry::PinholeCameraModel rgb_camera_model;
-    kinect_openni_utils::read_camera_model_files
+    vision_utils::read_camera_model_files
         (DEFAULT_KINECT_SERIAL(), _default_depth_camera_model, rgb_camera_model);
   }
 
@@ -65,24 +65,24 @@ public:
 
   virtual void process_rgb_depth(const cv::Mat3b & rgb,
                                  const cv::Mat1f & depth) {
-    std::vector<geometry_utils::Rect3f> comps_bboxes;
+    std::vector<vision_utils::Rect3f> comps_bboxes;
     rois(rgb, depth, _default_depth_camera_model,
          _comps_points, _comps_images, comps_bboxes);
     unsigned int npeople = _comps_images.size();
 
     if (get_ppl_num_subscribers() > 0) { // build PPL message
-      Timer timer;
+      vision_utils::Timer timer;
       _ppl.header = _images_header; // reuse the header of the last frame
-      _ppl.method = "ppm";
-      _ppl.poses.resize(npeople);
+      _ppl.people.resize(npeople);
+
       for (unsigned int people_idx = 0; people_idx < npeople; ++people_idx) {
-        people_msgs_rl::PeoplePose* pp = &(_ppl.poses[people_idx]);
+        people_msgs::Person* pp = &(_ppl.people[people_idx]);
+        vision_utils::set_method(*pp, "ppm");
         pp->header = _images_header;
-        pp->person_name = people_msgs_rl::PeoplePose::NO_RECOGNITION_MADE;
-        pt_utils::copy3(comps_bboxes[people_idx].centroid<Pt3f>(),
-                        pp->head_pose.position);
-        pp->std_dev = 1; // TODO improve that
-        pp->confidence = 1; // TODO improve that
+        pp->name = "NOREC";
+        vision_utils::copy3(comps_bboxes[people_idx].centroid<Pt3f>(),
+                        pp->position);
+        pp->reliability = 1; // TODO improve that
         _images2pp.rgb2user_and_convert(*pp, &_comps_images[people_idx], &depth, true);
       } // end for people_idx
       DEBUG_PRINT("Time for PPL creation:%g ms, %i users\n", timer.time(), npeople);
@@ -98,21 +98,21 @@ public:
             const image_geometry::PinholeCameraModel & depth_camera_model,
             std::vector<std::vector<Pt3f> > & comps_points,
             std::vector<cv::Mat3b> & comps_images,
-            std::vector<geometry_utils::Rect3f> & comps_bboxes) {
+            std::vector<vision_utils::Rect3f> & comps_bboxes) {
     if (!depth_camera_model.initialized()) {
       printf("rois(): depth_cam_model not initialized\n");
       return false;
     }
 
-    Timer timer;
+    vision_utils::Timer timer;
     // convert to Cartesian
     //std::vector<cv::Scalar> colors;
     unsigned int data_step = 2;
-    kinect_openni_utils::pixel2world_depth
+    vision_utils::pixel2world_depth
         (depth, depth_camera_model, _depth_reprojected,
          data_step, cv::Mat(), true);
     unsigned int npts3d = _depth_reprojected.size();
-    //  kinect_openni_utils::pixel2world_rgb_color255
+    //  vision_utils::pixel2world_rgb_color255
     //      (bgr, depth, depth_camera_model, depth_reprojected, colors,
     //       step, cv::Mat(), true);
     _cloud2ppm.resize(npts3d);
@@ -195,7 +195,7 @@ public:
       const float* depth_ptr = depth.ptr<float>(row);
       const cv::Vec3b* bgr_data = bgr.ptr<cv::Vec3b>(row);
       for (int col = 0; col < cols; col += data_step) {
-        if (std_utils::is_nan_depth(depth_ptr[col])) // NaN depth point
+        if (vision_utils::is_nan_depth(depth_ptr[col])) // NaN depth point
           continue;
         // reproject depth point to 3D - reuse reproject points
         Pt3f* pt3d = &(_depth_reprojected[depth_reprojected_ctr]);
@@ -251,8 +251,8 @@ public:
 
     for (unsigned int comp_idx = 0; comp_idx < _comps_points_non_filtered.size(); ++comp_idx) {
       Comp3f* curr_comp = &(_comps_points_non_filtered[comp_idx]);
-      geometry_utils::Rect3f curr_comp_bbox =
-          geometry_utils::boundingBox_vec3<float, Pt3f, Comp3f >(*curr_comp);
+      vision_utils::Rect3f curr_comp_bbox =
+          vision_utils::boundingBox_vec3<float, Pt3f, Comp3f >(*curr_comp);
       if (curr_comp_bbox.height < MIN_USER_HEIGHT
           || curr_comp_bbox.height > MAX_USER_HEIGHT
           || curr_comp_bbox.width < MIN_USER_WIDTH
@@ -291,7 +291,7 @@ public:
     // now compute all bounding boxes
     // the default constructor of Rect3f sets width at -1,
     // which ensure proper behaviour for extendToInclude() for the first pt
-    std::vector<geometry_utils::Rect3f> _bboxes(ncomps);
+    std::vector<vision_utils::Rect3f> _bboxes(ncomps);
     for (unsigned int pt_idx = 0; pt_idx < npts3d; ++pt_idx) {
       unsigned int ppm_idx = _cloud2ppm[pt_idx];
       CompIdx comp_idx = ppm2comp_data[ppm_idx];
@@ -307,7 +307,7 @@ public:
     std::vector<int> keep_comp2good_idx(ncomps, -1);
     int ngood_comps = 0;
     for (unsigned int bbox_idx = 0; bbox_idx < ncomps; ++bbox_idx) {
-      geometry_utils::Rect3f* curr_comp_bbox = &(_bboxes[bbox_idx]);
+      vision_utils::Rect3f* curr_comp_bbox = &(_bboxes[bbox_idx]);
       if (curr_comp_bbox->height < MIN_USER_HEIGHT
           || curr_comp_bbox->height > MAX_USER_HEIGHT
           || curr_comp_bbox->width < MIN_USER_WIDTH
@@ -341,7 +341,7 @@ public:
       const float* depth_ptr = depth.ptr<float>(row);
       const cv::Vec3b* bgr_data = bgr.ptr<cv::Vec3b>(row);
       for (int col = 0; col < depth_cols; col += data_step) {
-        if (std_utils::is_nan_depth(depth_ptr[col])) // NaN depth point
+        if (vision_utils::is_nan_depth(depth_ptr[col])) // NaN depth point
           continue;
         unsigned int ppm_idx = _cloud2ppm[depth_reprojected_ctr];
         CompIdx comp_idx = ppm2comp_data[ppm_idx];
@@ -378,30 +378,30 @@ public:
                const std::vector<cv::Mat3b> & comps_images) {
     _ppm.convertTo(_ppm_float, CV_32FC1);
     cv::imshow("rgb", rgb);
-    cv::imshow("depth", image_utils::depth2viz(depth, image_utils::FULL_RGB_STRETCHED));
-    cv::imshow("ppm_float", image_utils::depth2viz(_ppm_float, image_utils::FULL_RGB_STRETCHED, 3));
+    cv::imshow("depth", vision_utils::depth2viz(depth, vision_utils::FULL_RGB_STRETCHED));
+    cv::imshow("ppm_float", vision_utils::depth2viz(_ppm_float, vision_utils::FULL_RGB_STRETCHED, 3));
     cv::imshow("ppm_thres", _ppm_thres);
     cv::imshow("ppm2comp", user_image_to_rgb(_ppm2comp, 16));
 
-    image_utils::imwrite_debug("rgb.png", rgb);
-    image_utils::imwrite_debug("depth.png", image_utils::depth2viz(depth, image_utils::FULL_RGB_STRETCHED), image_utils::COLORS256);
-    image_utils::imwrite_debug("ppm_float.png", image_utils::depth2viz(_ppm_float, image_utils::FULL_RGB_STRETCHED, 3), image_utils::COLORS256);
-    image_utils::imwrite_debug("ppm_thres.png", _ppm_thres, image_utils::MONOCHROME);
-    image_utils::imwrite_debug("ppm2comp.png", user_image_to_rgb(_ppm2comp, 16), image_utils::COLORS256);
+    vision_utils::imwrite_debug("rgb.png", rgb);
+    vision_utils::imwrite_debug("depth.png", vision_utils::depth2viz(depth, vision_utils::FULL_RGB_STRETCHED), vision_utils::COLORS256);
+    vision_utils::imwrite_debug("ppm_float.png", vision_utils::depth2viz(_ppm_float, vision_utils::FULL_RGB_STRETCHED, 3), vision_utils::COLORS256);
+    vision_utils::imwrite_debug("ppm_thres.png", _ppm_thres, vision_utils::MONOCHROME);
+    vision_utils::imwrite_debug("ppm2comp.png", user_image_to_rgb(_ppm2comp, 16), vision_utils::COLORS256);
 
     if (!_comps_images_non_filtered.empty()) {
-      image_utils::paste_images(_comps_images_non_filtered,
+      vision_utils::paste_images(_comps_images_non_filtered,
                                 _comps_images_non_filtered_collage, true, 100, 100, 5,
-                                true, titlemaps::int_to_number);
+                                true, vision_utils::int_to_number);
       cv::imshow("comps_images_non_filtered", _comps_images_non_filtered_collage);
-      image_utils::imwrite_debug("comps_images_non_filtered.png", _comps_images_non_filtered_collage, image_utils::COLORS256);
+      vision_utils::imwrite_debug("comps_images_non_filtered.png", _comps_images_non_filtered_collage, vision_utils::COLORS256);
     }
     printf("_comps_images.size():%i\n", comps_images.size());
-    image_utils::paste_images(comps_images,
+    vision_utils::paste_images(comps_images,
                               _comps_images_filtered_collage, true, 100, 100, 5,
-                              true, titlemaps::int_to_number);
+                              true, vision_utils::int_to_number);
     cv::imshow("comps_images_filtered", _comps_images_filtered_collage);
-    image_utils::imwrite_debug("comps_images_filtered.png", _comps_images_filtered_collage, image_utils::COLORS256);
+    vision_utils::imwrite_debug("comps_images_filtered.png", _comps_images_filtered_collage, vision_utils::COLORS256);
   }
 
   virtual void display(const cv::Mat3b & rgb, const cv::Mat1f & depth) {
@@ -470,8 +470,8 @@ private:
   // conversion to PPL
   std::vector<std::vector<cv::Point3f> > _comps_points;
   std::vector<cv::Mat3b> _comps_images;
-  people_msgs_rl::PeoplePoseList _ppl;
-  ppl_utils::Images2PP _images2pp;
+  people_msgs::People _ppl;
+  vision_utils::Images2PP _images2pp;
 
   // viz
   cv::Mat1f _ppm_float;

@@ -27,7 +27,7 @@
 #include <std_msgs/Int32.h>
 #include <std_msgs/Empty.h>
 #include <sensor_msgs/Joy.h>
-// people_msgs_rl
+// people_msgs
 #include "people_detection_vision/fast_cluster_functions.h"
 
 ros::Subscriber joy_sub_;

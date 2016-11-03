@@ -22,7 +22,7 @@ ________________________________________________________________________________
 
 Tests for \file ppm_pplp.h
 rosparam set /kinect_only/kinect_serial_number A00365A10630110A
-ROS_NAMESPACE=kinect_only rosrun people_msgs_rl ppm_pplp.exe --activate
+ROS_NAMESPACE=kinect_only rosrun people_msgs ppm_pplp.exe --activate
 
  */
 #if 0
@@ -62,12 +62,12 @@ public:
          ppm, ppm_thres, set, comps_points, comps_images);
 
     cv::imshow("bgr", frame());
-    //cv::imshow("depth", image_utils::depth2viz(frame_depth(), image_utils::FULL_RGB_STRETCHED));
+    //cv::imshow("depth", vision_utils::depth2viz(frame_depth(), vision_utils::FULL_RGB_STRETCHED));
     ppm.convertTo(ppm_float, CV_32FC1);
     if (!ppm_float.empty())
-      cv::imshow("ppm_float", image_utils::depth2viz(ppm_float, image_utils::FULL_RGB_STRETCHED, 3));
+      cv::imshow("ppm_float", vision_utils::depth2viz(ppm_float, vision_utils::FULL_RGB_STRETCHED, 3));
     //cv::imshow("ppm_thres", ppm_thres);
-    image_utils::paste_images(comps_images, comps_images_collage, true, 200, 150);
+    vision_utils::paste_images(comps_images, comps_images_collage, true, 200, 150);
     cv::imshow("comps_images_collage", comps_images_collage);
     cv::waitKey(50);
   }

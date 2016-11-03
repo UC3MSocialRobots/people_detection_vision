@@ -3,7 +3,7 @@
   \author      Arnaud Ramey <arnaud.a.ramey@gmail.com>
                 -- Robotics Lab, University Carlos III of Madrid
   \date        2013/10/9
-  
+
 ________________________________________________________________________________
 
 This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ________________________________________________________________________________
 
-A people detector and people_msgs_rl::PeoplePoseList publisher
+A people detector and people_msgs::People publisher
 based on ARToolkit tags.
 
 \section Parameters
@@ -55,7 +55,7 @@ based on ARToolkit tags.
         The camera info that activates the 'ar_pose' node.
 
   - \b "~ppl"
-        [people_msgs_rl::PeoplePoseList]
+        [people_msgs::People]
         The detected users in the mask
  */
 
@@ -63,11 +63,11 @@ based on ARToolkit tags.
 #include <sensor_msgs/CameraInfo.h>
 #include <ros/topic.h>
 // AD
-#include <people_msgs_rl/PeoplePoseList.h>
+#include <people_msgs/People.h>
 #include "vision_utils/pplp_template.h"
-#include "vision_utils/utils/system_utils.h"
-#include "vision_utils/utils/stats_utils.h"
-#include "vision_utils/utils/map_utils.h"
+
+
+
 #include "people_detection_vision/artoolkit_utils.h"
 
 class ARToolkitPPLP : public PPLPublisherTemplate {
@@ -147,7 +147,7 @@ public:
       return;
     // convert to PPL
     // prepare the message
-    people_msgs_rl::PeoplePoseList ppl_msg;
+    people_msgs::People ppl_msg;
     // ppl_msg.header = msg->header;
     // the header of the marker list is empty but not the header of each marker
     if (nmarkers >= 1)
@@ -157,20 +157,20 @@ public:
       ppl_msg.header.stamp = ros::Time::now();
     }
     ppl_msg.poses.reserve(nmarkers);
-    ppl_msg.method = "artoolkit";
 
     // convert center of masses to 3D positions
     for (unsigned int marker_idx = 0; marker_idx < nmarkers; ++marker_idx) {
       ar_pose::ARMarker marker = msg->markers[marker_idx];
-      // shape a PeoplePose
-      people_msgs_rl::PeoplePose pp;
+      // shape a Person
+      people_msgs::Person pp;
+      vision_utils::set_method(pp, "artoolkit");
       pp.header = ppl_msg.header;
       std::string name;
       if (_pattern_map.direct_lookup(marker.id, name)) // conversion id -> name
-        pp.person_name = name;
+        pp.name = name;
       else // keep id
-        pp.person_name = string_utils::cast_to_string(marker.id);
-      pp.head_pose = marker.pose.pose;
+        pp.name = vision_utils::cast_to_string(marker.id);
+      pp.position = marker.pose.pose;
       // http://en.wikipedia.org/wiki/Covariance_and_correlation
       // The covariance of a variable with itself (i.e. \sigma_{XX})
       // is called the variance and is more commonly denoted as \sigma_X^2,
@@ -179,7 +179,7 @@ public:
       //mean_std_dev(marker.pose.covariance, mean_cov, stddev_cov);
       mean<double>((double*) &(marker.pose.covariance), 36);
       pp.std_dev = mean_cov;
-      pp.confidence = 0.01 * marker.confidence; // 0..100 -> 0..1
+      pp.reliability = 0.01 * marker.reliability; // 0..100 -> 0..1
       ppl_msg.poses.push_back(pp);
     } // end loop marker_idx
     publish_PPL(ppl_msg);
@@ -188,12 +188,12 @@ public:
   //////////////////////////////////////////////////////////////////////////////
 
   void shutdown_subscribers_and_publishers()  {
-    maggieDebug2("shutdown_subscribers_and_publishers()");
+    ROS_INFO("shutdown_subscribers_and_publishers()");
     // unsubscribe to markers
     _art_markers_sub.shutdown();
 
     // kill the node
-    std::string out = system_utils::exec_system_get_output
+    std::string out = vision_utils::exec_system_get_output
                       ("rosnode kill ar_pose");
     // correct output:
     // killing /input_only/ar_pose
@@ -218,7 +218,7 @@ private:
   std::string _art_markers_topic;
 
   std::string _marker_pattern_list;
-  artoolkit_utils::Id2PatternName _pattern_map;
+  vision_utils::Id2PatternName _pattern_map;
 }; // end ARToolkitPPLP
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -34,7 +34,7 @@ Parameters:
 #ifdef USE_BACKGROUND_SUBSTRACTION
 #include "people_detection_vision/bg_substractor_pplp.h"
 #include "kinect/nite_subscriber_template.h"
-#include "vision_utils/io.h"
+
 
 class RLPDGrabber : public NiteSubscriberTemplate, public BackgroundSubstractorPPLP
 {
@@ -62,7 +62,7 @@ private:
 #else // no USE_BACKGROUND_SUBSTRACTION
 ////////////////////////////////////////////////////////////////////////////////
 #include "vision_utils/rgb_depth_user_skill.h"
-#include "vision_utils/io.h"
+
 
 class RLPDGrabber : public RgbDepthUserSkill {
 public:
@@ -81,7 +81,7 @@ public:
     std::ostringstream prefix;
     int msec = (_images_header.stamp - _beginning_stamp).toSec() * 1000;
     prefix << "/tmp/" << std::setw(6) << std::setfill('0') << msec;
-    if (!image_utils::write_rgb_depth_user_to_image_file
+    if (!vision_utils::write_rgb_depth_user_to_image_file
         (prefix.str(), &rgb, &depth, &user, &user_illus)) {
       printf("Could not save the images to '%s'!\n", prefix.str().c_str());
     }

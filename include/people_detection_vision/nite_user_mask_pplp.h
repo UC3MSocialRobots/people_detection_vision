@@ -25,7 +25,7 @@ the NITE middleware:
 * RGB stream,
 * depth stream,
 * user mask stream,
-and converts them into a people_msgs_rl::PeoplePoseList message
+and converts them into a people_msgs::People message
 that contains both the 3D position of the users and
 their color and depth masks.
 
@@ -49,7 +49,7 @@ in the user mask.
 
 \section Publications
   - \b "~ppl"
-        [people_msgs_rl::PeoplePoseList]
+        [people_msgs::People]
         The detected users in the mask
 
  */
@@ -66,10 +66,10 @@ in the user mask.
 #endif
 
 // AD
-#include "vision_utils/utils/map_utils.h"
-#include "vision_utils/utils/timer.h"
+
+#include "vision_utils/timer.h"
 #include "vision_utils/pplp_template.h"
-// people_msgs_rl
+// people_msgs
 #include "vision_utils/images2ppl.h"
 
 #define DEBUG_PRINT(...)   {}
@@ -99,7 +99,7 @@ public:
                        const cv::Mat1b & user_mask) {
     user_image_to_rgb(user_mask, user_illus);
     std::vector<cv::Point> coms2D;
-    map_utils::map_values_to_container(_ppl_conv.get_coms(), coms2D);
+    vision_utils::map_values_to_container(_ppl_conv.get_coms(), coms2D);
     for (unsigned int com2D_idx = 0; com2D_idx < coms2D.size(); ++com2D_idx)
       cv::circle(user_illus, coms2D[com2D_idx], 5, CV_RGB(255,255,255), -1);
     cv::imshow("NiteUserMask2Ppl", user_illus);
@@ -167,9 +167,9 @@ public:
       printf("/!\\ cv_bridge exception: %s\n", e.what());
       return;
     }
-    //  image_utils::imwrite_debug("rgb.png", _rgb_bridge->image);
-    //  image_utils::imwrite_debug("depth.png", _depth_bridge->image);
-    //  image_utils::imwrite_debug("user.png", _user_bridge->image);
+    //  vision_utils::imwrite_debug("rgb.png", _rgb_bridge->image);
+    //  vision_utils::imwrite_debug("depth.png", _depth_bridge->image);
+    //  vision_utils::imwrite_debug("user.png", _user_bridge->image);
     //  cv::imshow("rgb", _rgb_bridge->image);
     //  cv::imshow("depth", _depth_bridge->image);
     //  cv::imshow("user", _user_bridge->image);
@@ -219,7 +219,7 @@ protected:
   message_filters::Synchronizer<MySyncPolicy>* _sync;
   cv_bridge::CvImage::ConstPtr _rgb_bridge, _depth_bridge, _user_bridge;
   //! information sharing
-  ppl_utils::Images2PPL _ppl_conv;
+  vision_utils::Images2PPL _ppl_conv;
 }; // end NiteUserMask2Ppl
 
 #endif // NITE_USER_MASK_PPLP_H

@@ -1,7 +1,6 @@
-#include "vision_utils/utils/debug_utils.h"
 #include "people_detection_vision/connected_components_matcher.h"
-#include "vision_utils/drawing_utils.h"
-#include "vision_utils/color_utils.h"
+
+
 
 inline void test_given_patterns(ConnectedComponentsMatcher & matcher,
                                 cv::Mat1b & patterns,
@@ -14,7 +13,7 @@ inline void test_given_patterns(ConnectedComponentsMatcher & matcher,
   std::vector<ConnectedComponentsMatcher::Bbox> bboxes;
   set.get_connected_components(patterns.cols, comps, bboxes);
 
-  Timer timer;
+  vision_utils::Timer timer;
   matcher.set_new_data(comps, bboxes);
   timer.printTime("after set_new_data()");
   matcher.match();
@@ -23,7 +22,7 @@ inline void test_given_patterns(ConnectedComponentsMatcher & matcher,
 #if 0 // display resized components
   for (unsigned int comp_idx = 0; comp_idx < matcher._last_resized_components.size(); ++comp_idx) {
     patterns = 0;
-    image_utils::drawListOfPoints
+    vision_utils::drawListOfPoints
         (patterns, matcher._last_resized_components[comp_idx], (uchar) 180);
     cv::imshow("patterns", patterns); cv::waitKey(0);
   } // end loop comp_idx
@@ -36,13 +35,13 @@ inline void test_given_patterns(ConnectedComponentsMatcher & matcher,
       ConnectedComponentsMatcher::ObjectName obj_name = 0;
       bool success = matcher.get_comp_name(0, comp_idx, obj_name);
       if (!success) {
-        maggiePrint("Impossible to retrieve the name of %i", comp_idx);
+        ROS_WARN("Impossible to retrieve the name of %i", comp_idx);
         continue;
       }
-      image_utils::drawListOfPoints
-          (illus, comps[comp_idx], color_utils::color<cv::Vec3b>(obj_name));
-      cv::putText(illus, string_utils::cast_to_string(obj_name), bboxes[comp_idx].tl(),
-                  CV_FONT_HERSHEY_PLAIN, 2, color_utils::color_scalar<cv::Scalar>(obj_name));
+      vision_utils::drawListOfPoints
+          (illus, comps[comp_idx], vision_utils::color<cv::Vec3b>(obj_name));
+      cv::putText(illus, vision_utils::cast_to_string(obj_name), bboxes[comp_idx].tl(),
+                  CV_FONT_HERSHEY_PLAIN, 2, vision_utils::color_scalar<cv::Scalar>(obj_name));
     } // end loop comp_idx
     cv::imshow("illus", illus);
     char c = cv::waitKey(time_display_ms);
@@ -88,7 +87,7 @@ inline void test_moving_numbers(bool display) {
         directions[comp_idx].y = -std::abs(directions[comp_idx].y);
       // generate the img
       cv::putText(patterns,
-                  string_utils::cast_to_string<char>('A' + comp_idx),
+                  vision_utils::cast_to_string<char>('A' + comp_idx),
                   centers[comp_idx],
                   CV_FONT_HERSHEY_PLAIN, 3 + drand48() / 2, cv::Scalar::all(255),
                   3);
@@ -111,7 +110,7 @@ inline void test_increasing_numbers(bool display) {
     patterns = 0;
     for (unsigned int comp_idx = 0; comp_idx < n_comp - 1; ++comp_idx) {
       // generate the img
-      std::string text = string_utils::cast_to_string<int>(comp_idx);
+      std::string text = vision_utils::cast_to_string<int>(comp_idx);
       cv::putText(patterns,
                   text,
                   cv::Point(40 + 40 * comp_idx, 100 + 20 * cos(t)),
@@ -126,10 +125,10 @@ inline void test_increasing_numbers(bool display) {
 ////////////////////////////////////////////////////////////////////////////////
 
 int main(int, char**) {
-  maggieDebug2("main()");
+  ROS_INFO("main()");
   srand(time(NULL));
-  maggiePrint("1: test_increasing_numbers()");
-  maggiePrint("2: test_moving_numbers()");
+  ROS_WARN("1: test_increasing_numbers()");
+  ROS_WARN("2: test_moving_numbers()");
   int choice = 1;
   //std::cin >> choice;
   if (choice == 1)

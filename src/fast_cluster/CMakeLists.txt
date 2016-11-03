@@ -1,5 +1,5 @@
 add_executable(fast_cluster_detector.exe fast_cluster_detector.cpp )
-target_link_libraries(fast_cluster_detector.exe disjoint_sets2 ${catkin_LIBRARIES})
+target_link_libraries(fast_cluster_detector.exe ${catkin_LIBRARIES})
 add_dependencies(fast_cluster_detector.exe ${catkin_EXPORTED_TARGETS})
 
 add_executable(fast_cluster_selector.exe fast_cluster_selector.cpp )
@@ -17,5 +17,5 @@ add_dependencies(fast_dialog.exe ${catkin_EXPORTED_TARGETS})
 ################################################################################
 
 add_executable(test_connected_components_matcher.exe  test_connected_components_matcher.cpp )
-target_link_libraries(test_connected_components_matcher.exe disjoint_sets2 ${catkin_LIBRARIES})
+target_link_libraries(test_connected_components_matcher.exe ${catkin_LIBRARIES})
 add_dependencies(test_connected_components_matcher.exe ${catkin_EXPORTED_TARGETS})

@@ -48,7 +48,7 @@ Systems, Man, and Cybernetics, Part B:  …, 2009.
 
 \section Publications
   - \b "~ppl"
-        [people_msgs_rl::PeoplePoseList]
+        [people_msgs::People]
         The poses of the found people.
 
   - \b "~marker"
@@ -63,23 +63,21 @@ Systems, Man, and Cybernetics, Part B:  …, 2009.
 // ROS
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
-// people_msgs_rl
+// people_msgs
 #include "vision_utils/pplp_template.h"
 // utils
-#include "vision_utils/utils/pt_utils.h"
-#include "vision_utils/utils/local_minimization_operator.h"
-#include "vision_utils/utils/geometry_utils.h"
-#include "vision_utils/utils/foo_point.h"
-#include "vision_utils/utils/string_casts.h"
-#include "vision_utils/utils/timer.h"
+
+#include "vision_utils/local_minimization_operator.h"
+#include "vision_utils/foo_point.h"
+#include "vision_utils/timer.h"
 #ifdef PUBLISH_MARKER
-#include "vision_utils/utils/marker_utils.h"
+
 #endif // PUBLISH_MARKER
 
 class LegPPLP : public PPLPublisherTemplate {
 public:
   //! a minimalistic Point structure
-  typedef geometry_utils::FooPoint2f Point2;
+  typedef vision_utils::FooPoint2f Point2;
   static const double ADJACENT_EDGES_DISTANCE_THRESH = .3 * .3; // m^2
   static const double ADJACENT_EDGES_ANGLE_THRESH = .2; // radians
   // distance parameters
@@ -121,12 +119,12 @@ public:
     if  (e1.type != e2.type)
       return false;
     // close matching ends
-    if (geometry_utils::distance_points(e1.p1, e2.p0)
+    if (vision_utils::distance_points(e1.p1, e2.p0)
         > ADJACENT_EDGES_DISTANCE_THRESH)
       return false;
     // between 0 and PI
     if (fabs(M_PI -
-             geometry_utils::absolute_angle_between_three_points
+             vision_utils::absolute_angle_between_three_points
              (e1.p0, e1.p1, e2.p1)) > ADJACENT_EDGES_ANGLE_THRESH)
       return false;
     return true;
@@ -174,8 +172,8 @@ connect edges that are adjacent one to the other,
     _nh_private.param("edge_distance_threshold", edge_distance_threshold, .2);
     _nh_private.param("local_minimization_window_size", local_minimization_window_size, 3);
 
-	const double LEG_PATTERN_LA_LEG_WIDTH_auxConst = LEG_PATTERN_LA_LEG_WIDTH;
-	const double LEG_PATTERN_LA_LEG_GAP_auxConst = LEG_PATTERN_LA_LEG_GAP;
+  const double LEG_PATTERN_LA_LEG_WIDTH_auxConst = LEG_PATTERN_LA_LEG_WIDTH;
+  const double LEG_PATTERN_LA_LEG_GAP_auxConst = LEG_PATTERN_LA_LEG_GAP;
 
     // prepare patterns
     template_LA_pattern.clear();
@@ -206,7 +204,7 @@ connect edges that are adjacent one to the other,
 #endif // PUBLISH_MARKER
     ROS_WARN
         ("leg_pplp:This executable subscribes to a laser scan '%s', "
-         "and find leg patterns in them. It publishes PeoplePoseList results to '%s'.",
+         "and find leg patterns in them. It publishes People results to '%s'.",
          _laser_sub.getTopic().c_str(), get_ppl_topic().c_str());
   }
 
@@ -237,7 +235,7 @@ connect edges that are adjacent one to the other,
       marker_msg.colors.push_back(color);
       marker_msg.colors.push_back(color);
     } // end loop edge_idx
-    marker_utils::list_points2_as_primitives
+    vision_utils::list_points2_as_primitives
         (marker_msg, marker_pts, "edges_ends", 0.1, // z
          0.02, // size
          1, 0, 0, 1,
@@ -259,7 +257,7 @@ connect edges that are adjacent one to the other,
   void find_LA_patterns(std::vector<Edge> & E,
                         std::vector<Point2> & out) {
     // printf("find_LA_patterns()\n");
-    // Timer timer;
+    // vision_utils::Timer timer;
     out.clear();
     // e_m = first left edge of E
     unsigned int m = 0;
@@ -279,7 +277,7 @@ connect edges that are adjacent one to the other,
             candidate_LA_pattern[1] = E[m + 1].p0;
             candidate_LA_pattern[2] = E[n]    .p1;
             candidate_LA_pattern[3] = E[n + 1].p0;
-            double pattern_dist = geometry_utils::distance_patterns
+            double pattern_dist = vision_utils::distance_patterns
                                   (template_LA_pattern, candidate_LA_pattern, LEG_PATTERN_LA_MAX_DIST);
             //  ROS_INFO_THROTTLE(1, "pattern_dist=%g: possible LA pattern at indices %i, %i, %i, %i\n",
             //         pattern_dist, m, m + 1, n, n + 1);
@@ -315,7 +313,7 @@ connect edges that are adjacent one to the other,
   void find_FS_patterns(std::vector<Edge> & E,
                         std::vector<Point2> & out) {
     // printf("find_FS_patterns()\n");
-    // Timer timer;
+    // vision_utils::Timer timer;
     out.clear();
     // e_m = first left edge of E
     unsigned int m = 0;
@@ -337,14 +335,14 @@ connect edges that are adjacent one to the other,
         candidate_FS_pattern[2] = E[m + 2].p0;
         if (E[m + 1].type == Edge::LEFT_EDGE) { // LLR -> p1, p1, p0
           candidate_FS_pattern[1] = E[m + 1].p1;
-          pattern_dist = geometry_utils::distance_patterns
+          pattern_dist = vision_utils::distance_patterns
                          (template_FS_LLR_pattern, candidate_FS_pattern, LEG_PATTERN_FS_MAX_DIST);
           //  ROS_INFO_THROTTLE(1, "pattern_dist=%g: possible LLR FS pattern at indices %i, %i, %i\n",
           //         pattern_dist, m, m + 1, m + 2);
         }
         else { // LRR -> p1, p0, p0
           candidate_FS_pattern[1] = E[m + 1].p0;
-          pattern_dist = geometry_utils::distance_patterns
+          pattern_dist = vision_utils::distance_patterns
                          (template_FS_LRR_pattern, candidate_FS_pattern, LEG_PATTERN_FS_MAX_DIST);
           //  ROS_INFO_THROTTLE(1, "pattern_dist=%g: possible LRR FS pattern at indices %i, %i, %i\n",
           //         pattern_dist, m, m + 1, m + 2);
@@ -376,7 +374,7 @@ connect edges that are adjacent one to the other,
   void find_SL_patterns(std::vector<Edge> & E,
                         std::vector<Point2> & out) {
     // printf("find_SL_patterns()\n");
-    // Timer timer;
+    // vision_utils::Timer timer;
     out.clear();
     // e_m = first left edge of E
     unsigned int m = 0;
@@ -390,7 +388,7 @@ connect edges that are adjacent one to the other,
           && E[m + 1].type == Edge::RIGHT_EDGE) {
         candidate_SL_pattern[0] = E[m]    .p1;
         candidate_SL_pattern[1] = E[m + 1].p0;
-        double pattern_dist = geometry_utils::distance_patterns
+        double pattern_dist = vision_utils::distance_patterns
                               (template_SL_pattern, candidate_SL_pattern, LEG_PATTERN_SL_MAX_DIST);
 
         if (pattern_dist < LEG_PATTERN_SL_MAX_DIST) {
@@ -473,46 +471,45 @@ connect edges that are adjacent one to the other,
     unsigned int n_people = LA_patterns.size() + FS_patterns.size() + SL_patterns.size();
     // build new message
     _ppl.header = scan_ptr->header;
-    _ppl.method = "leg_pplp";
-    _ppl.poses.clear();
-    _ppl.poses.reserve(n_people);
+    _ppl.people.clear();
+    _ppl.people.reserve(n_people);
     for (unsigned int head_idx = 0; head_idx < n_people; ++head_idx) {
-      people_msgs_rl::PeoplePose people_pose;
+      people_msgs::Person people_pose;
+      vision_utils::set_method(people_pose, "leg_pplp");
       people_pose.header = _ppl.header; // copy header
-      people_pose.person_name = string_utils::cast_to_string(head_idx);
-      people_pose.confidence = 1;
-      people_pose.std_dev = .1;
+      people_pose.name = vision_utils::cast_to_string(head_idx);
+      people_pose.reliability = 1;
       // set pose
-      geometry_msgs::Pose* new_pose = &(people_pose.head_pose);
+      geometry_msgs::Pose* new_pose = &(people_pose.position);
       new_pose->orientation = tf::createQuaternionMsgFromYaw(0);
       if (head_idx < LA_patterns.size())
-        pt_utils::copy2(LA_patterns[head_idx],
+        vision_utils::copy2(LA_patterns[head_idx],
                         new_pose->position);
       else if (head_idx < LA_patterns.size() + FS_patterns.size())
-        pt_utils::copy2(FS_patterns[head_idx - LA_patterns.size()],
+        vision_utils::copy2(FS_patterns[head_idx - LA_patterns.size()],
             new_pose->position);
       else
-        pt_utils::copy2(SL_patterns[head_idx - LA_patterns.size() - FS_patterns.size()],
+        vision_utils::copy2(SL_patterns[head_idx - LA_patterns.size() - FS_patterns.size()],
             new_pose->position);
       new_pose->position.z = 1.7;
 
       // add it
-      _ppl.poses.push_back(people_pose);
+      _ppl.people.push_back(people_pose);
     } // end loop head_idx
     // publish message
     publish_PPL(_ppl);
 
 #ifdef PUBLISH_MARKER
     marker_msg.header.frame_id = scan_ptr->header.frame_id;
-    marker_utils::list_points2_as_primitives
+    vision_utils::list_points2_as_primitives
         (marker_msg, LA_patterns, "LA_patterns", 0.1, // z
          0.2 /* size */ , 1, 0, 0, 1, marker_msg.header.frame_id);
     _marker_pub.publish(marker_msg);
-    marker_utils::list_points2_as_primitives
+    vision_utils::list_points2_as_primitives
         (marker_msg, FS_patterns, "FS_patterns", 0.1, // z
          0.2 /* size */ , 0, 1, 0, 1, marker_msg.header.frame_id);
     _marker_pub.publish(marker_msg);
-    marker_utils::list_points2_as_primitives
+    vision_utils::list_points2_as_primitives
         (marker_msg, SL_patterns, "SL_patterns", 0.1, // z
          0.2 /* size */ , 0, 0, 1, 1, marker_msg.header.frame_id);
     _marker_pub.publish(marker_msg);
@@ -549,7 +546,7 @@ private:
 #endif // PUBLISH_MARKER
 
   //! ROS message to share results
-  people_msgs_rl::PeoplePoseList _ppl;
+  people_msgs::People _ppl;
 }; // end class LegPPLP
 
 

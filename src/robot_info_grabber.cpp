@@ -72,12 +72,12 @@ or another without odometry.
 
 // boost
 #include "boost/filesystem.hpp" // for creating folders
-#include "vision_utils/cv_conversion_float_uchar.h"
+
 
 // utils
-#include "vision_utils/io.h"
-#include "vision_utils/utils/pt_utils.h"
-#include "vision_utils/utils/timestamp.h"
+
+
+#include "vision_utils/timestamp.h"
 // ROS
 #include <ros/ros.h>
 #include <message_filters/subscriber.h>
@@ -104,7 +104,7 @@ cv_bridge::CvImageConstPtr _rgb_ptr;
 //depth stuff
 cv_bridge::CvImageConstPtr _depth_ptr;
 cv::Mat _depth_img_as_uchar, _src_float_clean_buffer;
-image_utils::ScaleFactorType _alpha, _beta;
+vision_utils::ScaleFactorType _alpha, _beta;
 // odom
 typedef nav_msgs::Odometry OdomMsg;
 OdomMsg _last_odom;
@@ -126,9 +126,9 @@ inline double time() {
 
 bool save_rgb_as_png(const sensor_msgs::ImageConstPtr& rgb_msg,
                      const std::string & filename_prefix) {
-  image_utils::write_rgb_and_depth_image_as_uchar_to_image_file
+  vision_utils::write_rgb_and_depth_image_as_uchar_to_image_file
       (filename_prefix, &_rgb_ptr->image, NULL, NULL, NULL,
-       image_utils::FILE_BMP, false);
+       vision_utils::FILE_BMP, false);
   return true;
 } // end save_rgb_as_png()
 
@@ -136,13 +136,13 @@ bool save_rgb_as_png(const sensor_msgs::ImageConstPtr& rgb_msg,
 
 bool save_depth_as_png(const sensor_msgs::ImageConstPtr& depth_msg,
                        const std::string & filename_prefix) {
-  //image_utils::write_rgb_and_depth_image_to_image_file(filename_prefix, NULL, &depth_ptr->image);
-  image_utils::convert_float_to_uchar(_depth_ptr->image,
+  //vision_utils::write_rgb_and_depth_image_to_image_file(filename_prefix, NULL, &depth_ptr->image);
+  vision_utils::convert_float_to_uchar(_depth_ptr->image,
                                       _depth_img_as_uchar, _src_float_clean_buffer,
                                       _alpha, _beta);
-  image_utils::write_rgb_and_depth_image_as_uchar_to_image_file
+  vision_utils::write_rgb_and_depth_image_as_uchar_to_image_file
       (filename_prefix, &_rgb_ptr->image, &_depth_img_as_uchar, &_alpha, &_beta,
-       image_utils::FILE_BMP, false);
+       vision_utils::FILE_BMP, false);
   return true;
 } // end save_depth_as_png()
 
@@ -155,7 +155,7 @@ bool save_last_odom_as_yaml(const std::string & filename_prefix) {
   odom_yaml << "\tx:"<< _last_odom.pose.pose.position.x << "\n";
   odom_yaml << "\ty:"<< _last_odom.pose.pose.position.y << "\n";
   double roll, pitch, yaw;
-  pt_utils::rpy_from_quaternion(_last_odom.pose.pose.orientation,
+  vision_utils::rpy_from_quaternion(_last_odom.pose.pose.orientation,
                                 roll, pitch, yaw);
   odom_yaml << "\tyaw:"<< yaw << "\n";
   odom_yaml << "\torientation_quaternion:\n";
@@ -183,7 +183,7 @@ bool save_last_odom_as_yaml(const std::string & filename_prefix) {
 
 void rgb_depth_cb(const sensor_msgs::ImageConstPtr& rgb_msg,
                   const sensor_msgs::ImageConstPtr& depth_msg) {
-  std::string filename_prefix = _output_folder + std::string("/") + string_utils::timestamp();
+  std::string filename_prefix = _output_folder + std::string("/") + vision_utils::timestamp();
   ROS_INFO_THROTTLE(1, " %.2f Hz (%g s, %i frames), rgb_depth_cb('%s')",
                     freq_get(), time(), _frames_grabbed, filename_prefix.c_str());
   freq_reset();
@@ -201,7 +201,7 @@ void rgb_depth_cb(const sensor_msgs::ImageConstPtr& rgb_msg,
     save_depth_as_png(depth_msg, filename_prefix);
   }
   if (_save_images_yaml)
-    image_utils::write_rgb_and_depth_to_yaml_file
+    vision_utils::write_rgb_and_depth_to_yaml_file
         (filename_prefix, _rgb_ptr->image, _depth_ptr->image, false);
   if (_subscribe_odom) // save odometry if wanted
     save_last_odom_as_yaml(filename_prefix);
@@ -210,7 +210,7 @@ void rgb_depth_cb(const sensor_msgs::ImageConstPtr& rgb_msg,
 ////////////////////////////////////////////////////////////////////////////////
 
 void depth_cb(const sensor_msgs::ImageConstPtr& depth_msg) {
-  std::string filename_prefix = _output_folder + std::string("/") + string_utils::timestamp();
+  std::string filename_prefix = _output_folder + std::string("/") + vision_utils::timestamp();
   ROS_INFO_THROTTLE(1, " %.2f Hz (%i frames), depth_cb('%s')",
                     freq_get(), _frames_grabbed, filename_prefix.c_str());
   freq_reset();
@@ -225,7 +225,7 @@ void depth_cb(const sensor_msgs::ImageConstPtr& depth_msg) {
   if (_save_images_png)
     save_depth_as_png(depth_msg, filename_prefix);
   if (_save_images_yaml)
-    image_utils::write_rgb_and_depth_to_yaml_file(filename_prefix, cv::Mat(), _depth_ptr->image);
+    vision_utils::write_rgb_and_depth_to_yaml_file(filename_prefix, cv::Mat(), _depth_ptr->image);
   if (_subscribe_odom) // save odometry if wanted
     save_last_odom_as_yaml(filename_prefix);
 } // end rgb_depth_odom_cb();
@@ -233,7 +233,7 @@ void depth_cb(const sensor_msgs::ImageConstPtr& depth_msg) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void rgb_cb(const sensor_msgs::ImageConstPtr& rgb_msg) {
-  std::string filename_prefix = _output_folder + std::string("/") + string_utils::timestamp();
+  std::string filename_prefix = _output_folder + std::string("/") + vision_utils::timestamp();
   ROS_INFO_THROTTLE(1, " %.2f Hz (%i frames), rgb_cb('%s')",
                     freq_get(), _frames_grabbed, filename_prefix.c_str());
   freq_reset();
@@ -248,7 +248,7 @@ void rgb_cb(const sensor_msgs::ImageConstPtr& rgb_msg) {
   if (_save_images_png)
     save_rgb_as_png(rgb_msg, filename_prefix);
   if (_save_images_yaml)
-    image_utils::write_rgb_and_depth_to_yaml_file
+    vision_utils::write_rgb_and_depth_to_yaml_file
         (filename_prefix, _rgb_ptr->image,cv::Mat(), false);
   if (_subscribe_odom) // save odometry if wanted
     save_last_odom_as_yaml(filename_prefix);
@@ -261,7 +261,7 @@ void odom_cb(const OdomMsg::ConstPtr & odom_msg) {
   // keep a copy
   _last_odom = *odom_msg;
   if (!_subscribe_depth && !_subscribe_rgb) { // save odometry if wanted
-    std::string filename_prefix = _output_folder + std::string("/") + string_utils::timestamp();
+    std::string filename_prefix = _output_folder + std::string("/") + vision_utils::timestamp();
     save_last_odom_as_yaml(filename_prefix);
   }
 } // end odom_cb();
@@ -277,7 +277,7 @@ int main(int argc, char** argv) {
   nh_private.param("depth_topic", depth_topic, depth_topic);
   std::string odom_topic = "";
   nh_private.param("odom_topic", odom_topic, odom_topic);
-  _output_folder = std::string("/tmp/robot_info_grabber_") + string_utils::timestamp();
+  _output_folder = std::string("/tmp/robot_info_grabber_") + vision_utils::timestamp();
   nh_private.param("output_folder", _output_folder, _output_folder);
   nh_private.param("save_images_png", _save_images_png, _save_images_png);
   nh_private.param("save_images_yaml", _save_images_yaml, _save_images_yaml);
@@ -293,7 +293,7 @@ int main(int argc, char** argv) {
            _output_folder.c_str());
   //  std::ostringstream command;
   //  command << "mkdir --parents " << _output_folder;
-  //  int retval = system_utils::exec_system(command.str());
+  //  int retval = vision_utils::exec_system(command.str());
   //  if (retval != 0) {
   boost::filesystem::path dir(_output_folder);
   if(!boost::filesystem::create_directory(dir)) {

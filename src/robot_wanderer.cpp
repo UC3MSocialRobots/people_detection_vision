@@ -27,13 +27,13 @@
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Twist.h>
 #include <signal.h>
-// people_msgs_rl
-#include "vision_utils/utils/marker_utils.h"
-#include "vision_utils/utils/odom_utils.h"
-#include "vision_utils/utils/laser_utils.h"
-#include "vision_utils/utils/distances.h"
-#include "vision_utils/utils/geometry_utils.h"
-#include "vision_utils/utils/timer.h"
+// people_msgs
+
+
+
+#include "vision_utils/distances.h"
+
+#include "vision_utils/timer.h"
 
 /*
 
@@ -57,7 +57,7 @@ static const float speed_timeout = 5;
 static const int MAX_TRIES = 100000;
 
 // TYPEDEFS
-typedef geometry_utils::FooPoint2f Pt2;
+typedef vision_utils::FooPoint2f Pt2;
 // DATA
 //! the publishers
 ros::Publisher vel_pub, _marker_pub;
@@ -100,9 +100,9 @@ bool check_trajectory_valid(const float & vel_lin, const float & vel_ang,
                             const std::vector<Pt2> & laser_xy) {
   // determine the coming trajectory
   std::vector<Pt2> traj_xy;
-  odom_utils::make_trajectory(vel_lin, vel_ang, traj_xy, TIME_PRED, DT, 0, 0, 0);
+  vision_utils::make_trajectory(vel_lin, vel_ang, traj_xy, TIME_PRED, DT, 0, 0, 0);
   // find if there might be a collision
-  if (geometry_utils::two_vectors_closer_than_threshold(traj_xy, laser_xy, min_obstacle_distance))
+  if (vision_utils::two_vectors_closer_than_threshold(traj_xy, laser_xy, min_obstacle_distance))
     return false;
   else
     return true;
@@ -115,8 +115,8 @@ void laser_callback(const sensor_msgs::LaserScanConstPtr & laser_in) {
   //ROS_INFO("laser_callback()");
 
   // convert laser data to xy
-  laser_utils::convert_sensor_data_to_xy(*laser_in, laser_xy);
-  //  marker_utils::list_points2_as_primitives(marker, laser_xy, "laser_xy", 0.1, 0.01, 0, 1, 0);
+  vision_utils::convert_sensor_data_to_xy(*laser_in, laser_xy);
+  //  vision_utils::list_points2_as_primitives(marker, laser_xy, "laser_xy", 0.1, 0.01, 0, 1, 0);
   //  marker_pub.publish(marker);
 
   bool want_recompute_speed = false;
@@ -162,8 +162,8 @@ void laser_callback(const sensor_msgs::LaserScanConstPtr & laser_in) {
   } // end if (want_recompute_speed)
 
   std::vector<Pt2> traj_xy;
-  odom_utils::make_trajectory(_vel_lin, _vel_ang, traj_xy, TIME_PRED, DT, 0, 0, 0);
-  marker_utils::list_points2_as_primitives(_marker, traj_xy, "traj_xy", 0.1, 0.03, 1, 0, 0);
+  vision_utils::make_trajectory(_vel_lin, _vel_ang, traj_xy, TIME_PRED, DT, 0, 0, 0);
+  vision_utils::list_points2_as_primitives(_marker, traj_xy, "traj_xy", 0.1, 0.03, 1, 0, 0);
   _marker_pub.publish(_marker);
 
   // publish the computed speed

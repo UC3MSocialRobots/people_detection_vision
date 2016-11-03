@@ -57,7 +57,7 @@ people_msgs/Person[] people
 $ rosmsg show people_msgs_rl/PeoplePoseList
 std_msgs/Header header                  --> "header"
 string method                           --> tagsnames: "method",tags: "XXX"
-people_msgs_rl/PeoplePose[] poses       --> "poses"
+people_msgs_rl/PeoplePose[] poses       --> "people"
   string NO_RECOGNITION_MADE=NOREC      --> "NOREC"
   string RECOGNITION_FAILED=RECFAIL     --> "RECFAIL"
   std_msgs/Header header                --> parent.header
@@ -83,6 +83,8 @@ people_detection_vision
 mip_calibrate
 people_recognition_vision
 
+
+catkin_make --only-pkg-with-deps games_vision  people_detection_vision  mip_calibrate  people_recognition_vision
 ```
 
 How to install

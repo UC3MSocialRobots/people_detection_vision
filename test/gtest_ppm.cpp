@@ -23,9 +23,9 @@ ________________________________________________________________________________
 Tests for \file ppm_pplp.h
 
  */
-#include <vision_utils/utils/rosmaster_alive.h>
+#include <vision_utils/rosmaster_alive.h>
 #include "vision_utils/pplp_testing.h"
-// people_msgs_rl
+// people_msgs
 #include "vision_utils/test_person_histogram_set_variables.h"
 #include "people_detection_vision/ppm_pplp.h"
 // opencv
@@ -38,22 +38,22 @@ namespace testvar = test_person_histogram_set_variables;
 ////////////////////////////////////////////////////////////////////////////////
 #if 1
 void direct_test(const std::string & filename_prefix) {
-  if (!rosmaster_alive()) return;
+  if (!vision_utils::rosmaster_alive()) return;
   printf("\ndirect_test('%s')\n", filename_prefix.c_str());
   std::string kinect_serial_number = DEFAULT_KINECT_SERIAL();
   // read images
   cv::Mat bgr, depth;
-  image_utils::read_rgb_and_depth_image_from_image_file(filename_prefix, &bgr, &depth);
+  vision_utils::read_rgb_and_depth_image_from_image_file(filename_prefix, &bgr, &depth);
   // get camera model
   image_geometry::PinholeCameraModel depth_camera_model, rgb_camera_model;
-  kinect_openni_utils::read_camera_model_files
+  vision_utils::read_camera_model_files
       (kinect_serial_number, depth_camera_model, rgb_camera_model);
 
   // call
   Ppm ppm;
   std::vector<std::vector<cv::Point3f> > comps_points;
   std::vector<cv::Mat3b> comps_images;
-  std::vector<geometry_utils::Rect3f> comps_bboxes;
+  std::vector<vision_utils::Rect3f> comps_bboxes;
   ppm.rois(bgr, depth, depth_camera_model, comps_points, comps_images, comps_bboxes);
   ASSERT_TRUE(comps_images.size() == comps_points.size());
   ASSERT_TRUE(comps_images.size() == comps_bboxes.size());
@@ -64,7 +64,7 @@ void direct_test(const std::string & filename_prefix) {
 #endif // DISPLAY
 
   // now test using pplp_testing
-  pplp_testing::ppl_vs_user_benchmark(ppm, filename_prefix, true);
+  vision_utils::ppl_vs_user_benchmark(ppm, filename_prefix, true);
 } // end direct_test();
 
 TEST(TestSuite, direct_test_empty_lab) { direct_test(IMG_DIR "depth/empty_lab"); }
@@ -82,37 +82,37 @@ TEST(TestSuite, direct_test_david_arnaud3) { direct_test(IMG_DIR "depth/david_ar
 #endif /////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, empty_lab) {
-  if (!rosmaster_alive()) return;
+  if (!vision_utils::rosmaster_alive()) return;
   Ppm skill;
-  pplp_testing::ppl_vs_user_benchmark(skill, IMG_DIR "depth/empty_lab");
+  vision_utils::ppl_vs_user_benchmark(skill, IMG_DIR "depth/empty_lab");
 }
 TEST(TestSuite, all_multi_users) {
-  if (!rosmaster_alive()) return;
+  if (!vision_utils::rosmaster_alive()) return;
   Ppm skill;
-  pplp_testing::ppl_vs_user_benchmark(skill, testvar::all_multi_user_filename_prefixes(),
+  vision_utils::ppl_vs_user_benchmark(skill, testvar::all_multi_user_filename_prefixes(),
                                      false, true, true);
 }
 TEST(TestSuite, all_single_users) {
-  if (!rosmaster_alive()) return;
+  if (!vision_utils::rosmaster_alive()) return;
   Ppm skill;
-  pplp_testing::ppl_vs_user_benchmark(skill, testvar::all_single_user_filename_prefixes(),
+  vision_utils::ppl_vs_user_benchmark(skill, testvar::all_single_user_filename_prefixes(),
                                      false, true, true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, start_stop) {
-  if (!rosmaster_alive()) return;
+  if (!vision_utils::rosmaster_alive()) return;
   Ppm skill;
-  pplp_testing::start_stop(skill);
+  vision_utils::start_stop(skill);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, speed_test) {
-  if (!rosmaster_alive()) return;
+  if (!vision_utils::rosmaster_alive()) return;
   Ppm skill;
-  pplp_testing::speed_test(skill, false, 10, .8);
+  vision_utils::speed_test(skill, false, 10, .8);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

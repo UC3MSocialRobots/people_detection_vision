@@ -59,21 +59,21 @@ such as a minimum size for the blobs.
 
 \section Publications
   - \b "~ppl"
-        [people_msgs_rl::PeoplePoseList]
+        [people_msgs::People]
         The detected users, \see PPLPublisherTemplate.
  */
 
 #ifndef TABLETOP_PPLP_H
 #define TABLETOP_PPLP_H
 
-// people_msgs_rl
+// people_msgs
 #include "vision_utils/rgb_depth_pplp_template.h"
 #include "vision_utils/images2ppl.h"
-#include "vision_utils/color_utils.h"
+
 #include "vision_utils/blob_segmenter.h"
-#include "vision_utils/content_processing.h"
-#include "vision_utils/drawing_utils.h"
-#include "vision_utils/utils/pt_utils.h"
+
+
+
 
 class TabletopPPLP : public RgbDepthPPLPublisherTemplate {
 public:
@@ -88,12 +88,12 @@ public:
 
     // get camera model
     image_geometry::PinholeCameraModel rgb_camera_model;
-    kinect_openni_utils::read_camera_model_files
+    vision_utils::read_camera_model_files
         (DEFAULT_KINECT_SERIAL(), _default_depth_camera_model, rgb_camera_model);
 
     DEBUG_PRINT("TabletopPPLP: started with '%s' and stopped with '%s', "
                 "subscribing to '%s', '%s', "
-                "publish PeoplePoseList results on '%s'\n",
+                "publish People results on '%s'\n",
                 get_start_stopic().c_str(), get_stop_stopic().c_str(),
                 get_rgb_topic().c_str(), get_depth_topic().c_str(),
                 get_ppl_topic().c_str());
@@ -116,35 +116,34 @@ public:
       curr_user_mask.create(depth.size());
       curr_user_mask.setTo(0);
       _ppl.header = _images_header; // reuse the header of the last frame
-      _ppl.method = "tabletop_pplp";
-      _ppl.poses.resize(nusers);
+      _ppl.people.resize(nusers);
       for (int user_idx = 0; user_idx < nusers; ++user_idx) {
-        people_msgs_rl::PeoplePose* pp = &(_ppl.poses[user_idx]);
+        people_msgs::Person* pp = &(_ppl.people[user_idx]);
+        vision_utils::set_method(*pp, "tabletop_pplp");
         cv::Rect curr_roi = boundingBoxes[user_idx];
         pp->header = _ppl.header; // copy header
-        pp->person_name = people_msgs_rl::PeoplePose::NO_RECOGNITION_MADE;
-        pp->confidence = 1;
+        pp->name = "NOREC";
+        pp->reliability = 1;
 
         // image
-        image_utils::drawListOfPoints(curr_user_mask, _components_pts[user_idx], (uchar) 255);
+        vision_utils::drawListOfPoints(curr_user_mask, _components_pts[user_idx], (uchar) 255);
         cv::Mat3b curr_rgb_roi = rgb(curr_roi);
         cv::Mat1f curr_depth_roi = depth(curr_roi);
         cv::Mat1b curr_user_roi = curr_user_mask(curr_roi);
         _images2pp.convert(*pp, &curr_rgb_roi, &curr_depth_roi, &curr_user_roi, false);
 
         // pose - need to be done after image for the use of curr_user_mask
-        cv::Point2d user_center2d = geometry_utils::rect_center<cv::Rect, cv::Point>(curr_roi);
+        cv::Point2d user_center2d = vision_utils::rect_center<cv::Rect, cv::Point>(curr_roi);
         user_center2d = _roi_center2user_mask.find(curr_user_mask, user_center2d);
         if (user_center2d.x < 0) {
           printf("TabletopPPLP:user %i: cant find a user point in the mask!\n",
                  user_idx);
           //continue;
         }
-        cv::Point3d user_center3d = kinect_openni_utils::pixel2world_depth<cv::Point3d>
+        cv::Point3d user_center3d = vision_utils::pixel2world_depth<cv::Point3d>
             (user_center2d, _default_depth_camera_model, depth);
-        pt_utils::copy3(user_center3d, pp->head_pose.position);
-        pp->head_pose.orientation = tf::createQuaternionMsgFromYaw(0);
-        pp->std_dev = .1;
+        vision_utils::copy3(user_center3d, pp->position);
+        pp->position.orientation = tf::createQuaternionMsgFromYaw(0);
 
         curr_user_roi.setTo(0); // clean curr_user_mask only where needed
       } // end loop user_idx
@@ -157,12 +156,12 @@ public:
 
   void display(const cv::Mat3b & rgb,
                const cv::Mat1f & depth) {
-    image_utils::depth_image_to_vizualisation_color_image(depth, _depth2viz);
+    vision_utils::depth_image_to_vizualisation_color_image(depth, _depth2viz);
     _comps_illus.create(rgb.size());
     _comps_illus.setTo(0);
     for (unsigned int comp_idx = 0; comp_idx < _components_pts.size(); ++comp_idx)
-      image_utils::drawListOfPoints(_comps_illus, _components_pts[comp_idx],
-                                    color_utils::color<cv::Vec3b>(comp_idx));
+      vision_utils::drawListOfPoints(_comps_illus, _components_pts[comp_idx],
+                                    vision_utils::color<cv::Vec3b>(comp_idx));
     // generate a mask for valid depth measures
     cv::threshold(depth, _depth_mask_buffer, min_dist_m, 1, CV_THRESH_BINARY);
     _depth_mask_illus = (_depth_mask_buffer > 0);
@@ -172,24 +171,24 @@ public:
     if (_segmenter.generate_ground_mask(depth, _ground_mask_illus,
                                         &_default_depth_camera_model, min_dist_m, max_dist_m)) {
       cv::imshow("ground_mask", _ground_mask_illus);
-      image_utils::imwrite_debug("ground_mask.png", _ground_mask_illus,
-                                 image_utils::MONOCHROME);
+      vision_utils::imwrite_debug("ground_mask.png", _ground_mask_illus,
+                                 vision_utils::MONOCHROME);
     }
     cv::imshow("rgb", rgb);
-    //    image_utils::imwrite_debug("rgb.png", rgb,
-    //                               image_utils::COLOR_24BITS);
+    //    vision_utils::imwrite_debug("rgb.png", rgb,
+    //                               vision_utils::COLOR_24BITS);
     cv::imshow("depth", _depth2viz);
-    //    image_utils::imwrite_debug("depth.png", _depth2viz,
-    //                               image_utils::COLORS256);
+    //    vision_utils::imwrite_debug("depth.png", _depth2viz,
+    //                               vision_utils::COLORS256);
     cv::imshow("comps_illus", _comps_illus);
-    //    image_utils::imwrite_debug("comps_illus.png", _comps_illus,
-    //                               image_utils::COLORS256);
+    //    vision_utils::imwrite_debug("comps_illus.png", _comps_illus,
+    //                               vision_utils::COLORS256);
     cv::imshow("segmenter_final_mask", _segmenter.get_final_mask());
-    //    image_utils::imwrite_debug("segmenter_final_mask.png", _segmenter.get_final_mask(),
-    //                               image_utils::MONOCHROME);
+    //    vision_utils::imwrite_debug("segmenter_final_mask.png", _segmenter.get_final_mask(),
+    //                               vision_utils::MONOCHROME);
     cv::imshow("depth_mask_illus", _depth_mask_illus);
-    //    image_utils::imwrite_debug("depth_mask_illus.png", _depth_mask_illus,
-    //                               image_utils::MONOCHROME);
+    //    vision_utils::imwrite_debug("depth_mask_illus.png", _depth_mask_illus,
+    //                               vision_utils::MONOCHROME);
   } // end display();
 
   //////////////////////////////////////////////////////////////////////////////
@@ -203,9 +202,9 @@ public:
   int max_blobs_nb, min_blob_size_pix;
 
   //! information sharing
-  people_msgs_rl::PeoplePoseList _ppl;
-  ppl_utils::Images2PP _images2pp;
-  image_utils::ClosestPointInMask2<uchar> _roi_center2user_mask;
+  people_msgs::People _ppl;
+  vision_utils::Images2PP _images2pp;
+  vision_utils::ClosestPointInMask2<uchar> _roi_center2user_mask;
   cv::Mat1b curr_user_mask;
 
   //! illus

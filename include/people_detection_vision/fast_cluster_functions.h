@@ -7,8 +7,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 // vision
-#include "vision_utils/drawing_utils.h"
-#include "vision_utils/color_utils.h"
+
+
 
 namespace fast_cluster_functions {
 
@@ -93,7 +93,7 @@ inline void paint_object_image(const cv::Mat1i & objects_names_img,
         } // end if next or previous value is not tracked object
       } // end if (*objects_names_img_ptr == tracked_obj_name)
       else { // not tracked object -> random color acording to index
-        color_utils::indexed_color255((*components_illus_ptr)[0],
+        vision_utils::indexed_color255((*components_illus_ptr)[0],
             (*components_illus_ptr)[1],
             (*components_illus_ptr)[2],
             *objects_names_img_ptr);

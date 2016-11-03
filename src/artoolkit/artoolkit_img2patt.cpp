@@ -33,8 +33,8 @@ This program can transform color or BW images into ARToolkit patterns.
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include "vision_utils/border_remover.h"
-#include "vision_utils/utils/filename_handling.h"
-#include "vision_utils/utils/file_io.h"
+#include "vision_utils/filename_handling.h"
+
 
 bool img2pat(const std::string & imgfilein,
              const std::string & patfileout,
@@ -46,7 +46,7 @@ bool img2pat(const std::string & imgfilein,
   }
   // remove border
   cv::Mat3b img_noborder;
-  image_utils::remove_border(img, img_noborder, cv::Vec3b(0, 0, 0));
+  vision_utils::remove_border(img, img_noborder, cv::Vec3b(0, 0, 0));
   cv::imshow("img_noborder", img_noborder); cv::waitKey(100);
 
   cv::Mat3b img_resized;
@@ -79,7 +79,7 @@ bool img2pat(const std::string & imgfilein,
     out << std::endl;
   } // end loop rotate_idx
 
-  string_utils::save_file(patfileout, out.str());
+  vision_utils::save_file(patfileout, out.str());
   printf("Written file '%s'\n", patfileout.c_str());
   return true;
 }
@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
   }
   std::string imgfilein = argv[1];
   std::string patfileout = (argc >= 3 ? argv[2] :
-                            string_utils::change_filename_extension(imgfilein,  ".patt"));
+                            vision_utils::change_filename_extension(imgfilein,  ".patt"));
   int cols = (argc >= 4 ? atoi(argv[3]) : 16);
   bool ok = img2pat(imgfilein, patfileout, cols);
   return (ok ? 0 : -1);

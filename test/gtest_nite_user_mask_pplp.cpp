@@ -26,9 +26,9 @@ Some tests for
  */
 //#define DISPLAY
 
-#include <vision_utils/utils/rosmaster_alive.h>
+#include <vision_utils/rosmaster_alive.h>
 #include "vision_utils/pplp_testing.h"
-// people_msgs_rl
+// people_msgs
 #include "vision_utils/test_person_histogram_set_variables.h"
 #include "people_detection_vision/nite_user_mask_pplp.h"
 // opencv
@@ -43,7 +43,7 @@ void direct_test(NiteUserMask2Ppl & skill,
   // read user, depth, rgb files
   cv::Mat rgb, depth;
   cv::Mat1b user_mask;
-  image_utils::read_rgb_depth_user_image_from_image_file
+  vision_utils::read_rgb_depth_user_image_from_image_file
       (filename_prefix, &rgb, &depth, &user_mask);
   // cv::Mat3b user_illus;  user_image_to_rgb(user_mask, user_illus);  cv::imshow("NiteUserMask2Ppl", user_illus); cv::waitKey(0);
   // test the skill
@@ -57,7 +57,7 @@ void direct_test(NiteUserMask2Ppl & skill,
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, direct_tests) {
-  if (!rosmaster_alive()) return;
+  if (!vision_utils::rosmaster_alive()) return;
   NiteUserMask2Ppl skill;
   skill.create_subscribers_and_publishers();
   direct_test(skill, IMG_DIR "depth/juggling1");
@@ -68,37 +68,37 @@ TEST(TestSuite, direct_tests) {
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, start_stop) {
-  if (!rosmaster_alive()) return;
+  if (!vision_utils::rosmaster_alive()) return;
   NiteUserMask2Ppl skill;
-  pplp_testing::start_stop(skill, true);
+  vision_utils::start_stop(skill, true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, empty_lab) {
-  if (!rosmaster_alive()) return;
+  if (!vision_utils::rosmaster_alive()) return;
   NiteUserMask2Ppl skill;
-  pplp_testing::ppl_vs_user_benchmark(skill, IMG_DIR "depth/empty_lab", true);
+  vision_utils::ppl_vs_user_benchmark(skill, IMG_DIR "depth/empty_lab", true);
 }
 TEST(TestSuite, all_multi_users) {
-  if (!rosmaster_alive()) return;
+  if (!vision_utils::rosmaster_alive()) return;
   NiteUserMask2Ppl skill;
-  pplp_testing::ppl_vs_user_benchmark(skill, testvar::all_multi_user_filename_prefixes(),
+  vision_utils::ppl_vs_user_benchmark(skill, testvar::all_multi_user_filename_prefixes(),
                                      true, true, true);
 }
 TEST(TestSuite, all_single_users) {
-  if (!rosmaster_alive()) return;
+  if (!vision_utils::rosmaster_alive()) return;
   NiteUserMask2Ppl skill;
-  pplp_testing::ppl_vs_user_benchmark(skill, testvar::all_single_user_filename_prefixes(),
+  vision_utils::ppl_vs_user_benchmark(skill, testvar::all_single_user_filename_prefixes(),
                                      true, true, true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, speed_test) {
-  if (!rosmaster_alive()) return;
+  if (!vision_utils::rosmaster_alive()) return;
   NiteUserMask2Ppl skill;
-  pplp_testing::speed_test(skill, true, 30, .8);
+  vision_utils::speed_test(skill, true, 30, .8);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

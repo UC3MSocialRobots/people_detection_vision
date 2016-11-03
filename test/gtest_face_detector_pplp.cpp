@@ -24,9 +24,9 @@ ________________________________________________________________________________
  */
 //#define DISPLAY
 
-#include <vision_utils/utils/rosmaster_alive.h>
+#include <vision_utils/rosmaster_alive.h>
 #include "vision_utils/pplp_testing.h"
-// people_msgs_rl
+// people_msgs
 #include "vision_utils/test_person_histogram_set_variables.h"
 #include "people_detection_vision/face_detector_pplp.h"
 // opencv
@@ -37,37 +37,37 @@ namespace testvar = test_person_histogram_set_variables;
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, empty_lab) {
-  if (!rosmaster_alive()) return;
+  if (!vision_utils::rosmaster_alive()) return;
   FaceDetectorPPLP skill;
-  pplp_testing::ppl_vs_user_benchmark(skill, IMG_DIR "depth/empty_lab");
+  vision_utils::ppl_vs_user_benchmark(skill, IMG_DIR "depth/empty_lab");
 }
 TEST(TestSuite, all_multi_users) {
-  if (!rosmaster_alive()) return;
+  if (!vision_utils::rosmaster_alive()) return;
   FaceDetectorPPLP skill;
-  pplp_testing::ppl_vs_user_benchmark(skill, testvar::all_multi_user_filename_prefixes(),
+  vision_utils::ppl_vs_user_benchmark(skill, testvar::all_multi_user_filename_prefixes(),
                                      false, true, true);
 }
 TEST(TestSuite, all_single_users) {
-  if (!rosmaster_alive()) return;
+  if (!vision_utils::rosmaster_alive()) return;
   FaceDetectorPPLP skill;
-  pplp_testing::ppl_vs_user_benchmark(skill, testvar::all_single_user_filename_prefixes(),
+  vision_utils::ppl_vs_user_benchmark(skill, testvar::all_single_user_filename_prefixes(),
                                      false, true, true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, start_stop) {
-  if (!rosmaster_alive()) return;
+  if (!vision_utils::rosmaster_alive()) return;
   FaceDetectorPPLP skill;
-  pplp_testing::start_stop(skill);
+  vision_utils::start_stop(skill);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, speed_test) {
-  if (!rosmaster_alive()) return;
+  if (!vision_utils::rosmaster_alive()) return;
   FaceDetectorPPLP skill;
-  pplp_testing::speed_test(skill, false, 10, .3); // slow algorithm...
+  vision_utils::speed_test(skill, false, 10, .3); // slow algorithm...
 }
 
 ////////////////////////////////////////////////////////////////////////////////

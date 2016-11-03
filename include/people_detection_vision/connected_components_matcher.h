@@ -2,11 +2,11 @@
 #define CONNECTED_COMPONENTS_MATCHER_H
 
 #include "vision_utils/disjoint_sets2.h"
-#include "vision_utils/content_processing.h"
+
 //#include "people_detection_vision/recognition_conflict_solver.h"
-#include "vision_utils/content_processing.h"
-#include "vision_utils/utils/hausdorff_distances.h"
-#include "vision_utils/utils/timer.h"
+
+#include "vision_utils/hausdorff_distances.h"
+#include "vision_utils/timer.h"
 #include "ros/ros.h"
 #include <deque>
 
@@ -107,7 +107,7 @@ public:
     */
   inline void set_new_data(const std::vector<Comp> & components,
                            const std::vector<Bbox> & bboxes) {
-    maggieDebug3("set_new_data(components.size:%i)",
+    ROS_DEBUG("set_new_data(components.size:%i)",
                  components.size());
     // increment the frame idx of one for the recognition history
     ObjectRecoHistory::iterator obj_it = _recognition_history.begin();
@@ -115,7 +115,7 @@ public:
       for (unsigned int obj_rec_idx = 0; obj_rec_idx < obj_it->second.size();
            ++obj_rec_idx) {
         ++((obj_it->second)[obj_rec_idx].comp_frame_idx);
-        maggieDebug3("name:'%i', comp%i@frame%i",
+        ROS_DEBUG("name:'%i', comp%i@frame%i",
                      obj_it->first, (obj_it->second)[obj_rec_idx].comp_idx,
                      (obj_it->second)[obj_rec_idx].comp_frame_idx);
       }
@@ -183,13 +183,13 @@ public:
   //////////////////////////////////////////////////////////////////////////////
 
   void match() {
-    maggieDebug3("match()");
+    ROS_DEBUG("match()");
     //Timer timer;
 
     // resize all components to a default size, keeping ratio
     for (unsigned int comp_idx = 0;
          comp_idx < _components_history.front().size(); ++comp_idx) {
-      image_utils::redimContent_vector_without_repetition_given_resized_array
+      vision_utils::redimContent_vector_without_repetition_given_resized_array
           (_components_history.front()[comp_idx],
            _resized_components_history.front()[comp_idx],
            cv::Rect(0, 0, DEFAULT_WIDTH - 1, DEFAULT_HEIGHT - 1),
@@ -257,8 +257,8 @@ public:
       // to measure the most probables first
       std::sort(to_recompute_D22.begin(), to_recompute_D22.end(),
                 compare_marks);
-      maggieDebug3("to_recompute_D22(size:%i) : '%s'", to_recompute_D22.size(),
-                   string_utils::accessible_to_string(to_recompute_D22).c_str());
+      ROS_DEBUG("to_recompute_D22(size:%i) : '%s'", to_recompute_D22.size(),
+                   vision_utils::accessible_to_string(to_recompute_D22).c_str());
 
       // now compare with, in order, all the points of to_recompute_D22
       curr_comp_best_mark.object_frame_idx = -1;
@@ -282,7 +282,7 @@ public:
         if (!d22_mark_success)
           continue;
 #ifdef DEBUG_PRINT
-        maggieDebug2("Really called D22 for '%s', got d22_mark=%g",
+        ROS_INFO("Really called D22 for '%s', got d22_mark=%g",
                      curr_to_rec.to_string().c_str(), d22_mark);
 #endif // DEBUG_PRINT
         // keep the new mark
@@ -305,7 +305,7 @@ public:
         _recognition_history[curr_comp_best_mark.possible_object_correspondance].
             push_back(curr_comp_reco_result);
 #ifdef DEBUG_PRINT
-        maggieDebug1("comp %i was matched to object '%i' (mark:%f). ",
+        ROS_INFO("comp %i was matched to object '%i' (mark:%f). ",
                      curr_comp_idx, curr_comp_best_mark.possible_object_correspondance,
                      curr_comp_best_mark.mark);
 #endif // DEBUG_PRINT
@@ -313,7 +313,7 @@ public:
 
       else {
 #ifdef DEBUG_PRINT
-        maggieDebug1("Impossible to match comp %i to any object "
+        ROS_INFO("Impossible to match comp %i to any object "
                      "(best object '%i', mark:%f). "
                      "Adding it with name '%i'.",
                      curr_comp_idx,
@@ -438,7 +438,7 @@ public:
                                   const Comp* & comp_pts_ptr,
                                   const Comp* & comp_resized_ptr,
                                   const Bbox* & comp_bbox_ptr) const {
-    maggieDebug3("reco_history_lookup(obj_name:%i, frame_idx:%i)",
+    ROS_DEBUG("reco_history_lookup(obj_name:%i, frame_idx:%i)",
                  obj_name, frame_idx);
     //    if (_recognition_history.count(obj_name) == 0)
     //      return false;
@@ -484,13 +484,13 @@ protected:
                              const Comp* & comp_pts_ptr,
                              const Comp* & comp_resized_ptr,
                              const Bbox* & comp_bbox_ptr) const {
-    maggieDebug3("history_lookup(frame_idx:%i, comp_idx:%i)",
+    ROS_DEBUG("history_lookup(frame_idx:%i, comp_idx:%i)",
                  frame_idx, comp_idx);
     comp_pts_ptr     = &(_components_history        [frame_idx][comp_idx]);
     comp_resized_ptr = &(_resized_components_history[frame_idx][comp_idx]);
     comp_bbox_ptr    = &(_bboxes_history            [frame_idx][comp_idx]);
-    maggieDebug3("comp_pts_ptr:'%s'",
-                 geometry_utils::print_rect(*comp_bbox_ptr).c_str());
+    ROS_DEBUG("comp_pts_ptr:'%s'",
+                 vision_utils::print_rect(*comp_bbox_ptr).c_str());
   } // end history_lookup();
 
   //////////////////////////////////////////////////////////////////////////////

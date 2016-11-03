@@ -34,29 +34,29 @@ ________________________________________________________________________________
 
 \section Publications
   - \b "~ppl"
-        [people_msgs_rl::PeoplePoseList]
+        [people_msgs::People]
         The found people heads
  */
 // AD
-#include "vision_utils/utils/timer.h"
-#include "vision_utils/utils/pt_utils.h"
+#include "vision_utils/timer.h"
+
 #include "vision_utils/opencv_face_detector.h"
 #include "vision_utils/rgb_skill.h"
-// people_msgs_rl
+// people_msgs
 #include "vision_utils/images2ppl.h"
 
 class FaceDetector2DPPLP : public RgbSkill {
 public:
-  typedef people_msgs_rl::PeoplePoseList PPL;
+  typedef people_msgs::People PPL;
   typedef cv::Point3d Pt3d;
 
   FaceDetector2DPPLP() : RgbSkill("FACE_DETECTOR2D_PPLP_START", "FACE_DETECTOR2D_PPLP_STOP")
   {
-    _cascade_classifier = image_utils::create_face_classifier();
+    _cascade_classifier = vision_utils::create_face_classifier();
 
     // get camera model
     image_geometry::PinholeCameraModel rgb_camera_model;
-    kinect_openni_utils::read_camera_model_files
+    vision_utils::read_camera_model_files
         (DEFAULT_KINECT_SERIAL(), _default_depth_camera_model, rgb_camera_model);
 
     //  PPLPublisherTemplate
@@ -78,7 +78,7 @@ public:
     _nh_private.param("min_width", _min_width, 10);
 
     printf("FaceDetector2DPPLP: getting rgb on '%s', "
-           "publish PeoplePoseList results on '%s'\n",
+           "publish People results on '%s'\n",
            get_rgb_topic().c_str(), _ppl_resolved_topic.c_str());
   }
 
@@ -89,13 +89,13 @@ public:
   ///////////////////////////////////////////////////////////////////////////////
 
   virtual void process_rgb(const cv::Mat3b & rgb) {
-    Timer timer;
+    vision_utils::Timer timer;
     // clear data
     _faces2d.clear();
     _faces_centers_3d.clear();
 
     // detect with opencv
-    image_utils::detect_with_opencv
+    vision_utils::detect_with_opencv
         (rgb, _cascade_classifier,
          _small_img, _faces2d,
          _resize_max_width, _resize_max_height, _scale_factor,
@@ -105,7 +105,7 @@ public:
 
     // remove including faces
     std::vector< cv::Rect > faces_not_filtered_orig = _faces2d;
-    geometry_utils::remove_including_rectangles
+    vision_utils::remove_including_rectangles
         (faces_not_filtered_orig, _faces2d);
     DEBUG_PRINT("time for remove_including_rectangles(): %g ms, %i faces\n",
                timer.time(), _faces2d.size());
@@ -114,9 +114,9 @@ public:
       // 3D ray
     for (unsigned int user_idx = 0; user_idx < _faces2d.size(); ++user_idx) {
       double depth = 1.; // meter, see if we can find something more clever
-      cv::Point2d center = geometry_utils::rect_center<cv::Rect, cv::Point2d>
+      cv::Point2d center = vision_utils::rect_center<cv::Rect, cv::Point2d>
                            (_faces2d[user_idx]);
-      _faces_centers_3d[user_idx] =kinect_openni_utils::pixel2world_depth<Pt3d>
+      _faces_centers_3d[user_idx] =vision_utils::pixel2world_depth<Pt3d>
                                    (center, _default_depth_camera_model, depth);
     }
 
@@ -131,29 +131,28 @@ public:
   //////////////////////////////////////////////////////////////////////////////
 
   /*! share the poses of the detected users in a
-   *  people_msgs_rl::PeoplePoseList msg */
+   *  people_msgs::People msg */
   void build_ppl_message(const cv::Mat3b & rgb) {
     // printf("build_ppl_message()\n");
     // share the poses
     unsigned int n_faces = _faces_centers_3d.size();
     _ppl.header = _images_header;
-    _ppl.method = "face_detector2d";
-    _ppl.poses.resize(n_faces);
+    _ppl.people.resize(n_faces);
 
-    // build the PeoplePose
+    // build the Person
     cv::Mat3b face_img;
     face_img.create(rgb.size());
     for (unsigned int user_idx = 0; user_idx < n_faces; ++user_idx) {
-      people_msgs_rl::PeoplePose* pp = &(_ppl.poses[user_idx]);
+      people_msgs::Person* pp = &(_ppl.people[user_idx]);
+      vision_utils::set_method(*pp, "face_detector2d");
       pp->header = _ppl.header; // copy header
-      // people_pose.person_name = string_utils::cast_to_string(user_idx);
-      pp->person_name = people_msgs_rl::PeoplePose::NO_RECOGNITION_MADE;
-      pp->confidence = 1;
-      pp->std_dev = .1;
+      // people_pose.name = vision_utils::cast_to_string(user_idx);
+      pp->name = "NOREC";
+      pp->reliability = 1;
 
       // pose
-      pt_utils::copy3(_faces_centers_3d[user_idx], pp->head_pose.position);
-      pp->head_pose.orientation = tf::createQuaternionMsgFromYaw(0);
+      vision_utils::copy3(_faces_centers_3d[user_idx], pp->position);
+      pp->position.orientation = tf::createQuaternionMsgFromYaw(0);
 
       // image
       face_img.setTo(0);
@@ -210,8 +209,8 @@ private:
   cv::Mat3b _img_out;
 
   // PPL
-  people_msgs_rl::PeoplePoseList _ppl;
-  ppl_utils::Images2PP _images2pp;
+  people_msgs::People _ppl;
+  vision_utils::Images2PP _images2pp;
 }; // end class FaceDetector2DPPLP
 
 ////////////////////////////////////////////////////////////////////////////////

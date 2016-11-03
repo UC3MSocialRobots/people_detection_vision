@@ -79,7 +79,6 @@
 
 */
 
-#include "vision_utils/utils/error.h"
 
 // ROS
 #include <ros/ros.h>
@@ -98,21 +97,20 @@
 #endif // CV_MAJOR_VERSION == 2 && CV_MINOR_VERSION >= 4
 #include <cv_bridge/cv_bridge.h>
 // AD
-#include "vision_utils/utils/debug_utils.h"
-#include "vision_utils/utils/timer.h"
+#include "vision_utils/timer.h"
 #include "vision_utils/disjoint_sets2.h"
 #include "vision_utils/border_remover.h"
-#include "vision_utils/color_utils.h"
-#include "vision_utils/drawing_utils.h"
+
+
 #include "vision_utils/value_remover.h"
 #include <followme_laser/TrackingStatus.h>
 #include <followme_laser/SetTrackingSeed.h>
-// people_msgs_rl
-#include "vision_utils/cv_conversion_float_uchar.h"
+// people_msgs
+
 
 #include "people_detection_vision/connected_components_matcher.h"
 #include "people_detection_vision/fast_cluster_functions.h"
-#include "vision_utils/utils/marker_utils.h"
+
 
 //#define TIMER_ON
 
@@ -243,7 +241,7 @@ public:
     // marker
     _marker_pub = nh_private.advertise<visualization_msgs::Marker>
         ("tracking_marker", 1);
-    marker_utils::make_header(_marker, visualization_msgs::Marker::SPHERE,
+    vision_utils::make_header(_marker, visualization_msgs::Marker::SPHERE,
                               "fast_cluster_tracked_object",
                               0.2,   0, 0, 0, 1,  _static_frame);
 
@@ -263,7 +261,7 @@ public:
 
   //! this function is called each time an image is received
   void image_callback(const sensor_msgs::ImageConstPtr& img_msg) {
-    //maggieDebug2("image_callback()");
+    //ROS_INFO("image_callback()");
 
     _timer.reset();
     _img_msg_timestamp = img_msg->header.stamp;
@@ -283,15 +281,15 @@ public:
     const cv::Mat & img_ptr = _bridge_img_ptr->image;
     //cv::imshow("img_ptr", img_ptr);
 
-    //image_utils::print_random_pts_float<float>(img_ptr, 10);
-    //image_utils::print_random_pts_int<uchar>(img_ptr, 10);
+    //vision_utils::print_random_pts_float<float>(img_ptr, 10);
+    //vision_utils::print_random_pts_int<uchar>(img_ptr, 10);
     // ...
-    image_utils::convert_float_to_uchar(img_ptr, img_uchar, src_float_clean_buffer,
+    vision_utils::convert_float_to_uchar(img_ptr, img_uchar, src_float_clean_buffer,
                                         alpha_trans, beta_trans);
     //cv::imshow("img_uchar", img_uchar);
 
     //print_random_pts_int<uchar>(img_uchar, 10);
-    //    maggieDebug2("nonZero:%f",
+    //    ROS_INFO("nonZero:%f",
     //                 1.f *cv::countNonZero(img_uchar) / (img_uchar.cols *img_uchar.rows));
 
 #ifdef TIMER_ON
@@ -304,7 +302,7 @@ public:
     if (_nan_removal_method == _VALUE_REMOVAL_METHOD_DIRECTIONAL_VALUE_PROPAGATION) {
       // left value propagation
       img_uchar.copyTo(img_uchar_with_no_nan);
-      image_utils::remove_value_left_propagation<uchar>(img_uchar_with_no_nan, image_utils::NAN_UCHAR);
+      vision_utils::remove_value_left_propagation<uchar>(img_uchar_with_no_nan, vision_utils::NAN_UCHAR);
     } // end if _VALUE_REMOVAL_METHOD_DIRECTIONAL_VALUE_PROPAGATION
 
     else if (_nan_removal_method == _VALUE_REMOVAL_METHOD_INPAINT) {
@@ -316,8 +314,8 @@ public:
 
     else if (_nan_removal_method == _VALUE_REMOVAL_METHOD_AVERAGE_BORDER) {
       // remove border
-      roi = image_utils::remove_border(img_uchar, img_uchar_with_no_nan,
-                                       image_utils::NAN_UCHAR, 0.5);
+      roi = vision_utils::remove_border(img_uchar, img_uchar_with_no_nan,
+                                       vision_utils::NAN_UCHAR, 0.5);
     } // end if _VALUE_REMOVAL_METHOD_AVERAGE_BORDER
 
     /*
@@ -326,13 +324,13 @@ public:
     // canny
     canny_param1 = 1.f *canny_tb1_value / TRACK_BAR_SCALE_FACTOR;
     canny_param2 = 1.f *canny_tb2_value / TRACK_BAR_SCALE_FACTOR;
-    maggieDebug3("canny_param1:%g, canny_param2:%g, alpha_trans:%g",
+    ROS_DEBUG("canny_param1:%g, canny_param2:%g, alpha_trans:%g",
                  canny_param1, canny_param2, alpha_trans);
     cv::Canny(img_uchar_with_no_nan, edges,
               alpha_trans *canny_param1, alpha_trans *canny_param2);
     //    cv::Scalar mean = cv::mean(edges);
     //    cv::minMaxLoc(edges, &minVal, &maxVal);
-    //    maggiePrint("min:%f, max:%f, mean:%f", minVal, maxVal, mean[0]);
+    //    ROS_WARN("min:%f, max:%f, mean:%f", minVal, maxVal, mean[0]);
 
     // harris corners
     //    cv::cornerHarris(img_ptr, edges, 3, 3, 0.01);
@@ -343,14 +341,14 @@ public:
     //    cv::imshow("harrisCorners", harrisCorners);
 
 #ifdef TIMER_ON
-    maggiePrint("Time after Canny (param1:%g, param2:%g):%g ms",
+    ROS_WARN("Time after Canny (param1:%g, param2:%g):%g ms",
                 canny_param1, canny_param2, _timer.time());
 #endif // TIMER_ON
 
     /*invert the edges */
     cv::threshold(edges, edges_inverted, 128, 255, cv::THRESH_BINARY_INV);
     // close borders
-    //image_utils::close_borders(edges_inverted_with_nan, (uchar) 255);
+    //vision_utils::close_borders(edges_inverted_with_nan, (uchar) 255);
     //    cv::morphologyEx(edges_inverted, edges_inverted_opened,
     //                     cv::MORPH_OPEN,
     //                     cv::Mat(MORPH_OPEN_KERNEL_SIZE, MORPH_OPEN_KERNEL_SIZE, CV_8U, 255));
@@ -366,7 +364,7 @@ public:
     else
       cv::min(edges_inverted_opened, img_uchar, edges_inverted_opened_with_nan);
     cv::threshold(edges_inverted_opened_with_nan, edges_inverted_opened_with_nan,
-                  image_utils::NAN_UCHAR, 255, cv::THRESH_BINARY);
+                  vision_utils::NAN_UCHAR, 255, cv::THRESH_BINARY);
 #ifdef TIMER_ON
     _timer.printTime("after cv::min()");
 #endif // TIMER_ON
@@ -393,7 +391,7 @@ public:
       //Bbox*curr_bbox = &(_bounding_boxes.at(cluster_idx));
       bool need_delete = false;
       // value = black -> remove
-      if (curr_val == 0) // can be a image_utils::NAN_UCHAR or 0 from threshold
+      if (curr_val == 0) // can be a vision_utils::NAN_UCHAR or 0 from threshold
         need_delete = true;
       // min size test
       else if (curr_comp->size() < min_cluster_size_pixels)
@@ -416,7 +414,7 @@ public:
       } // end if need_delete
     } // end loop _components_pts
 #ifdef TIMER_ON
-    maggiePrint("Time after filtering:%g ms, filtering:%i -> %i clusters",
+    ROS_WARN("Time after filtering:%g ms, filtering:%i -> %i clusters",
                 _timer.time(),  n_clusters_before, _components_pts.size());
 #endif // TIMER_ON
     /*
@@ -458,7 +456,7 @@ public:
     cv::Point3d vec_bad_orien =
         line_vec // direction vector at pt
         *(_bridge_img_ptr->image.at<float>(pt.y, pt.x) // depth
-          / geometry_utils::norm(line_vec) // direction vector norm at pt
+          / vision_utils::norm(line_vec) // direction vector norm at pt
           );
     //    ROS_INFO_THROTTLE(1, "(%i, %i) -> (%g, %g, %g)",
     //                      pt.x, pt.y, vec_bad_orien.x, vec_bad_orien.y, vec_bad_orien.z);
@@ -480,7 +478,7 @@ public:
    */
   inline cv::Point2d project_to_2d(const cv::Point3d & pt_cam_frame) const {
     //    ROS_INFO_THROTTLE(1, "project_to_2d('%s')",
-    //                      geometry_utils::printP(pt_cam_frame).c_str());
+    //                      vision_utils::printP(pt_cam_frame).c_str());
 
     return _cam_model.project3dToPixel(pt_cam_frame);
 
@@ -562,14 +560,14 @@ public:
   (followme_laser::SetTrackingSeed::Request  & req,
    followme_laser::SetTrackingSeed::Response & res) {
     ROS_INFO_THROTTLE(1, "FastClusterDetector:tracking_seed_callback(%s)",
-                      geometry_utils::pose_stamped_to_string(req.pose_in).c_str());
+                      vision_utils::pose_stamped_to_string(req.pose_in).c_str());
     // make some sanity checks
     if (req.pose_in.pose.orientation.x == 0 &&
         req.pose_in.pose.orientation.y == 0 &&
         req.pose_in.pose.orientation.z == 0 &&
         req.pose_in.pose.orientation.w == 0) {
       ROS_WARN("tracking_seed_callback: invalid seed %s, stopping tracking.",
-               geometry_utils::pose_stamped_to_string(req.pose_in).c_str());
+               vision_utils::pose_stamped_to_string(req.pose_in).c_str());
       stop_tracking_object();
       return false;
     }
@@ -616,13 +614,13 @@ public:
     cv::Point3d reprojected_image_pt_good_orien
         (-reprojected_image_pt.y, -reprojected_image_pt.z, reprojected_image_pt.x);
 
-    double dist_pt_to_reproj = geometry_utils::distance_points3
+    double dist_pt_to_reproj = vision_utils::distance_points3
         (pose__camera_frame.pose.position, reprojected_image_pt_good_orien);
     //  ROS_WARN("pose__camera_frame.pose.position:%s,\t _clicked_pt:%s,\t "
     //           "reprojected_image_pt:%s,\t dist_pt_to_reproj:%g",
-    //           geometry_utils::printP(pose__camera_frame.pose.position).c_str(),
-    //           geometry_utils::printP2(_clicked_pt).c_str(),
-    //           geometry_utils::printP(reprojected_image_pt_good_orien).c_str(),
+    //           vision_utils::printP(pose__camera_frame.pose.position).c_str(),
+    //           vision_utils::printP2(_clicked_pt).c_str(),
+    //           vision_utils::printP(reprojected_image_pt_good_orien).c_str(),
     //           dist_pt_to_reproj);
 
     double max_seed_reproj_distance = 1;
@@ -630,8 +628,8 @@ public:
       ROS_WARN("tracking_seed_callback(): the distance between the wanted seed %s "
                "and its reprojection on the depth image %s is too high: "
                "%g > max=%g . Not tracking.",
-               geometry_utils::printP(pose__camera_frame.pose.position).c_str(),
-               geometry_utils::printP(reprojected_image_pt_good_orien).c_str(),
+               vision_utils::printP(pose__camera_frame.pose.position).c_str(),
+               vision_utils::printP(reprojected_image_pt_good_orien).c_str(),
                dist_pt_to_reproj, max_seed_reproj_distance);
       stop_tracking_object();
       return false;
@@ -797,9 +795,9 @@ public:
         bool success = matcher.get_comp_name(0, cluster_idx, obj_name);
         if (!success)
           continue;
-        image_utils::draw_text_centered
+        vision_utils::draw_text_centered
             (_components_illus,
-             string_utils::cast_to_string(obj_name),
+             vision_utils::cast_to_string(obj_name),
              .5 *(_bounding_boxes[cluster_idx].tl() + _bounding_boxes[cluster_idx].br()),
              CV_FONT_HERSHEY_PLAIN, 1, CV_RGB(255, 255, 255), 2);
       } // end loop cluster_idx
@@ -821,33 +819,33 @@ public:
       _img_gui.setTo(0);
       // 1st row
       cv::cvtColor(img_uchar, _img_gui_rgb_buffer, cv::COLOR_GRAY2RGB);
-      image_utils::paste_img(_img_gui_rgb_buffer, _img_gui,
+      vision_utils::paste_img(_img_gui_rgb_buffer, _img_gui,
                              0 *img_uchar.cols, 0 *img_uchar.rows, 0, "img_uchar");
       //#if _nan_removal_method == _VALUE_REMOVAL_METHOD_INPAINT
       //    cv::cvtColor(inpaint_mask, _img_gui_rgb_buffer, cv::COLOR_GRAY2RGB);
-      //    image_utils::paste_img(img_gui_rgb_buffer, _img_gui,
+      //    vision_utils::paste_img(img_gui_rgb_buffer, _img_gui,
       //                           1 *img_uchar.cols, 0 *img_uchar.rows);
       //#endif // _VALUE_REMOVAL_METHOD_INPAINT
       cv::cvtColor(img_uchar_with_no_nan, _img_gui_rgb_buffer, cv::COLOR_GRAY2RGB);
-      image_utils::paste_img
+      vision_utils::paste_img
           (_img_gui_rgb_buffer, _img_gui,
            1 *img_uchar.cols, 0 *img_uchar.rows, 0,
            std::string("img_uchar_with_no_nan: m") +
-           string_utils::cast_to_string(_nan_removal_method));
+           vision_utils::cast_to_string(_nan_removal_method));
       cv::cvtColor(edges_inverted, _img_gui_rgb_buffer, cv::COLOR_GRAY2RGB);
-      image_utils::paste_img(_img_gui_rgb_buffer, _img_gui,
+      vision_utils::paste_img(_img_gui_rgb_buffer, _img_gui,
                              2 *img_uchar.cols, 0 *img_uchar.rows, 0, "edges_inverted");
 
       // 2nd row
       cv::cvtColor(edges_inverted_opened, _img_gui_rgb_buffer, cv::COLOR_GRAY2RGB);
-      image_utils::paste_img(_img_gui_rgb_buffer, _img_gui,
+      vision_utils::paste_img(_img_gui_rgb_buffer, _img_gui,
                              0 *img_uchar.cols, 1 *img_uchar.rows, 0,
                              "edges_inverted_opened");
       cv::cvtColor(edges_inverted_opened_with_nan, _img_gui_rgb_buffer, cv::COLOR_GRAY2RGB);
-      image_utils::paste_img(_img_gui_rgb_buffer, _img_gui,
+      vision_utils::paste_img(_img_gui_rgb_buffer, _img_gui,
                              1 *img_uchar.cols, 1 *img_uchar.rows, 0,
                              "edges_inverted_opened_with_nan");
-      image_utils::paste_img(_components_illus, _img_gui,
+      vision_utils::paste_img(_components_illus, _img_gui,
                              2 *img_uchar.cols, 1 *img_uchar.rows, 0, "components_illus");
 #ifdef TIMER_ON
       _timer.printTime("collage in _img_gui");

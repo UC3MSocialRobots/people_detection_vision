@@ -58,7 +58,7 @@ It consists of two steps:
 
 \section Publications
   - \b "~ppl"
-        [people_msgs_rl::PeoplePoseList]
+        [people_msgs::People]
         The found people heads
 
 */
@@ -70,13 +70,13 @@ It consists of two steps:
 #include <dynamic_reconfigure/server.h>
 #include <people_detection_vision/ViolaConfig.h>
 // AD
-#include "vision_utils/utils/Rect3.h"
-#include "vision_utils/utils/timer.h"
-#include "vision_utils/utils/pt_utils.h"
+#include "vision_utils/Rect3.h"
+#include "vision_utils/timer.h"
+
 #include "vision_utils/opencv_face_detector.h"
 #include "vision_utils/blob_segmenter.h"
-#include "vision_utils/color_utils.h"
-// people_msgs_rl
+
+// people_msgs
 #include "vision_utils/rgb_depth_pplp_template.h"
 #include "vision_utils/images2ppl.h"
 
@@ -96,7 +96,7 @@ public:
   FaceDetectorPPLP() :
     RgbDepthPPLPublisherTemplate("FACE_DETECTOR_PPLP_START", "FACE_DETECTOR_PPLP_STOP")
   {
-    _cascade_classifier = image_utils::create_face_classifier();
+    _cascade_classifier = vision_utils::create_face_classifier();
 
     // params
     //! the maximum bounding-box depth of the face points (m)
@@ -116,10 +116,10 @@ public:
 
     // get camera model
     image_geometry::PinholeCameraModel rgb_camera_model;
-    kinect_openni_utils::read_camera_model_files
+    vision_utils::read_camera_model_files
         (DEFAULT_KINECT_SERIAL(), _default_depth_camera_model, rgb_camera_model);
     printf("FaceDetectorPPLP: getting rgb on '%s', depth on '%s', "
-           "publish PeoplePoseList results on '%s', _display:%i\n",
+           "publish People results on '%s', _display:%i\n",
            get_rgb_topic().c_str(), get_depth_topic().c_str(),
            get_ppl_topic().c_str(), _display);
   }
@@ -128,14 +128,14 @@ public:
 
   virtual void process_rgb_depth(const cv::Mat3b & rgb,
                                  const cv::Mat1f & depth) {
-    Timer timer;
+    vision_utils::Timer timer;
     // clear data
     _faces_filtered.clear();
     _faces_centers_3d.clear();
     _users.clear();
 
     // detect with opencv
-    image_utils::detect_with_opencv
+    vision_utils::detect_with_opencv
         (rgb, _cascade_classifier,
          _small_img, _faces_not_filtered,
          _resize_max_width, _resize_max_height, _scale_factor,
@@ -145,7 +145,7 @@ public:
 
     // remove including faces
     std::vector< cv::Rect > faces_not_filtered_orig = _faces_not_filtered;
-    geometry_utils::remove_including_rectangles
+    vision_utils::remove_including_rectangles
         (faces_not_filtered_orig, _faces_not_filtered);
     DEBUG_PRINT("time for remove_including_rectangles(): %g ms, %i faces\n",
                 timer.time(), _faces_not_filtered.size());
@@ -154,7 +154,7 @@ public:
     DEBUG_PRINT("Time for filter_outliers_with_depth(): %g ms, "
                 "after filtering, %i faces: %s\n",
                 timer.time(), _faces_filtered.size(),
-                string_utils::accessible_to_string(_faces_centers_3d).c_str());
+                vision_utils::accessible_to_string(_faces_centers_3d).c_str());
     if (get_ppl_num_subscribers() > 0)
       build_ppl_message(rgb, depth);
     _last_time = timer.time();
@@ -167,29 +167,28 @@ public:
   //////////////////////////////////////////////////////////////////////////////
 
   /*! share the poses of the detected users in a
-   *  people_msgs_rl::PeoplePoseList msg */
+   *  people_msgs::People msg */
   void build_ppl_message(const cv::Mat3b & rgb,
                          const cv::Mat1f & depth) {
     // printf("build_ppl_message()\n");
     // share the poses
     unsigned int n_faces = _faces_centers_3d.size();
     _ppl.header = _images_header;
-    _ppl.method = "face_detector";
-    _ppl.poses.resize(n_faces);
+    _ppl.people.resize(n_faces);
 
 
-    // build the PeoplePose
+    // build the Person
     for (unsigned int user_idx = 0; user_idx < n_faces; ++user_idx) {
-      people_msgs_rl::PeoplePose* pp = &(_ppl.poses[user_idx]);
+      people_msgs::Person* pp = &(_ppl.people[user_idx]);
+      vision_utils::set_method(*pp, "face_detector");
       pp->header = _ppl.header; // copy header
-      // people_pose.person_name = string_utils::cast_to_string(user_idx);
-      pp->person_name = people_msgs_rl::PeoplePose::NO_RECOGNITION_MADE;
-      pp->confidence = 1;
-      pp->std_dev = .1;
+      // people_pose.name = vision_utils::cast_to_string(user_idx);
+      pp->name = "NOREC";
+      pp->reliability = 1;
 
       // pose
-      pt_utils::copy3(_faces_centers_3d[user_idx], pp->head_pose.position);
-      pp->head_pose.orientation = tf::createQuaternionMsgFromYaw(0);
+      vision_utils::copy3(_faces_centers_3d[user_idx], pp->position);
+      pp->position.orientation = tf::createQuaternionMsgFromYaw(0);
 
       // image
       if (!_images2pp.convert(*pp, &rgb, &depth, &(_users[user_idx]), true))
@@ -209,12 +208,12 @@ public:
     for (unsigned int user_idx = 0; user_idx < _faces_not_filtered.size(); ++user_idx) {
       // get a small rect centered on the face
       cv::Rect curr_face = _faces_not_filtered.at(user_idx);
-      cv::Rect curr_face_shrunk = geometry_utils::shrink_rec(curr_face, 0.5);
+      cv::Rect curr_face_shrunk = vision_utils::shrink_rec(curr_face, 0.5);
 
       // check if seed already seen in user mask
       cv::Point user_mask_seed = .5 * (curr_face.tl() + curr_face.br());
       for (unsigned int prev_user_idx = 0; prev_user_idx < _users.size(); ++prev_user_idx) {
-        if (image_utils::bbox_full(_users[prev_user_idx]).contains(user_mask_seed)
+        if (vision_utils::bbox_full(_users[prev_user_idx]).contains(user_mask_seed)
             && _users[prev_user_idx](user_mask_seed) > 0) {
           DEBUG_PRINT("Face %i: blob at seed (%i, %i) already seen before \n",
                       prev_user_idx, user_mask_seed.x, user_mask_seed.y);
@@ -232,7 +231,7 @@ public:
                                   curr_face_shrunk.y + rand() % curr_face_shrunk.height);
         // reproject it
         Pt3d curr_face_pt3d = //pixel2world_rgb(curr_face_pt2d);
-            kinect_openni_utils::pixel2world_depth<Pt3d>
+            vision_utils::pixel2world_depth<Pt3d>
             (curr_face_pt2d, _default_depth_camera_model,
              depth);
         // dismiss the NaN points
@@ -249,8 +248,8 @@ public:
       }
 
       // now compute the bounding box of this sample
-      geometry_utils::Rect3d bbox =
-          geometry_utils::boundingBox_vec3
+      vision_utils::Rect3d bbox =
+          vision_utils::boundingBox_vec3
           <double, Pt3d, std::vector<Pt3d> >(face_sample);
       // printf("Face %i: bbox:%s\n", user_idx, bbox.to_string().c_str());
 
@@ -299,13 +298,13 @@ public:
     cv::putText(_img_out, txt.str(), cv::Point(10, 30),
                 CV_FONT_HERSHEY_DUPLEX, 1.0f, CV_RGB(0, 0, 255));
     // convert the depth to an RGB image for display
-    //    image_utils::convert_float_to_uchar(depth, depth_color_to_uchar,
+    //    vision_utils::convert_float_to_uchar(depth, depth_color_to_uchar,
     //                                        alpha_trans, beta_trans);
     //    cv::imshow("depth_color_to_uchar", depth_color_to_uchar);
 
     // paint each user mask in _img_out
     for (unsigned int user_idx = 0; user_idx < _users.size(); ++user_idx) {
-      cv::Vec3b color = color_utils::color<cv::Vec3b>(user_idx);
+      cv::Vec3b color = vision_utils::color<cv::Vec3b>(user_idx);
       color += cv::Vec3b(70, 70, 70); //more pale colors
       _img_out.setTo(color, _users[user_idx]);
       //cv::add(_img_out, cv::Scalar::all(150), _img_out, _users[user_idx]);
@@ -316,7 +315,7 @@ public:
       cv::Rect curr_face = _faces_not_filtered.at(user_idx);
       cv::rectangle(_img_out, curr_face, CV_RGB(255, 0, 0), 2);
       // get a small rect centered on the face
-      cv::Rect curr_face_shrunk = geometry_utils::shrink_rec(curr_face, 0.5);
+      cv::Rect curr_face_shrunk = vision_utils::shrink_rec(curr_face, 0.5);
       cv::rectangle(_img_out, curr_face_shrunk, CV_RGB(255, 255, 0), 2);
     }
     // kept faces in green
@@ -325,12 +324,12 @@ public:
 
     //  if (!_users.empty()) {
     //    cv::Mat1b users_collage;
-    //    image_utils::paste_images(_users, users_collage, true, 100, 100);
+    //    vision_utils::paste_images(_users, users_collage, true, 100, 100);
     //    cv::imshow("users_collage", users_collage);
     //  }
 
     //cv::imshow("rgb", rgb);
-    //cv::imshow("depth", image_utils::depth2viz(depth, image_utils::FULL_RGB_STRETCHED));
+    //cv::imshow("depth", vision_utils::depth2viz(depth, vision_utils::FULL_RGB_STRETCHED));
     cv::imshow("FaceDetectorPPLP", _img_out);
     int key_code = (char) cv::waitKey(1);
     if (key_code == 27)
@@ -382,8 +381,8 @@ private:
   double _last_time;
 
   // PPL
-  people_msgs_rl::PeoplePoseList _ppl;
-  ppl_utils::Images2PP _images2pp;
+  people_msgs::People _ppl;
+  vision_utils::Images2PP _images2pp;
 
   dynamic_reconfigure::Server<people_detection_vision::ViolaConfig> server;
   dynamic_reconfigure::Server<people_detection_vision::ViolaConfig>::CallbackType f;

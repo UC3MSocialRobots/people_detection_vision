@@ -43,7 +43,7 @@ http://experienceopencv.blogspot.com/2011/02/hog-descriptor.html
 
 \section Publications
   - \b "~ppl"
-        [people_msgs_rl::PeoplePoseList]
+        [people_msgs::People]
         The detected users, \see PPLPublisherTemplate.
  */
 
@@ -55,10 +55,10 @@ http://experienceopencv.blogspot.com/2011/02/hog-descriptor.html
 #include <people_detection_vision/HOGConfig.h>
 // AD
 #include "vision_utils/image_clusterer.h"
-#include "vision_utils/utils/Rect3.h"
-#include "vision_utils/utils/timer.h"
-#include "vision_utils/io.h"
-// people_msgs_rl
+#include "vision_utils/Rect3.h"
+#include "vision_utils/timer.h"
+
+// people_msgs
 #include "vision_utils/rgb_depth_pplp_template.h"
 #include "vision_utils/images2ppl.h"
 // OpenCV
@@ -87,12 +87,12 @@ public:
 
     // get camera model
     image_geometry::PinholeCameraModel rgb_camera_model;
-    kinect_openni_utils::read_camera_model_files
+    vision_utils::read_camera_model_files
         (DEFAULT_KINECT_SERIAL(), _default_depth_camera_model, rgb_camera_model);
 
     ROS_INFO("HogPPLP: started with '%s' and stopped with '%s', display:%i, "
              "subscribing to '%s', '%s', "
-             "publish PeoplePoseList results on '%s'\n",
+             "publish People results on '%s'\n",
              get_start_stopic().c_str(), get_stop_stopic().c_str(),
              _display,
              get_rgb_topic().c_str(), get_depth_topic().c_str(),
@@ -106,7 +106,7 @@ public:
                                  const cv::Mat1f & depth) {
     DEBUG_PRINT("process_rgb_depth()\n");
 
-    Timer timer;
+    vision_utils::Timer timer;
     // clear previous data
     _cuts_offsets.clear();
     _rgb_cuts.clear();
@@ -135,7 +135,7 @@ public:
     DEBUG_PRINT("Time for _hog.detectMultiScale():%g ms\n", timer.time());
 
     // filter the rectangles
-    geometry_utils::remove_including_rectangles
+    vision_utils::remove_including_rectangles
         (found_rectangles, _found_rectangles_filtered);
     unsigned int nusers = _found_rectangles_filtered.size();
 
@@ -148,13 +148,13 @@ public:
       r->height /= _preprocess_resize_scale;
       // the HOG detector returns slightly larger rectangles than the real objects.
       // so we slightly shrink the rectangles to get a nicer output.
-      //*r = geometry_utils::shrink_rec(*r, 0.8);
+      //*r = vision_utils::shrink_rec(*r, 0.8);
       // only shrink horizontally
       double ratio = .5;
       r->x = r->x + r->width * (1. - ratio) / 2;
       r->width = ratio * r->width;
       // ensure the new rectangle is in the image
-      *r = geometry_utils::rectangle_intersection_img(rgb, *r);
+      *r = vision_utils::rectangle_intersection_img(rgb, *r);
     } // end loop user_idx
     // DEBUG_PRINT("Time for rectangles rescaling:%g ms\n", timer.time());
 
@@ -206,13 +206,13 @@ public:
                            cv::Mat1f & depth_cut,
                            cv::Mat1b & user_cut,
                            cv::Point3d & face_center3d) {
-    // DEBUG_PRINT("compute_cluster_roi(%s)\n", geometry_utils::print_rect(roi).c_str());
+    // DEBUG_PRINT("compute_cluster_roi(%s)\n", vision_utils::print_rect(roi).c_str());
     if (!_clusterer.cluster(rgb(roi), depth(roi), _default_depth_camera_model, _clusterer_data_skip)) {
       printf("Fail in clusterer.cluster()!\n");
       return false;
     }
     // get the bounding box -> face_center3d
-    geometry_utils::Rect3d bbox;
+    vision_utils::Rect3d bbox;
     if (!_clusterer.get_biggest_cluster_bbox(bbox)) {
       printf("Fail in clusterer.get_biggest_cluster_bbox()!\n");
       return false;
@@ -221,7 +221,7 @@ public:
     // head.y = 10 cm under top (y axis is inverted)
     face_center3d.y = bbox.y + 0.10;
     face_center3d.z = bbox.z + bbox.depth/2;
-    // printf("face_center3d:'%s'\n", geometry_utils::printP(face_center3d).c_str());
+    // printf("face_center3d:'%s'\n", vision_utils::printP(face_center3d).c_str());
 
     // generate mask
     if (!_clusterer.get_biggest_cluster_pixels
@@ -244,7 +244,7 @@ public:
   //////////////////////////////////////////////////////////////////////////////
 
   /*! share the poses of the detected users in a
-   *  people_msgs_rl::PeoplePoseList msg */
+   *  people_msgs::People msg */
   void build_ppl_message() {
     // share the poses
     unsigned int n_faces = _faces_centers3d.size();
@@ -253,21 +253,20 @@ public:
     assert(_user_cuts.size() == n_faces);
     assert(_cuts_offsets.size() == n_faces);
     _ppl.header = _images_header; // reuse the header of the last frame
-    _ppl.method = "hog_pplp";
-    _ppl.poses.resize(n_faces);
+    _ppl.people.resize(n_faces);
 
-    // build the PeoplePose
+    // build the Person
     for (unsigned int user_idx = 0; user_idx < n_faces; ++user_idx) {
-      people_msgs_rl::PeoplePose* pp = &(_ppl.poses[user_idx]);
+      people_msgs::Person* pp = &(_ppl.people[user_idx]);
+      vision_utils::set_method(*pp, "hog_pplp");
       pp->header = _ppl.header; // copy header
-      // pp->person_name = string_utils::cast_to_string(user_idx);
-      pp->person_name = people_msgs_rl::PeoplePose::NO_RECOGNITION_MADE;
-      pp->confidence = 1;
+      // pp->name = vision_utils::cast_to_string(user_idx);
+      pp->name = "NOREC";
+      pp->reliability = 1;
 
       // pose
-      pt_utils::copy3(_faces_centers3d[user_idx], pp->head_pose.position);
-      pp->head_pose.orientation = tf::createQuaternionMsgFromYaw(0);
-      pp->std_dev = .1;
+      vision_utils::copy3(_faces_centers3d[user_idx], pp->position);
+      pp->position.orientation = tf::createQuaternionMsgFromYaw(0);
 
       // image
       _images2pp.convert(*pp, &(_rgb_cuts[user_idx]), &(_depth_cuts[user_idx]), &(_user_cuts[user_idx]), false);
@@ -285,7 +284,7 @@ public:
   virtual void display(const cv::Mat3b & rgb,
                        const cv::Mat1f & depth) {
     //cv::imshow("rgb", rgb);
-    //cv::imshow("depth", image_utils::depth2viz(depth, image_utils::FULL_RGB_STRETCHED));
+    //cv::imshow("depth", vision_utils::depth2viz(depth, vision_utils::FULL_RGB_STRETCHED));
     rgb.copyTo(img_out);
     std::ostringstream txt; txt << (int) _last_time << " ms";
     cv::putText(img_out, txt.str(), cv::Point(10, 30),
@@ -352,8 +351,8 @@ private:
   image_geometry::PinholeCameraModel _default_depth_camera_model;
 
   //! information sharing
-  people_msgs_rl::PeoplePoseList _ppl;
-  ppl_utils::Images2PP _images2pp;
+  people_msgs::People _ppl;
+  vision_utils::Images2PP _images2pp;
 
   dynamic_reconfigure::Server<people_detection_vision::HOGConfig> server;
   dynamic_reconfigure::Server<people_detection_vision::HOGConfig>::CallbackType f;

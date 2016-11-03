@@ -151,13 +151,13 @@
 #include <geometry_msgs/PointStamped.h>
 #include <tf/transform_listener.h>
 // ros utils
-#include "vision_utils/utils/marker_utils.h"
-#include "vision_utils/utils/costmap_utils.h"
-#include "vision_utils/utils/odom_utils.h"
-#include "vision_utils/utils/pt_utils.h"
-#include "vision_utils/utils/geometry_utils.h"
-#include "vision_utils/utils/timer.h"
-#include "vision_utils/utils/genetic.h"
+
+
+
+
+
+#include "vision_utils/timer.h"
+#include "vision_utils/genetic.h"
 
 #ifdef USE_ETTS
 #include "vision_utils/nano_etts_api.h"
@@ -166,7 +166,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // TYPEDEFS
-typedef geometry_utils::FooPoint2f Pt2;
+typedef vision_utils::FooPoint2f Pt2;
 struct Pose2 {
   Pt2 position;
   float yaw;
@@ -437,7 +437,7 @@ protected:
     otherwise: fabs(min_goal_distance - the L2 distance to the goal)
 */
   inline float traj_grade(const SpeedOrder & order) {
-    double goal_distance = costmap_utils::trajectory_mark<Pt2>
+    double goal_distance = vision_utils::trajectory_mark<Pt2>
                            (_current_robot_pose.position, // Pt2
                             _current_robot_pose.yaw, // float
                             _goal.position, // Pt2
@@ -451,7 +451,7 @@ protected:
   ////////////////////////////////////////////////////////////////////////////////
 
   void recompute_speed() {
-    Timer timer;
+    vision_utils::Timer timer;
     //_speed_genetic_finder.run_algorithm();
     //SpeedOrder best_order = _speed_genetic_finder.get_best_element().element;
     run_algorithm();
@@ -482,7 +482,7 @@ protected:
     _last_goal_timer.reset();
 
     // make a copy of the goal
-    pt_utils::copy2(pt3D->pose.position, _goal.position);
+    vision_utils::copy2(pt3D->pose.position, _goal.position);
     _goal.yaw = tf::getYaw(pt3D->pose.orientation);
     //_goal = *pt3D;
 
@@ -507,7 +507,7 @@ protected:
       ROS_WARN_THROTTLE(2, "transform error:'%s'", e.what());
       return;
     }
-    pt_utils::copy2(robot_pose_static_frame.pose.position,
+    vision_utils::copy2(robot_pose_static_frame.pose.position,
                     _current_robot_pose.position);
     _current_robot_pose.yaw = tf::getYaw(robot_pose_static_frame.pose.orientation);
     //  ROS_INFO_THROTTLE(1, "Robot is in (%g, %g), yaw:%g in '%s'.",
@@ -517,11 +517,11 @@ protected:
 
     // determine if we have reached the goal - 2D distance
     float curr_goal_distance =
-        //geometry_utils::distance_points
+        //vision_utils::distance_points
         hausdorff_distances::dist_L2
         (_current_robot_pose.position, _goal.position);
     float vector_to_goal_yaw =
-        geometry_utils::oriented_angle_of_a_vector
+        vision_utils::oriented_angle_of_a_vector
         (_goal.position - _current_robot_pose.position);
     float angle_to_goal = vector_to_goal_yaw - _current_robot_pose.yaw;
     if (angle_to_goal > M_PI)
@@ -653,9 +653,9 @@ protected:
 
     // emit marker
     std::vector<Pt2> traj_xy;
-    odom_utils::make_trajectory(_current_order.vel_lin, _current_order.vel_ang,
+    vision_utils::make_trajectory(_current_order.vel_lin, _current_order.vel_ang,
                                 traj_xy, _time_pred, DT, 0, 0, 0);
-    marker_utils::list_points2_as_primitives(_marker, traj_xy, "traj_xy",
+    vision_utils::list_points2_as_primitives(_marker, traj_xy, "traj_xy",
                                              0.1, 0.03, 1, 0, 0, 1, _robot_frame_id);
     _marker.header.stamp = pt3D->header.stamp;
     _marker_pub.publish(_marker);
@@ -681,7 +681,7 @@ protected:
       const geometry_msgs::Point & curr_cell = msg->cells[cell_idx];
       cell_centers.push_back(geometry_msgs::Point(curr_cell.x, curr_cell.y));
     } // end loop cell_idx
-    marker_utils::list_points2_as_primitives(_marker, cell_centers, "cell_centers",
+    vision_utils::list_points2_as_primitives(_marker, cell_centers, "cell_centers",
                                              0.1, 0.05, 0, 1, 0, 1, static_frame_id);
     _marker_pub.publish(_marker);
 #endif // EMIT_LOCAL_COSTMAP_MARKER

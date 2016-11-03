@@ -45,20 +45,20 @@ ________________________________________________________________________________
 
 \section Publications
   - \b "~ppl"
-        [people_msgs_rl::PeoplePoseList]
+        [people_msgs::People]
         The wanted people heads
 
  */
 #include <ros/ros.h>
 #include <tf/tf.h>
-#include <people_msgs_rl/PeoplePoseList.h>
-#include "vision_utils/utils/pt_utils.h"
-#include "vision_utils/utils/timer.h"
-#include "vision_utils/utils/foo_point.h"
-#include "vision_utils/utils/combinatorics_utils.h"
-#include "vision_utils/utils/string_split.h"
+#include <people_msgs/People.h>
 
-typedef geometry_utils::FooPoint3f Point3;
+#include "vision_utils/timer.h"
+#include "vision_utils/foo_point.h"
+
+#include "vision_utils/string_split.h"
+
+typedef vision_utils::FooPoint3f Point3;
 
 int main(int argc, char** argv) {
   ros::init(argc, argv, "fake_face_detector_pplp");
@@ -85,10 +85,10 @@ int main(int argc, char** argv) {
   // parse the params
   std::vector<std::string> people_head_str_list;
   std::vector<Point3> people_heads;
-  string_utils::StringSplit(people_heads_str, ";", &people_head_str_list);
+  vision_utils::StringSplit(people_heads_str, ";", &people_head_str_list);
   for (unsigned int face_idx = 0; face_idx < people_head_str_list.size(); ++face_idx) {
     std::vector<double> head_coordinates;
-    string_utils::StringSplit_<double>
+    vision_utils::StringSplit_<double>
         (people_head_str_list[face_idx], ",", &head_coordinates);
     if (head_coordinates.size() != 3) {
       ROS_WARN("The string '%s' is not a valid 3D point! Skipping it.",
@@ -103,32 +103,31 @@ int main(int argc, char** argv) {
   unsigned int n_people = people_heads.size();
   ROS_INFO("fake_face_detector_pplp: emitting %i faces (%s), gaussian_error_sigma:%f",
            n_people,
-           string_utils::accessible_to_string(people_heads).c_str(),
+           vision_utils::accessible_to_string(people_heads).c_str(),
            gaussian_error_sigma);
 
   // build message for the first time
-  people_msgs_rl::PeoplePoseList ppl;
+  people_msgs::People ppl;
   ppl.header.frame_id = frame_id;
   // the stamp will be set in the update loop
-  ppl.poses.clear();
-  ppl.method = "fake_face_detector_pplp";
-  ppl.poses.reserve(n_people);
+  ppl.people.clear();
+  ppl.people.reserve(n_people);
   for (unsigned int face_idx = 0; face_idx < n_people; ++face_idx) {
-    people_msgs_rl::PeoplePose people_pose;
+    people_msgs::Person people_pose;
+    vision_utils::set_method(people_pose, "fake_face_detector_pplp");
     // the header will be set in the update loop
     // the position and orientation will be set in the update loop
-    people_pose.person_name = string_utils::cast_to_string(face_idx);
-    people_pose.confidence = 1;
-    people_pose.std_dev = .1;
-    ppl.poses.push_back(people_pose);
+    people_pose.name = vision_utils::cast_to_string(face_idx);
+    people_pose.reliability = 1;
+    ppl.people.push_back(people_pose);
   } // end loop face_idx
 
   ros::Publisher ppl_pub = nh_private.advertise
-      <people_msgs_rl::PeoplePoseList>("ppl", 1);
+      <people_msgs::People>("ppl", 1);
 
   // emit it periodically
   ros::Rate rate(15);
-  Timer timer_start;
+  vision_utils::Timer timer_start;
   while (ros::ok()) {
     double elapsed_time = timer_start.getTimeSeconds();
     ros::Time stamp = ros::Time::now();
@@ -136,23 +135,23 @@ int main(int argc, char** argv) {
     ppl.header.stamp = stamp;
     for (unsigned int face_idx = 0; face_idx < n_people; ++face_idx) {
       // copy header
-      ppl.poses[face_idx].header = ppl.header;
-      geometry_msgs::Pose* head_pose =
-          &(ppl.poses[face_idx].head_pose);
-      pt_utils::copy3(people_heads[face_idx],head_pose->position);
-      head_pose->position.x +=
+      ppl.people[face_idx].header = ppl.header;
+      geometry_msgs::Pose* position =
+          &(ppl.people[face_idx].position);
+      vision_utils::copy3(people_heads[face_idx],position->position);
+      position->position.x +=
           x_oscill_ampl * cos(elapsed_time * x_oscill_speed) +
-          combinatorics_utils::rand_gaussian() * gaussian_error_sigma;
-      head_pose->position.y +=
+          vision_utils::rand_gaussian() * gaussian_error_sigma;
+      position->position.y +=
           y_oscill_ampl * sin(elapsed_time * y_oscill_speed) +
-          combinatorics_utils::rand_gaussian() * gaussian_error_sigma;
-      head_pose->position.z +=
+          vision_utils::rand_gaussian() * gaussian_error_sigma;
+      position->position.z +=
           z_oscill_ampl * cos(elapsed_time * z_oscill_speed) +
-          combinatorics_utils::rand_gaussian() * gaussian_error_sigma;
-      head_pose->orientation = tf::createQuaternionMsgFromYaw(0);
+          vision_utils::rand_gaussian() * gaussian_error_sigma;
+      position->orientation = tf::createQuaternionMsgFromYaw(0);
 
       //  ROS_WARN_THROTTLE(1, "head #%i: pose='%s'",
-      //                    face_idx, pt_utils::print_pose(*head_pose).c_str());
+      //                    face_idx, vision_utils::print_pose(*position).c_str());
     } // end loop face_idx
 
     // publish message

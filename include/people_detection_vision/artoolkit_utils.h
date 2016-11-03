@@ -3,7 +3,7 @@
   \author      Arnaud Ramey <arnaud.a.ramey@gmail.com>
                 -- Robotics Lab, University Carlos III of Madrid
   \date        2013/10/10
-  
+
 ________________________________________________________________________________
 
 This program is free software: you can redistribute it and/or modify
@@ -31,11 +31,7 @@ ARToolkit in ROS (http://wiki.ros.org/ar_pose)
 #include <ar_pose/ARMarker.h>
 #include <ar_pose/ARMarkers.h>
 // AD
-#include "vision_utils/utils/string_casts_stl.h"
-#include "vision_utils/utils/string_casts.h"
-#include "vision_utils/utils/map_utils.h"
-#include "vision_utils/utils/file_io.h"
-#include "vision_utils/utils/find_and_replace.h"
+#include "vision_utils/find_and_replace.h"
 
 namespace artoolkit_utils {
 
@@ -65,11 +61,11 @@ public:
     _map.clear();
     // read file
     std::vector<std::string> lines;
-    string_utils::retrieve_file_split(filepath, lines);
+    vision_utils::retrieve_file_split(filepath, lines);
     // remove comments, empty spaces, etc.
     for (unsigned int line_idx = 0; line_idx < lines.size(); ++line_idx) {
-      string_utils::remove_trailing_spaces(lines[line_idx]);
-      string_utils::remove_beginning_spaces(lines[line_idx]);
+      vision_utils::remove_trailing_spaces(lines[line_idx]);
+      vision_utils::remove_beginning_spaces(lines[line_idx]);
       // remove comments
       if (lines[line_idx].size() > 0 && lines[line_idx][0] == '#') // comment
         lines[line_idx] = "";
@@ -86,7 +82,7 @@ public:
     }
 
     // get number of blocks
-    int nlines = lines.size(), nblocks = string_utils::cast_from_string<int>(lines[0]);
+    int nlines = lines.size(), nblocks = vision_utils::cast_from_string<int>(lines[0]);
     if (nblocks < 0 || nblocks > 100) {
       ROS_WARN("parse('%s'): incorrect nb of blocks:%i\n", filepath.c_str(), nblocks);
       return false;
@@ -115,7 +111,7 @@ public:
   //////////////////////////////////////////////////////////////////////////////
 
   //! \return a string representation of the map
-  inline std::string to_string() const { return string_utils::map_to_string(_map); }
+  inline std::string to_string() const { return vision_utils::map_to_string(_map); }
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -129,7 +125,7 @@ public:
    */
   inline bool direct_lookup(const Id & id,
                      PatternName & pattern) const {
-    return map_utils::direct_search(_map, id, pattern);
+    return vision_utils::direct_search(_map, id, pattern);
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -144,7 +140,7 @@ public:
    */
   inline bool reverse_lookup(const PatternName & pattern,
                       Id & id) const {
-    return map_utils::reverse_search(_map, pattern, id);
+    return vision_utils::reverse_search(_map, pattern, id);
   }
 
 

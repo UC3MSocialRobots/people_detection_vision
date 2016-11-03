@@ -15,12 +15,11 @@
   <depend>libv4l-dev</depend>
   <!-- ROS dependencies -->
   <depend>dynamic_reconfigure</depend>
+  <depend>people_msgs</depend>
   <!-- third party sources:
         these should be in the dependencies.rosinstall of the package -->
   <depend>ar_pose</depend>
   <!-- AD -->
-  <depend>kinect</depend>
-  <depend>vision_utils</depend>
 
   <export>
     <rosdoc config="rosdoc.yaml" />

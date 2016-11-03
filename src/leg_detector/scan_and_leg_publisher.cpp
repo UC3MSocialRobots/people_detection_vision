@@ -46,19 +46,19 @@ Publishes the former in ROS LaserScans and the latter in PPL messages.
         The laser scans read from the file.
 
   - \b "~ppl"
-        [people_msgs_rl::PeoplePoseList]
+        [people_msgs::People]
         The poses of the found people.
  */
 // ROS
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
 #include <tf/transform_datatypes.h>
-// people_msgs_rl
+// people_msgs
 #include "vision_utils/pplp_template.h"
 // utils
-#include "vision_utils/utils/file_io.h"
-#include "vision_utils/utils/string_split.h"
-#include "vision_utils/utils/foo_point.h"
+
+#include "vision_utils/string_split.h"
+#include "vision_utils/foo_point.h"
 
 #define DEG2RAD 0.01745329251994329577
 #define RAD2DEG 57.2957795130823208768
@@ -66,7 +66,7 @@ Publishes the former in ROS LaserScans and the latter in PPL messages.
 class ScanAndLegPublisher : public PPLPublisherTemplate {
 public:
   //! a minimalistic Point structure
-  typedef geometry_utils::FooPoint2f Point2;
+  typedef vision_utils::FooPoint2f Point2;
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -101,12 +101,12 @@ public:
     _laser_pub = _nh_public.advertise<sensor_msgs::LaserScan>(laser_topic, 1);
 
     // parse file
-    if (!string_utils::retrieve_file_split(csv_filename, _lines, false, true)) {
+    if (!vision_utils::retrieve_file_split(csv_filename, _lines, false, true)) {
       printf("Could not read CSV '%s'!\n", csv_filename.c_str());
     }
 
     printf("scan_and_leg_publisher:This executable loads data from '%s'"
-           ", publishes laser scans on '%s', and PeoplePoseList results to '%s'.",
+           ", publishes laser scans on '%s', and People results to '%s'.",
            csv_filename.c_str(),
            _laser_pub.getTopic().c_str(), get_ppl_topic().c_str());
   }
@@ -125,7 +125,7 @@ public:
       return false;
     }
     // read scan
-    string_utils::StringSplit_<float>(_lines[_curr_line+1], ",", &_scan.ranges);
+    vision_utils::StringSplit_<float>(_lines[_curr_line+1], ",", &_scan.ranges);
     if (fabs(_scan_unit2meters - 1) > 1E-3)
       //_scan.ranges *= _scan_unit2meters;
       std::transform(_scan.ranges.begin(), _scan.ranges.end(), _scan.ranges.begin(),
@@ -142,26 +142,25 @@ public:
 
     // read user pos
     std::vector<float> users_positions;
-    string_utils::StringSplit_<float>(_lines[_curr_line+2], ",", &users_positions);
+    vision_utils::StringSplit_<float>(_lines[_curr_line+2], ",", &users_positions);
     unsigned int nusers = users_positions.size() / 3;
     // build new message
     _ppl.header = _scan.header;
-    _ppl.method = "scan_and_leg_publisher";
-    _ppl.poses.clear();
-    _ppl.poses.reserve(nusers);
+    _ppl.people.clear();
+    _ppl.people.reserve(nusers);
     for (unsigned int user_idx = 0; user_idx < nusers; ++user_idx) {
-      people_msgs_rl::PeoplePose people_pose;
+      people_msgs::Person people_pose;
+      vision_utils::set_method(people_pose, "scan_and_leg_publisher");
       people_pose.header = _ppl.header; // copy header
-      people_pose.person_name = string_utils::cast_to_string(user_idx);
-      people_pose.confidence = 1;
-      people_pose.std_dev = 0;
+      people_pose.name = vision_utils::cast_to_string(user_idx);
+      people_pose.reliability = 1;
       // set pose
-      people_pose.head_pose.orientation = tf::createQuaternionMsgFromYaw(0);
-      people_pose.head_pose.position.x = users_positions[user_idx*3];
-      people_pose.head_pose.position.y = users_positions[user_idx*3+1];
-      people_pose.head_pose.position.z = 1.7;
+      people_pose.position.orientation = tf::createQuaternionMsgFromYaw(0);
+      people_pose.position.position.x = users_positions[user_idx*3];
+      people_pose.position.position.y = users_positions[user_idx*3+1];
+      people_pose.position.position.z = 1.7;
       // add it
-      _ppl.poses.push_back(people_pose);
+      _ppl.people.push_back(people_pose);
     } // end loop user_idx
     // publish message
 
@@ -175,7 +174,7 @@ public:
   //////////////////////////////////////////////////////////////////////////////
 
   //! ROS message to share results
-  people_msgs_rl::PeoplePoseList _ppl;
+  people_msgs::People _ppl;
   ros::Publisher _laser_pub;
   double _angle_min, _angle_max, _scan_unit2meters;
   std::vector<std::string> _lines;
