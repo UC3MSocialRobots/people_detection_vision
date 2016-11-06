@@ -1,16 +1,3 @@
 - git:
     local-name: ar_tools
     uri: https://github.com/ar-tools/ar_tools.git
-- git:
-    local-name: cvstage
-    uri: https://github.com/arnaud-ramey/cvstage.git
-- git:
-    local-name: kinect
-    uri: https://github.com/UC3MSocialRobots/kinect.git
-- git:
-    local-name: people_msgs_rl
-    uri: https://github.com/UC3MSocialRobots/people_msgs_rl.git
-- git:
-    local-name: vision_utils
-    uri: https://github.com/UC3MSocialRobots/vision_utils.git
-
