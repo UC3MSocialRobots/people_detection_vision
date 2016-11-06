@@ -14,8 +14,16 @@
        get the keys using "rosdep db"  -->
   <depend>libv4l-dev</depend>
   <!-- ROS dependencies -->
+  <depend>cv_bridge</depend>
   <depend>dynamic_reconfigure</depend>
+  <depend>image_geometry</depend>
+  <depend>image_transport</depend>
   <depend>people_msgs</depend>
+  <depend>pcl_ros</depend>
+  <depend>roscpp</depend>
+  <depend>roslib</depend>
+  <depend>rosbag</depend>
+  <depend>tf</depend>
   <!-- third party sources:
         these should be in the dependencies.rosinstall of the package -->
   <depend>ar_pose</depend>

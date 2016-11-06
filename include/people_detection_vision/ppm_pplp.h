@@ -30,17 +30,17 @@ Dynamic Environments"
 // utils
 #include "vision_utils/timer.h"
 #include "vision_utils/Rect3.h"
-
-// kinect
-
 // vision_utils
 #include "vision_utils/disjoint_sets2.h"
-
-// people_msgs
-#include "vision_utils/rgb_depth_pplp_template.h"
 #include "vision_utils/images2ppl.h"
+#include "vision_utils/imwrite_debug.h"
+#include "vision_utils/paste_images.h"
+#include "vision_utils/rgb_depth_pplp_template.h"
+#include "vision_utils/user_image_to_rgb.h"
 
-class Ppm : public RgbDepthPPLPublisherTemplate {
+#define DEG2RAD     0.01745329251994329577  //!< to convert degrees to radians
+
+class Ppm : public vision_utils::RgbDepthPPLPublisherTemplate {
 public:
   typedef cv::Point3f Pt3f;
   typedef std::vector<Pt3f> Comp3f;
@@ -58,7 +58,7 @@ public:
     // get camera model
     image_geometry::PinholeCameraModel rgb_camera_model;
     vision_utils::read_camera_model_files
-        (DEFAULT_KINECT_SERIAL(), _default_depth_camera_model, rgb_camera_model);
+        (vision_utils::DEFAULT_KINECT_SERIAL(), _default_depth_camera_model, rgb_camera_model);
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -78,7 +78,6 @@ public:
       for (unsigned int people_idx = 0; people_idx < npeople; ++people_idx) {
         people_msgs::Person* pp = &(_ppl.people[people_idx]);
         vision_utils::set_method(*pp, "ppm");
-        pp->header = _images_header;
         pp->name = "NOREC";
         vision_utils::copy3(comps_bboxes[people_idx].centroid<Pt3f>(),
                         pp->position);
@@ -381,13 +380,14 @@ public:
     cv::imshow("depth", vision_utils::depth2viz(depth, vision_utils::FULL_RGB_STRETCHED));
     cv::imshow("ppm_float", vision_utils::depth2viz(_ppm_float, vision_utils::FULL_RGB_STRETCHED, 3));
     cv::imshow("ppm_thres", _ppm_thres);
-    cv::imshow("ppm2comp", user_image_to_rgb(_ppm2comp, 16));
+    cv::imshow("ppm2comp", vision_utils::user_image_to_rgb(_ppm2comp, 16));
 
     vision_utils::imwrite_debug("rgb.png", rgb);
     vision_utils::imwrite_debug("depth.png", vision_utils::depth2viz(depth, vision_utils::FULL_RGB_STRETCHED), vision_utils::COLORS256);
     vision_utils::imwrite_debug("ppm_float.png", vision_utils::depth2viz(_ppm_float, vision_utils::FULL_RGB_STRETCHED, 3), vision_utils::COLORS256);
     vision_utils::imwrite_debug("ppm_thres.png", _ppm_thres, vision_utils::MONOCHROME);
-    vision_utils::imwrite_debug("ppm2comp.png", user_image_to_rgb(_ppm2comp, 16), vision_utils::COLORS256);
+    vision_utils::imwrite_debug("ppm2comp.png",
+                                vision_utils::user_image_to_rgb(_ppm2comp, 16), vision_utils::COLORS256);
 
     if (!_comps_images_non_filtered.empty()) {
       vision_utils::paste_images(_comps_images_non_filtered,
@@ -396,7 +396,7 @@ public:
       cv::imshow("comps_images_non_filtered", _comps_images_non_filtered_collage);
       vision_utils::imwrite_debug("comps_images_non_filtered.png", _comps_images_non_filtered_collage, vision_utils::COLORS256);
     }
-    printf("_comps_images.size():%i\n", comps_images.size());
+    printf("_comps_images.size():%li\n", comps_images.size());
     vision_utils::paste_images(comps_images,
                               _comps_images_filtered_collage, true, 100, 100, 5,
                               true, vision_utils::int_to_number);
@@ -456,7 +456,7 @@ private:
   image_geometry::PinholeCameraModel _default_depth_camera_model;
   cv::Mat1i _ppm;
   cv::Mat1b _ppm_thres;
-  DisjointSets2 _set;
+  vision_utils::DisjointSets2 _set;
 
   // method1
   std::vector<Comp3f > _comps_points_non_filtered;

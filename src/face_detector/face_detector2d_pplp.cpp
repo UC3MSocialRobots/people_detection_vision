@@ -38,14 +38,15 @@ ________________________________________________________________________________
         The found people heads
  */
 // AD
+#include "vision_utils/images2ppl.h"
+#include "vision_utils/opencv_face_detector.h"
+#include "vision_utils/rect_center.h"
+#include "vision_utils/rectangle_intersection.h"
+#include "vision_utils/remove_including_rectangles.h"
+#include "vision_utils/rgb_skill.h"
 #include "vision_utils/timer.h"
 
-#include "vision_utils/opencv_face_detector.h"
-#include "vision_utils/rgb_skill.h"
-// people_msgs
-#include "vision_utils/images2ppl.h"
-
-class FaceDetector2DPPLP : public RgbSkill {
+class FaceDetector2DPPLP : public vision_utils::RgbSkill {
 public:
   typedef people_msgs::People PPL;
   typedef cv::Point3d Pt3d;
@@ -57,7 +58,7 @@ public:
     // get camera model
     image_geometry::PinholeCameraModel rgb_camera_model;
     vision_utils::read_camera_model_files
-        (DEFAULT_KINECT_SERIAL(), _default_depth_camera_model, rgb_camera_model);
+        (vision_utils::DEFAULT_KINECT_SERIAL(), _default_depth_camera_model, rgb_camera_model);
 
     //  PPLPublisherTemplate
     _ppl_resolved_topic = _nh_private.resolveName("ppl");
@@ -145,14 +146,12 @@ public:
     for (unsigned int user_idx = 0; user_idx < n_faces; ++user_idx) {
       people_msgs::Person* pp = &(_ppl.people[user_idx]);
       vision_utils::set_method(*pp, "face_detector2d");
-      pp->header = _ppl.header; // copy header
       // people_pose.name = vision_utils::cast_to_string(user_idx);
       pp->name = "NOREC";
       pp->reliability = 1;
 
       // pose
       vision_utils::copy3(_faces_centers_3d[user_idx], pp->position);
-      pp->position.orientation = tf::createQuaternionMsgFromYaw(0);
 
       // image
       face_img.setTo(0);

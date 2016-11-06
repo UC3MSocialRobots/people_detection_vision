@@ -72,12 +72,12 @@ or another without odometry.
 
 // boost
 #include "boost/filesystem.hpp" // for creating folders
-
-
+#include <fstream>
 // utils
-
-
+#include "vision_utils/rpy_from_quaternion.h"
 #include "vision_utils/timestamp.h"
+#include "vision_utils/write_rgb_and_depth_image_to_image_file.h"
+#include "vision_utils/write_rgb_and_depth_to_yaml_file.h"
 // ROS
 #include <ros/ros.h>
 #include <message_filters/subscriber.h>

@@ -66,18 +66,18 @@ in the user mask.
 #endif
 
 // AD
-
 #include "vision_utils/timer.h"
 #include "vision_utils/pplp_template.h"
-// people_msgs
 #include "vision_utils/images2ppl.h"
+#include "vision_utils/user_image_to_rgb.h"
+#include "vision_utils/map_values_to_container.h"
 
 #define DEBUG_PRINT(...)   {}
 //#define DEBUG_PRINT(...)   ROS_INFO_THROTTLE(5, __VA_ARGS__)
 //#define DEBUG_PRINT(...)   ROS_WARN(__VA_ARGS__)
 //#define DEBUG_PRINT(...)   printf(__VA_ARGS__)
 
-class NiteUserMask2Ppl : public PPLPublisherTemplate {
+class NiteUserMask2Ppl : public vision_utils::PPLPublisherTemplate {
 public:
   typedef sensor_msgs::Image Image;
   // use of message filters - inspiration available at
@@ -97,7 +97,7 @@ public:
   virtual void display(const cv::Mat3b & rgb,
                        const cv::Mat1f & depth,
                        const cv::Mat1b & user_mask) {
-    user_image_to_rgb(user_mask, user_illus);
+    vision_utils::user_image_to_rgb(user_mask, user_illus);
     std::vector<cv::Point> coms2D;
     vision_utils::map_values_to_container(_ppl_conv.get_coms(), coms2D);
     for (unsigned int com2D_idx = 0; com2D_idx < coms2D.size(); ++com2D_idx)
@@ -191,7 +191,7 @@ public:
     }
     if (get_ppl_num_subscribers() > 0) {
       PPL* ppl = &(_ppl_conv.get_ppl());
-      ppl->method = "nite_user_mask_pplp";
+      vision_utils::set_method(*ppl, "nite_user_mask_pplp");
       publish_PPL(*ppl);
     }
     if (_display) display(rgb, depth, user_mask);

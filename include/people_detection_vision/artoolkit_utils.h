@@ -31,7 +31,12 @@ ARToolkit in ROS (http://wiki.ros.org/ar_pose)
 #include <ar_pose/ARMarker.h>
 #include <ar_pose/ARMarkers.h>
 // AD
+#include "vision_utils/map_direct_search.h"
+#include "vision_utils/map_reverse_search.h"
 #include "vision_utils/find_and_replace.h"
+#include "vision_utils/retrieve_file_split.h"
+#include "vision_utils/cast_from_string.h"
+#include "vision_utils/map_to_string.h"
 
 namespace artoolkit_utils {
 

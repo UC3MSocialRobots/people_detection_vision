@@ -65,12 +65,12 @@ based on ARToolkit tags.
 // AD
 #include <people_msgs/People.h>
 #include "vision_utils/pplp_template.h"
-
-
-
+#include "vision_utils/ppl_attributes.h"
+#include "vision_utils/mean.h"
+#include "vision_utils/exec_system_get_output.h"
 #include "people_detection_vision/artoolkit_utils.h"
 
-class ARToolkitPPLP : public PPLPublisherTemplate {
+class ARToolkitPPLP : public vision_utils::PPLPublisherTemplate {
 public:
   typedef sensor_msgs::CameraInfo CamInfo;
 
@@ -156,7 +156,7 @@ public:
       ppl_msg.header.frame_id = _caminfo.header.frame_id;
       ppl_msg.header.stamp = ros::Time::now();
     }
-    ppl_msg.poses.reserve(nmarkers);
+    ppl_msg.people.reserve(nmarkers);
 
     // convert center of masses to 3D positions
     for (unsigned int marker_idx = 0; marker_idx < nmarkers; ++marker_idx) {
@@ -164,23 +164,22 @@ public:
       // shape a Person
       people_msgs::Person pp;
       vision_utils::set_method(pp, "artoolkit");
-      pp.header = ppl_msg.header;
       std::string name;
       if (_pattern_map.direct_lookup(marker.id, name)) // conversion id -> name
         pp.name = name;
       else // keep id
         pp.name = vision_utils::cast_to_string(marker.id);
-      pp.position = marker.pose.pose;
+      pp.position = marker.pose.pose.position;
       // http://en.wikipedia.org/wiki/Covariance_and_correlation
       // The covariance of a variable with itself (i.e. \sigma_{XX})
       // is called the variance and is more commonly denoted as \sigma_X^2,
       // the square of the standard deviation
-      double mean_cov = -1;//, stddev_cov;
+      //double mean_cov = -1;//, stddev_cov;
       //mean_std_dev(marker.pose.covariance, mean_cov, stddev_cov);
-      mean<double>((double*) &(marker.pose.covariance), 36);
-      pp.std_dev = mean_cov;
-      pp.reliability = 0.01 * marker.reliability; // 0..100 -> 0..1
-      ppl_msg.poses.push_back(pp);
+      //vision_utils::mean<double>((double*) &(marker.pose.covariance), 36);
+      //pp.std_dev = mean_cov;
+      pp.reliability = 0.01 * marker.confidence; // 0..100 -> 0..1
+      ppl_msg.people.push_back(pp);
     } // end loop marker_idx
     publish_PPL(ppl_msg);
   }
@@ -218,7 +217,7 @@ private:
   std::string _art_markers_topic;
 
   std::string _marker_pattern_list;
-  vision_utils::Id2PatternName _pattern_map;
+  artoolkit_utils::Id2PatternName _pattern_map;
 }; // end ARToolkitPPLP
 
 ////////////////////////////////////////////////////////////////////////////////

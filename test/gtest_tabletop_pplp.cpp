@@ -32,10 +32,6 @@ Some tests for TabletopPPLP.
 // opencv
 #include <opencv2/highgui/highgui.hpp>
 
-namespace testvar = test_person_histogram_set_variables;
-
-////////////////////////////////////////////////////////////////////////////////
-
 TEST(TestSuite, start_stop) {
   if (!vision_utils::rosmaster_alive()) return;
   ros::NodeHandle nh_private("~");
@@ -49,18 +45,18 @@ TEST(TestSuite, start_stop) {
 TEST(TestSuite, empty_lab) {
   if (!vision_utils::rosmaster_alive()) return;
   TabletopPPLP skill;
-  vision_utils::ppl_vs_user_benchmark(skill, IMG_DIR "depth/empty_lab");
+  vision_utils::ppl_vs_user_benchmark(skill, vision_utils::IMG_DIR() + "depth/empty_lab");
 }
 TEST(TestSuite, all_multi_users) {
   if (!vision_utils::rosmaster_alive()) return;
   TabletopPPLP skill;
-  vision_utils::ppl_vs_user_benchmark(skill, testvar::all_multi_user_filename_prefixes(),
+  vision_utils::ppl_vs_user_benchmark(skill, vision_utils::all_multi_user_filename_prefixes(),
                                      false, true, true);
 }
 TEST(TestSuite, all_single_users) {
   if (!vision_utils::rosmaster_alive()) return;
   TabletopPPLP skill;
-  vision_utils::ppl_vs_user_benchmark(skill, testvar::all_single_user_filename_prefixes(),
+  vision_utils::ppl_vs_user_benchmark(skill, vision_utils::all_single_user_filename_prefixes(),
                                      false, true, true);
 }
 

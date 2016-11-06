@@ -62,9 +62,10 @@ private:
 #else // no USE_BACKGROUND_SUBSTRACTION
 ////////////////////////////////////////////////////////////////////////////////
 #include "vision_utils/rgb_depth_user_skill.h"
+#include "vision_utils/write_rgb_depth_user_to_image_file.h"
 
 
-class RLPDGrabber : public RgbDepthUserSkill {
+class RLPDGrabber : public vision_utils::RgbDepthUserSkill {
 public:
   RLPDGrabber() : RgbDepthUserSkill("RLPD_GRABBER_START", "RLPD_GRABBER_STOP") {
     _was_beginning_stamp_defined = false;

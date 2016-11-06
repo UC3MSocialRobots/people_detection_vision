@@ -17,4 +17,4 @@ catkin_add_gtest(gtest_nite_user_mask_pplp gtest_nite_user_mask_pplp.cpp)
 target_link_libraries(gtest_nite_user_mask_pplp  ${catkin_LIBRARIES})
 
 catkin_add_gtest(gtest_tabletop_pplp  gtest_tabletop_pplp.cpp)
-target_link_libraries(gtest_tabletop_pplp)
+target_link_libraries(gtest_tabletop_pplp  ${catkin_LIBRARIES})

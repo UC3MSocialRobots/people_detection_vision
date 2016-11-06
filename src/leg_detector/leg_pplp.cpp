@@ -63,18 +63,25 @@ Systems, Man, and Cybernetics, Part B:  …, 2009.
 // ROS
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
-// people_msgs
-#include "vision_utils/pplp_template.h"
-// utils
-
-#include "vision_utils/local_minimization_operator.h"
+#include <visualization_msgs/Marker.h>
+// vision _utils
+#include "vision_utils/absolute_angle_between_three_points.h"
+#include "vision_utils/align_polygons.h"
+#include "vision_utils/copy2.h"
+#include "vision_utils/distance_patterns.h"
+#include "vision_utils/distance_points.h"
 #include "vision_utils/foo_point.h"
+#include "vision_utils/local_minimization_operator.h"
+#include "vision_utils/oriented_angle_of_a_vector.h"
+#include "vision_utils/marker_utils.h"
+#include "vision_utils/ppl_attributes.h"
+#include "vision_utils/pplp_template.h"
 #include "vision_utils/timer.h"
 #ifdef PUBLISH_MARKER
 
 #endif // PUBLISH_MARKER
 
-class LegPPLP : public PPLPublisherTemplate {
+class LegPPLP : public vision_utils::PPLPublisherTemplate {
 public:
   //! a minimalistic Point structure
   typedef vision_utils::FooPoint2f Point2;
@@ -416,7 +423,7 @@ connect edges that are adjacent one to the other,
 
     // 1) data preprocessing
     scan_preprocessed = *scan_ptr;
-    apply_local_minimization(scan_ptr->ranges, scan_preprocessed.ranges,
+    vision_utils::apply_local_minimization(scan_ptr->ranges, scan_preprocessed.ranges,
                              scan_ptr->ranges.size(), local_minimization_window_size);
 
     // 2) detection of vertical edges
@@ -462,7 +469,7 @@ connect edges that are adjacent one to the other,
     find_FS_patterns(edges, FS_patterns);
     // SL
     find_SL_patterns(edges, SL_patterns);
-    ROS_INFO_THROTTLE(1, "Found patterns : %i LA, %i FS, %i SL",
+    ROS_INFO_THROTTLE(1, "Found patterns : %li LA, %li FS, %li SL",
                       LA_patterns.size(), FS_patterns.size(), SL_patterns.size());
 
     // timer.printTime("scan_callback();");
@@ -476,22 +483,20 @@ connect edges that are adjacent one to the other,
     for (unsigned int head_idx = 0; head_idx < n_people; ++head_idx) {
       people_msgs::Person people_pose;
       vision_utils::set_method(people_pose, "leg_pplp");
-      people_pose.header = _ppl.header; // copy header
       people_pose.name = vision_utils::cast_to_string(head_idx);
       people_pose.reliability = 1;
       // set pose
-      geometry_msgs::Pose* new_pose = &(people_pose.position);
-      new_pose->orientation = tf::createQuaternionMsgFromYaw(0);
+      geometry_msgs::Point* new_pose = &(people_pose.position);
       if (head_idx < LA_patterns.size())
         vision_utils::copy2(LA_patterns[head_idx],
-                        new_pose->position);
+                        *new_pose);
       else if (head_idx < LA_patterns.size() + FS_patterns.size())
         vision_utils::copy2(FS_patterns[head_idx - LA_patterns.size()],
-            new_pose->position);
+            *new_pose);
       else
         vision_utils::copy2(SL_patterns[head_idx - LA_patterns.size() - FS_patterns.size()],
-            new_pose->position);
-      new_pose->position.z = 1.7;
+            *new_pose);
+      new_pose->z = 1.7;
 
       // add it
       _ppl.people.push_back(people_pose);

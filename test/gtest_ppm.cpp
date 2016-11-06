@@ -31,8 +31,6 @@ Tests for \file ppm_pplp.h
 // opencv
 #include <opencv2/highgui/highgui.hpp>
 
-namespace testvar = test_person_histogram_set_variables;
-
 //#define DISPLAY
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -40,7 +38,7 @@ namespace testvar = test_person_histogram_set_variables;
 void direct_test(const std::string & filename_prefix) {
   if (!vision_utils::rosmaster_alive()) return;
   printf("\ndirect_test('%s')\n", filename_prefix.c_str());
-  std::string kinect_serial_number = DEFAULT_KINECT_SERIAL();
+  std::string kinect_serial_number = vision_utils::DEFAULT_KINECT_SERIAL();
   // read images
   cv::Mat bgr, depth;
   vision_utils::read_rgb_and_depth_image_from_image_file(filename_prefix, &bgr, &depth);
@@ -67,35 +65,35 @@ void direct_test(const std::string & filename_prefix) {
   vision_utils::ppl_vs_user_benchmark(ppm, filename_prefix, true);
 } // end direct_test();
 
-TEST(TestSuite, direct_test_empty_lab) { direct_test(IMG_DIR "depth/empty_lab"); }
+TEST(TestSuite, direct_test_empty_lab) { direct_test(vision_utils::IMG_DIR() + "depth/empty_lab"); }
 TEST(TestSuite, direct_test_all) {
-  for (unsigned int i = 0; i < testvar::refset_hists_nb; ++i)
-    direct_test(testvar::refset_filename_prefixes[i]);
+  for (unsigned int i = 0; i < vision_utils::refset_hists_nb; ++i)
+    direct_test(vision_utils::refset_filename_prefixes[i]);
 }
 TEST(TestSuite, direct_test_ainara) {
-  for (unsigned int i = 0; i < testvar::ainara_hists_nb; ++i)
-    direct_test(testvar::ainara_filename_prefixes[i]);
+  for (unsigned int i = 0; i < vision_utils::ainara_hists_nb; ++i)
+    direct_test(vision_utils::ainara_filename_prefixes[i]);
 }
-TEST(TestSuite, direct_test_david_arnaud1) { direct_test(IMG_DIR "depth/david_arnaud1"); }
-TEST(TestSuite, direct_test_david_arnaud2) { direct_test(IMG_DIR "depth/david_arnaud2"); }
-TEST(TestSuite, direct_test_david_arnaud3) { direct_test(IMG_DIR "depth/david_arnaud3"); }
+TEST(TestSuite, direct_test_david_arnaud1) { direct_test(vision_utils::IMG_DIR() + "depth/david_arnaud1"); }
+TEST(TestSuite, direct_test_david_arnaud2) { direct_test(vision_utils::IMG_DIR() + "depth/david_arnaud2"); }
+TEST(TestSuite, direct_test_david_arnaud3) { direct_test(vision_utils::IMG_DIR() + "depth/david_arnaud3"); }
 #endif /////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, empty_lab) {
   if (!vision_utils::rosmaster_alive()) return;
   Ppm skill;
-  vision_utils::ppl_vs_user_benchmark(skill, IMG_DIR "depth/empty_lab");
+  vision_utils::ppl_vs_user_benchmark(skill, vision_utils::IMG_DIR() + "depth/empty_lab");
 }
 TEST(TestSuite, all_multi_users) {
   if (!vision_utils::rosmaster_alive()) return;
   Ppm skill;
-  vision_utils::ppl_vs_user_benchmark(skill, testvar::all_multi_user_filename_prefixes(),
+  vision_utils::ppl_vs_user_benchmark(skill, vision_utils::all_multi_user_filename_prefixes(),
                                      false, true, true);
 }
 TEST(TestSuite, all_single_users) {
   if (!vision_utils::rosmaster_alive()) return;
   Ppm skill;
-  vision_utils::ppl_vs_user_benchmark(skill, testvar::all_single_user_filename_prefixes(),
+  vision_utils::ppl_vs_user_benchmark(skill, vision_utils::all_single_user_filename_prefixes(),
                                      false, true, true);
 }
 

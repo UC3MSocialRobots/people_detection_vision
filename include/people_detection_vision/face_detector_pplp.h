@@ -70,17 +70,21 @@ It consists of two steps:
 #include <dynamic_reconfigure/server.h>
 #include <people_detection_vision/ViolaConfig.h>
 // AD
+#include "vision_utils/blob_segmenter.h"
+#include "vision_utils/blob_segmenter.h"
+#include "vision_utils/color_utils.h"
+#include "vision_utils/depth_canny.h"
+#include "vision_utils/ground_plane_finder.h"
+#include "vision_utils/images2ppl.h"
+#include "vision_utils/opencv_face_detector.h"
 #include "vision_utils/Rect3.h"
+#include "vision_utils/rectangle_intersection.h"
+#include "vision_utils/remove_including_rectangles.h"
+#include "vision_utils/rgb_depth_pplp_template.h"
+#include "vision_utils/shrink_rec.h"
 #include "vision_utils/timer.h"
 
-#include "vision_utils/opencv_face_detector.h"
-#include "vision_utils/blob_segmenter.h"
-
-// people_msgs
-#include "vision_utils/rgb_depth_pplp_template.h"
-#include "vision_utils/images2ppl.h"
-
-class FaceDetectorPPLP : public RgbDepthPPLPublisherTemplate {
+class FaceDetectorPPLP : public vision_utils::RgbDepthPPLPublisherTemplate {
 public:
   typedef cv::Point3d Pt3d;
 
@@ -117,7 +121,7 @@ public:
     // get camera model
     image_geometry::PinholeCameraModel rgb_camera_model;
     vision_utils::read_camera_model_files
-        (DEFAULT_KINECT_SERIAL(), _default_depth_camera_model, rgb_camera_model);
+        (vision_utils::DEFAULT_KINECT_SERIAL(), _default_depth_camera_model, rgb_camera_model);
     printf("FaceDetectorPPLP: getting rgb on '%s', depth on '%s', "
            "publish People results on '%s', _display:%i\n",
            get_rgb_topic().c_str(), get_depth_topic().c_str(),
@@ -181,14 +185,12 @@ public:
     for (unsigned int user_idx = 0; user_idx < n_faces; ++user_idx) {
       people_msgs::Person* pp = &(_ppl.people[user_idx]);
       vision_utils::set_method(*pp, "face_detector");
-      pp->header = _ppl.header; // copy header
       // people_pose.name = vision_utils::cast_to_string(user_idx);
       pp->name = "NOREC";
       pp->reliability = 1;
 
       // pose
       vision_utils::copy3(_faces_centers_3d[user_idx], pp->position);
-      pp->position.orientation = tf::createQuaternionMsgFromYaw(0);
 
       // image
       if (!_images2pp.convert(*pp, &rgb, &depth, &(_users[user_idx]), true))
@@ -268,13 +270,13 @@ public:
       // last test (slow)
       cv::Mat1b curr_user_mask;
       if (!_segmenter.find_blob(depth, user_mask_seed, curr_user_mask,
-                                BlobSegmenter::GROUND_PLANE_FINDER,
+                                vision_utils::BlobSegmenter::GROUND_PLANE_FINDER,
                                 NULL,
                                 true,
-                                DepthCanny::DEFAULT_CANNY_THRES1,
-                                DepthCanny::DEFAULT_CANNY_THRES2,
-                                GroundPlaneFinder::DEFAULT_DISTANCE_THRESHOLD_M,
-                                GroundPlaneFinder::DEFAULT_LOWER_RATIO_TO_USE,
+                                vision_utils::DepthCanny::DEFAULT_CANNY_THRES1,
+                                vision_utils::DepthCanny::DEFAULT_CANNY_THRES2,
+                                vision_utils::GroundPlaneFinder::DEFAULT_DISTANCE_THRESHOLD_M,
+                                vision_utils::GroundPlaneFinder::DEFAULT_LOWER_RATIO_TO_USE,
                                 4)) // data skip
         continue; // cant find blob
 
@@ -365,7 +367,7 @@ private:
   /* reprojection and filtering */
   double _max_sample_depth, _max_sample_width;
   image_geometry::PinholeCameraModel _default_depth_camera_model;
-  BlobSegmenter _segmenter;
+  vision_utils::BlobSegmenter _segmenter;
 
   // shared data! the three vectors have the same size
   //! the filtered list of faces found

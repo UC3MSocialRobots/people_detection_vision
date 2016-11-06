@@ -945,7 +945,7 @@ private:
 
   ros::ServiceServer _tracking_seed_srv;
   // float receiver
-  Timer _timer;
+  vision_utils::Timer _timer;
   ros::Time _img_msg_timestamp; //!< when the message was received
   cv_bridge::CvImageConstPtr _bridge_img_ptr;
   image_transport::Subscriber _depth_image_subscriber;
@@ -982,7 +982,7 @@ private:
   cv::Mat3b _components_illus;
   //! the point clicked by the user on the GUI
   cv::Point _clicked_pt;
-  Timer _clicked_pt_timer;
+  vision_utils::Timer _clicked_pt_timer;
 
   // clustering
   image_transport::Publisher _objects_names_img_pub;
@@ -995,7 +995,7 @@ private:
   ObjectName _tracked_object_name;
   ros::Publisher _tracked_object_pose_publisher;
   ros::Publisher _stop_tracking_order_publisher;
-  Timer _tracked_object_last_time_seen;
+  vision_utils::Timer _tracked_object_last_time_seen;
 
   /*reprojection and filtering */
   sensor_msgs::CameraInfoConstPtr _cam_info;

@@ -42,18 +42,18 @@ ________________________________________________________________________________
 #include <gtest/gtest.h>
 #include "people_detection_vision/artoolkit_utils.h"
 #include <vision_utils/img_path.h>
-#define ART_TEST_DIR  LONG_TERM_MEMORY_DIR "artoolkit/tests/"
+#define ART_TEST_DIR  vision_utils::IMG_DIR() + "artoolkit/tests/"
 
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, empty_ctor) {
-  vision_utils::Id2PatternName map;
+  artoolkit_utils::Id2PatternName map;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, parse_empty) {
-  vision_utils::Id2PatternName map;
+  artoolkit_utils::Id2PatternName map;
   bool ok = map.parse(".dat");
   ASSERT_TRUE(ok);
   ASSERT_TRUE(map.nkeys() == 0);
@@ -62,7 +62,7 @@ TEST(TestSuite, parse_empty) {
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, parse_non_existing_file) {
-  vision_utils::Id2PatternName map;
+  artoolkit_utils::Id2PatternName map;
   bool ok = map.parse(ART_TEST_DIR "non_existing.dat");
   ASSERT_TRUE(ok);
   ASSERT_TRUE(map.nkeys() == 0);
@@ -71,7 +71,7 @@ TEST(TestSuite, parse_non_existing_file) {
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, parse_empty_file) {
-  vision_utils::Id2PatternName map;
+  artoolkit_utils::Id2PatternName map;
   bool ok = map.parse(ART_TEST_DIR "empty.dat");
   ASSERT_TRUE(ok);
   ASSERT_TRUE(map.nkeys() == 0);
@@ -80,7 +80,7 @@ TEST(TestSuite, parse_empty_file) {
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, parse_comment_only_file) {
-  vision_utils::Id2PatternName map;
+  artoolkit_utils::Id2PatternName map;
   bool ok = map.parse(ART_TEST_DIR "comment_only.dat");
   ASSERT_TRUE(ok);
   ASSERT_TRUE(map.nkeys() == 0);
@@ -89,7 +89,7 @@ TEST(TestSuite, parse_comment_only_file) {
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, parse_0_blocks_file) {
-  vision_utils::Id2PatternName map;
+  artoolkit_utils::Id2PatternName map;
   bool ok = map.parse(ART_TEST_DIR "0_blocks.dat");
   ASSERT_TRUE(ok);
   ASSERT_TRUE(map.nkeys() == 0);
@@ -98,7 +98,7 @@ TEST(TestSuite, parse_0_blocks_file) {
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, parse_1_block_empty_file) {
-  vision_utils::Id2PatternName map;
+  artoolkit_utils::Id2PatternName map;
   bool ok = map.parse(ART_TEST_DIR "1_block_empty.dat");
   ASSERT_TRUE(ok == false);
   ASSERT_TRUE(map.nkeys() == 0);
@@ -107,7 +107,7 @@ TEST(TestSuite, parse_1_block_empty_file) {
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, parse_1_block_file) {
-  vision_utils::Id2PatternName map;
+  artoolkit_utils::Id2PatternName map;
   bool ok = map.parse(ART_TEST_DIR "1_block.dat");
   ASSERT_TRUE(ok);
   ASSERT_TRUE(map.nkeys() == 1);
@@ -132,7 +132,7 @@ TEST(TestSuite, parse_1_block_file) {
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, parse_2_blocks_file) {
-  vision_utils::Id2PatternName map;
+  artoolkit_utils::Id2PatternName map;
   bool ok = map.parse(ART_TEST_DIR "2_blocks.dat");
   ASSERT_TRUE(ok);
   ASSERT_TRUE(map.nkeys() == 2);

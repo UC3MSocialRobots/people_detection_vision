@@ -43,3 +43,6 @@ script: # compile
   - export ROS_PACKAGE_PATH="$ROS_PACKAGE_PATH:$(pwd)/src"
   - rospack profile
   - catkin_make
+  # compile tests
+  - cd build
+  - make tests

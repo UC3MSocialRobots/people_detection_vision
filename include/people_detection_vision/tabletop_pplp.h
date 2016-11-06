@@ -66,16 +66,16 @@ such as a minimum size for the blobs.
 #ifndef TABLETOP_PPLP_H
 #define TABLETOP_PPLP_H
 
-// people_msgs
-#include "vision_utils/rgb_depth_pplp_template.h"
-#include "vision_utils/images2ppl.h"
-
+// vision_utils
 #include "vision_utils/blob_segmenter.h"
+#include "vision_utils/color_utils.h"
+#include "vision_utils/drawListOfPoints.h"
+#include "vision_utils/images2ppl.h"
+#include "vision_utils/imwrite_debug.h"
+#include "vision_utils/rect_center.h"
+#include "vision_utils/rgb_depth_pplp_template.h"
 
-
-
-
-class TabletopPPLP : public RgbDepthPPLPublisherTemplate {
+class TabletopPPLP : public vision_utils::RgbDepthPPLPublisherTemplate {
 public:
   TabletopPPLP() : RgbDepthPPLPublisherTemplate("TABLETOP_PPLP_START",
                                                 "TABLETOP_PPLP_STOP") {
@@ -89,7 +89,7 @@ public:
     // get camera model
     image_geometry::PinholeCameraModel rgb_camera_model;
     vision_utils::read_camera_model_files
-        (DEFAULT_KINECT_SERIAL(), _default_depth_camera_model, rgb_camera_model);
+        (vision_utils::DEFAULT_KINECT_SERIAL(), _default_depth_camera_model, rgb_camera_model);
 
     DEBUG_PRINT("TabletopPPLP: started with '%s' and stopped with '%s', "
                 "subscribing to '%s', '%s', "
@@ -106,7 +106,7 @@ public:
     // DEBUG_PRINT("process_rgb_depth()\n");
     bool ground_recompute_plane = true;
     _segmenter.find_all_blobs(depth, _components_pts, boundingBoxes,
-                              BlobSegmenter::GROUND_PLANE_FINDER,
+                              vision_utils::BlobSegmenter::GROUND_PLANE_FINDER,
                               &_default_depth_camera_model,
                               min_dist_m, max_dist_m,
                               max_blobs_nb, min_blob_size_pix,
@@ -121,7 +121,6 @@ public:
         people_msgs::Person* pp = &(_ppl.people[user_idx]);
         vision_utils::set_method(*pp, "tabletop_pplp");
         cv::Rect curr_roi = boundingBoxes[user_idx];
-        pp->header = _ppl.header; // copy header
         pp->name = "NOREC";
         pp->reliability = 1;
 
@@ -143,7 +142,6 @@ public:
         cv::Point3d user_center3d = vision_utils::pixel2world_depth<cv::Point3d>
             (user_center2d, _default_depth_camera_model, depth);
         vision_utils::copy3(user_center3d, pp->position);
-        pp->position.orientation = tf::createQuaternionMsgFromYaw(0);
 
         curr_user_roi.setTo(0); // clean curr_user_mask only where needed
       } // end loop user_idx
@@ -194,8 +192,8 @@ public:
   //////////////////////////////////////////////////////////////////////////////
 
   //! segmentation
-  BlobSegmenter _segmenter;
-  std::vector< DisjointSets2::Comp > _components_pts;
+  vision_utils::BlobSegmenter _segmenter;
+  std::vector< vision_utils::DisjointSets2::Comp > _components_pts;
   std::vector<cv::Rect> boundingBoxes;
   image_geometry::PinholeCameraModel _default_depth_camera_model;
   double min_dist_m, max_dist_m;

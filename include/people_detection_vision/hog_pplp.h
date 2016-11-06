@@ -57,14 +57,14 @@ http://experienceopencv.blogspot.com/2011/02/hog-descriptor.html
 #include "vision_utils/image_clusterer.h"
 #include "vision_utils/Rect3.h"
 #include "vision_utils/timer.h"
-
-// people_msgs
+#include "vision_utils/rectangle_intersection.h"
+#include "vision_utils/remove_including_rectangles.h"
 #include "vision_utils/rgb_depth_pplp_template.h"
 #include "vision_utils/images2ppl.h"
 // OpenCV
 #include "opencv2/objdetect/objdetect.hpp"
 
-class HogPPLP : public RgbDepthPPLPublisherTemplate  {
+class HogPPLP : public vision_utils::RgbDepthPPLPublisherTemplate  {
 public:
 
   //////////////////////////////////////////////////////////////////////////////
@@ -88,7 +88,7 @@ public:
     // get camera model
     image_geometry::PinholeCameraModel rgb_camera_model;
     vision_utils::read_camera_model_files
-        (DEFAULT_KINECT_SERIAL(), _default_depth_camera_model, rgb_camera_model);
+        (vision_utils::DEFAULT_KINECT_SERIAL(), _default_depth_camera_model, rgb_camera_model);
 
     ROS_INFO("HogPPLP: started with '%s' and stopped with '%s', display:%i, "
              "subscribing to '%s', '%s', "
@@ -259,20 +259,18 @@ public:
     for (unsigned int user_idx = 0; user_idx < n_faces; ++user_idx) {
       people_msgs::Person* pp = &(_ppl.people[user_idx]);
       vision_utils::set_method(*pp, "hog_pplp");
-      pp->header = _ppl.header; // copy header
       // pp->name = vision_utils::cast_to_string(user_idx);
       pp->name = "NOREC";
       pp->reliability = 1;
 
       // pose
       vision_utils::copy3(_faces_centers3d[user_idx], pp->position);
-      pp->position.orientation = tf::createQuaternionMsgFromYaw(0);
 
       // image
       _images2pp.convert(*pp, &(_rgb_cuts[user_idx]), &(_depth_cuts[user_idx]), &(_user_cuts[user_idx]), false);
       // restore proper offset (images were crops)
-      pp->images_offsetx = _cuts_offsets[user_idx].x;
-      pp->images_offsety = _cuts_offsets[user_idx].y;
+      vision_utils::set_tag(*pp, "images_offsetx", _cuts_offsets[user_idx].x);
+      vision_utils::set_tag(*pp, "images_offsety", _cuts_offsets[user_idx].y);
       //  printf("PP #%i:(%i, %i)+(%i, %i)\n", user_idx,
       //         pp->images_offsetx, pp->images_offsety, pp->user.width, pp->user.height);
     } // end loop user_idx
@@ -347,7 +345,7 @@ private:
   int _clusterer_data_skip;
   std::vector<cv::Point2i> _cluster_pixels;
   std::vector<cv::Scalar> _cluster_colors;
-  ImageClusterer _clusterer;
+  vision_utils::ImageClusterer _clusterer;
   image_geometry::PinholeCameraModel _default_depth_camera_model;
 
   //! information sharing

@@ -53,17 +53,17 @@ Publishes the former in ROS LaserScans and the latter in PPL messages.
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
 #include <tf/transform_datatypes.h>
-// people_msgs
-#include "vision_utils/pplp_template.h"
-// utils
-
-#include "vision_utils/string_split.h"
+// vision_utils
 #include "vision_utils/foo_point.h"
+#include "vision_utils/ppl_attributes.h"
+#include "vision_utils/pplp_template.h"
+#include "vision_utils/retrieve_file_split.h"
+#include "vision_utils/string_split.h"
 
 #define DEG2RAD 0.01745329251994329577
 #define RAD2DEG 57.2957795130823208768
 
-class ScanAndLegPublisher : public PPLPublisherTemplate {
+class ScanAndLegPublisher : public vision_utils::PPLPublisherTemplate {
 public:
   //! a minimalistic Point structure
   typedef vision_utils::FooPoint2f Point2;
@@ -151,14 +151,12 @@ public:
     for (unsigned int user_idx = 0; user_idx < nusers; ++user_idx) {
       people_msgs::Person people_pose;
       vision_utils::set_method(people_pose, "scan_and_leg_publisher");
-      people_pose.header = _ppl.header; // copy header
       people_pose.name = vision_utils::cast_to_string(user_idx);
       people_pose.reliability = 1;
       // set pose
-      people_pose.position.orientation = tf::createQuaternionMsgFromYaw(0);
-      people_pose.position.position.x = users_positions[user_idx*3];
-      people_pose.position.position.y = users_positions[user_idx*3+1];
-      people_pose.position.position.z = 1.7;
+      people_pose.position.x = users_positions[user_idx*3];
+      people_pose.position.y = users_positions[user_idx*3+1];
+      people_pose.position.z = 1.7;
       // add it
       _ppl.people.push_back(people_pose);
     } // end loop user_idx

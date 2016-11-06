@@ -34,10 +34,6 @@ Some tests for
 // opencv
 #include <opencv2/highgui/highgui.hpp>
 
-namespace testvar = test_person_histogram_set_variables;
-
-////////////////////////////////////////////////////////////////////////////////
-
 void direct_test(NiteUserMask2Ppl & skill,
           const std::string & filename_prefix) {
   // read user, depth, rgb files
@@ -60,8 +56,8 @@ TEST(TestSuite, direct_tests) {
   if (!vision_utils::rosmaster_alive()) return;
   NiteUserMask2Ppl skill;
   skill.create_subscribers_and_publishers();
-  direct_test(skill, IMG_DIR "depth/juggling1");
-  direct_test(skill, IMG_DIR "depth/david_arnaud1");
+  direct_test(skill, vision_utils::IMG_DIR() + "depth/juggling1");
+  direct_test(skill, vision_utils::IMG_DIR() + "depth/david_arnaud1");
   skill.shutdown_subscribers_and_publishers();
 }
 
@@ -78,18 +74,18 @@ TEST(TestSuite, start_stop) {
 TEST(TestSuite, empty_lab) {
   if (!vision_utils::rosmaster_alive()) return;
   NiteUserMask2Ppl skill;
-  vision_utils::ppl_vs_user_benchmark(skill, IMG_DIR "depth/empty_lab", true);
+  vision_utils::ppl_vs_user_benchmark(skill, vision_utils::IMG_DIR() + "depth/empty_lab", true);
 }
 TEST(TestSuite, all_multi_users) {
   if (!vision_utils::rosmaster_alive()) return;
   NiteUserMask2Ppl skill;
-  vision_utils::ppl_vs_user_benchmark(skill, testvar::all_multi_user_filename_prefixes(),
+  vision_utils::ppl_vs_user_benchmark(skill, vision_utils::all_multi_user_filename_prefixes(),
                                      true, true, true);
 }
 TEST(TestSuite, all_single_users) {
   if (!vision_utils::rosmaster_alive()) return;
   NiteUserMask2Ppl skill;
-  vision_utils::ppl_vs_user_benchmark(skill, testvar::all_single_user_filename_prefixes(),
+  vision_utils::ppl_vs_user_benchmark(skill, vision_utils::all_single_user_filename_prefixes(),
                                      true, true, true);
 }
 

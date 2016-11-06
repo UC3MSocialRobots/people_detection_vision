@@ -77,28 +77,29 @@ this can be useful to discriminate between users and other objects for instance.
 #define BG_SUBSTRACTOR_PPLP_H
 
 // AD
-
-
-
-
-#include "vision_utils/timestamp.h"
-
-#include "vision_utils/disjoint_sets2.h"
 #include "vision_utils/depth_canny.h"
-
+#include "vision_utils/drawListOfPoints.h"
+#include "vision_utils/copy2.h"
+#include "vision_utils/printP.h"
+#include "vision_utils/color_utils.h"
+#include "vision_utils/write_rgb_and_depth_image_to_image_file.h"
+#include "vision_utils/disjoint_sets2.h"
 #include "vision_utils/head_finder.h"
-// people_msgs
-#include "vision_utils/rgb_depth_pplp_template.h"
 #include "vision_utils/images2ppl.h"
+#include "vision_utils/kinect_serials.h"
+#include "vision_utils/rgb_depth_pplp_template.h"
+#include "vision_utils/timestamp.h"
 // ROS
 #include <tf/transform_datatypes.h>
 #include <tf/transform_listener.h>
+
+#include <iomanip>      // std::setw
 
 #undef DEBUG_PRINT
 #define DEBUG_PRINT(...)   printf(__VA_ARGS__)
 
 
-class BackgroundSubstractorPPLP : public RgbDepthPPLPublisherTemplate  {
+class BackgroundSubstractorPPLP : public vision_utils::RgbDepthPPLPublisherTemplate  {
 public:
   /*! the difference between a pixel depth and the background depth
   in meters to be considered as foreground */
@@ -123,8 +124,8 @@ public:
     _nh_private.param("min_comp_z", _min_comp_z, -10.);
     _nh_private.param("max_comp_z", _max_comp_z, 10.);
     double canny_thres1, canny_thres2;
-    const double DEFAULT_CANNY_THRES1_auxConst = DepthCanny::DEFAULT_CANNY_THRES1;
-    const double DEFAULT_CANNY_THRES2_auxConst = DepthCanny::DEFAULT_CANNY_THRES2;
+    const double DEFAULT_CANNY_THRES1_auxConst = vision_utils::DepthCanny::DEFAULT_CANNY_THRES1;
+    const double DEFAULT_CANNY_THRES2_auxConst = vision_utils::DepthCanny::DEFAULT_CANNY_THRES2;
     _nh_private.param("canny_thres1", canny_thres1, DEFAULT_CANNY_THRES1_auxConst);
     _nh_private.param("canny_thres1", canny_thres2, DEFAULT_CANNY_THRES2_auxConst);
     _canny.set_canny_thresholds(canny_thres1, canny_thres2);
@@ -138,7 +139,7 @@ public:
     // get camera model
     image_geometry::PinholeCameraModel rgb_camera_model;
     vision_utils::read_camera_model_files
-        (DEFAULT_KINECT_SERIAL(), _default_depth_camera_model, rgb_camera_model);
+        (vision_utils::DEFAULT_KINECT_SERIAL(), _default_depth_camera_model, rgb_camera_model);
 
     std::ostringstream info;
     info << "BackgroundSubstractorPPLP: started with '" << get_start_stopic()
@@ -303,20 +304,19 @@ public:
     for (unsigned int user_idx = 0; user_idx < nfaces; ++user_idx) {
       people_msgs::Person* pp = &(_ppl.people[user_idx]);
       vision_utils::set_method(*pp, "BG_SUBSTRACTOR_PPLP");
-      pp->header = _ppl.header; // copy header
       // pp->name = vision_utils::cast_to_string(user_idx);
       pp->name = "NOREC";
       pp->reliability = 1;
 
       // pose
       vision_utils::copy3(_faces_centers2d3d[user_idx].second, pp->position);
-      pp->position.orientation = tf::createQuaternionMsgFromYaw(0);
+      //pp->position.orientation = tf::createQuaternionMsgFromYaw(0);
 
       // image
       _images2pp.convert(*pp, &(_rgb_cuts[user_idx]), &(_depth_cuts[user_idx]), &(_user_cuts[user_idx]), false);
       // restore proper offset (images were crops)
-      pp->images_offsetx = _cuts_offsets[user_idx].x;
-      pp->images_offsety = _cuts_offsets[user_idx].y;
+      vision_utils::set_tag(*pp, "images_offsetx", _cuts_offsets[user_idx].x);
+      vision_utils::set_tag(*pp, "images_offsety", _cuts_offsets[user_idx].y);
       //  printf("PP #%i:(%i, %i)+(%i, %i)\n", user_idx,
       //         pp->images_offsetx, pp->images_offsety, pp->user.width, pp->user.height);
     } // end loop user_idx
@@ -369,10 +369,10 @@ public:
 
 private:
   //! Canny
-  DepthCanny _canny;
+  vision_utils::DepthCanny _canny;
 
   //! disjoint sets
-  DisjointSets2 _set;
+  vision_utils::DisjointSets2 _set;
   std::vector< std::vector<cv::Point> > _components_pts;
   std::vector<cv::Rect> _boundingBoxes;
   std::vector<bool> _comp_was_kept;
@@ -384,7 +384,7 @@ private:
   cv::Mat1f _background;
   cv::Mat1b _foreground;
   bool _update_background;
-  HeadFinder _head_finder;
+  vision_utils::HeadFinder _head_finder;
   cv::Mat1b _user_mask;
 
   //! the list of faces, with ROS orientation, in RGB frame
