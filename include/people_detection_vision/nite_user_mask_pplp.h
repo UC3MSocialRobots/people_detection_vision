@@ -58,6 +58,7 @@ in the user mask.
 // ROS
 #include <image_transport/image_transport.h>
 #include <image_transport/subscriber_filter.h>
+#include <cv_bridge/cv_bridge.h>
 // #define USE_EXACT_TIME // comment to use approx time
 #ifdef USE_EXACT_TIME
 #include <message_filters/sync_policies/exact_time.h>
