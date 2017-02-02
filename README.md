@@ -176,3 +176,8 @@ environments. In Kaneko, Makoto; Nakamura, Y., editor, Proceedings of the
 Viola, P. and Jones, M. (2001). Rapid object detection using a boosted
 cascade of simple features. In Computer Vision and Pattern Recognition, IEEE
 Computer Society Conference on
+
+Licence
+=======
+
+LGPL v3 (GNU Lesser General Public License version 3).
