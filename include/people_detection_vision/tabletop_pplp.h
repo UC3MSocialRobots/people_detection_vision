@@ -147,6 +147,10 @@ public:
       } // end loop user_idx
       publish_PPL(_ppl);
     } // end if (get_ppl_num_subscribers() > 0)
+    else {
+      ROS_INFO_THROTTLE(1, "TabletopPPLP: no subscriber on %s, "
+                        "publishing nothing.", get_ppl_topic().c_str());
+    }
     if (_display) display(rgb, depth);
   } // end process_rgb_depth();
 

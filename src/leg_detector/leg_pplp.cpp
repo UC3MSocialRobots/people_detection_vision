@@ -179,8 +179,8 @@ connect edges that are adjacent one to the other,
     _nh_private.param("edge_distance_threshold", edge_distance_threshold, .2);
     _nh_private.param("local_minimization_window_size", local_minimization_window_size, 3);
 
-  const double LEG_PATTERN_LA_LEG_WIDTH_auxConst = LEG_PATTERN_LA_LEG_WIDTH;
-  const double LEG_PATTERN_LA_LEG_GAP_auxConst = LEG_PATTERN_LA_LEG_GAP;
+    const double LEG_PATTERN_LA_LEG_WIDTH_auxConst = LEG_PATTERN_LA_LEG_WIDTH;
+    const double LEG_PATTERN_LA_LEG_GAP_auxConst = LEG_PATTERN_LA_LEG_GAP;
 
     // prepare patterns
     template_LA_pattern.clear();
@@ -285,7 +285,7 @@ connect edges that are adjacent one to the other,
             candidate_LA_pattern[2] = E[n]    .p1;
             candidate_LA_pattern[3] = E[n + 1].p0;
             double pattern_dist = vision_utils::distance_patterns
-                                  (template_LA_pattern, candidate_LA_pattern, LEG_PATTERN_LA_MAX_DIST);
+                (template_LA_pattern, candidate_LA_pattern, LEG_PATTERN_LA_MAX_DIST);
             //  ROS_INFO_THROTTLE(1, "pattern_dist=%g: possible LA pattern at indices %i, %i, %i, %i\n",
             //         pattern_dist, m, m + 1, n, n + 1);
             if (pattern_dist < LEG_PATTERN_LA_MAX_DIST) {
@@ -343,14 +343,14 @@ connect edges that are adjacent one to the other,
         if (E[m + 1].type == Edge::LEFT_EDGE) { // LLR -> p1, p1, p0
           candidate_FS_pattern[1] = E[m + 1].p1;
           pattern_dist = vision_utils::distance_patterns
-                         (template_FS_LLR_pattern, candidate_FS_pattern, LEG_PATTERN_FS_MAX_DIST);
+              (template_FS_LLR_pattern, candidate_FS_pattern, LEG_PATTERN_FS_MAX_DIST);
           //  ROS_INFO_THROTTLE(1, "pattern_dist=%g: possible LLR FS pattern at indices %i, %i, %i\n",
           //         pattern_dist, m, m + 1, m + 2);
         }
         else { // LRR -> p1, p0, p0
           candidate_FS_pattern[1] = E[m + 1].p0;
           pattern_dist = vision_utils::distance_patterns
-                         (template_FS_LRR_pattern, candidate_FS_pattern, LEG_PATTERN_FS_MAX_DIST);
+              (template_FS_LRR_pattern, candidate_FS_pattern, LEG_PATTERN_FS_MAX_DIST);
           //  ROS_INFO_THROTTLE(1, "pattern_dist=%g: possible LRR FS pattern at indices %i, %i, %i\n",
           //         pattern_dist, m, m + 1, m + 2);
         }
@@ -396,7 +396,7 @@ connect edges that are adjacent one to the other,
         candidate_SL_pattern[0] = E[m]    .p1;
         candidate_SL_pattern[1] = E[m + 1].p0;
         double pattern_dist = vision_utils::distance_patterns
-                              (template_SL_pattern, candidate_SL_pattern, LEG_PATTERN_SL_MAX_DIST);
+            (template_SL_pattern, candidate_SL_pattern, LEG_PATTERN_SL_MAX_DIST);
 
         if (pattern_dist < LEG_PATTERN_SL_MAX_DIST) {
           //  ROS_INFO_THROTTLE(1, "pattern_dist=%g: we found a SL pattern at indices %i, %i",
@@ -418,13 +418,16 @@ connect edges that are adjacent one to the other,
 
   void scan_callback(const sensor_msgs::LaserScanConstPtr & scan_ptr) {
     // ROS_INFO_THROTTLE(1, "scan_callback()");
-    if (get_ppl_num_subscribers() == 0)
+    if (get_ppl_num_subscribers() == 0) {
+      ROS_INFO_THROTTLE(1, "LegPPLP: no subscriber on %s, "
+                        "publishing nothing.", get_ppl_topic().c_str());
       return;
+    }
 
     // 1) data preprocessing
     scan_preprocessed = *scan_ptr;
     vision_utils::apply_local_minimization(scan_ptr->ranges, scan_preprocessed.ranges,
-                             scan_ptr->ranges.size(), local_minimization_window_size);
+                                           scan_ptr->ranges.size(), local_minimization_window_size);
 
     // 2) detection of vertical edges
     edges.clear();
@@ -435,13 +438,13 @@ connect edges that are adjacent one to the other,
         // push current segment
         Edge e;
         e.p0 = point_from_polar
-               (scan_preprocessed.ranges[range_idx - 1],
+            (scan_preprocessed.ranges[range_idx - 1],
             scan_preprocessed.angle_min +
             (range_idx - 1) * scan_preprocessed.angle_increment);
         e.p1 = point_from_polar
-               (scan_preprocessed.ranges[range_idx],
-                scan_preprocessed.angle_min +
-                range_idx  * scan_preprocessed.angle_increment);
+            (scan_preprocessed.ranges[range_idx],
+             scan_preprocessed.angle_min +
+             range_idx  * scan_preprocessed.angle_increment);
         if (scan_preprocessed.ranges[range_idx - 1] > scan_preprocessed.ranges[range_idx])
           e.type = Edge::LEFT_EDGE;
         else
@@ -453,8 +456,8 @@ connect edges that are adjacent one to the other,
 
     unsigned int edges_size_before = edges.size();
     connected_adjacent_edges(edges);
-//    ROS_INFO_THROTTLE(1, "Connecting adjacent edges: %i -> %i edges",
-//                      edges_size_before, edges.size());
+    //    ROS_INFO_THROTTLE(1, "Connecting adjacent edges: %i -> %i edges",
+    //                      edges_size_before, edges.size());
 
 #ifdef PUBLISH_MARKER
     // need to publish edges before finding patterns
@@ -489,7 +492,7 @@ connect edges that are adjacent one to the other,
       geometry_msgs::Point* new_pose = &(people_pose.position);
       if (head_idx < LA_patterns.size())
         vision_utils::copy2(LA_patterns[head_idx],
-                        *new_pose);
+                            *new_pose);
       else if (head_idx < LA_patterns.size() + FS_patterns.size())
         vision_utils::copy2(FS_patterns[head_idx - LA_patterns.size()],
             *new_pose);

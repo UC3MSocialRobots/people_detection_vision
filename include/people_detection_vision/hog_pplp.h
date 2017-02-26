@@ -190,6 +190,10 @@ public:
 
       if (get_ppl_num_subscribers() > 0)
         build_ppl_message();
+      else {
+        ROS_INFO_THROTTLE(1, "HogPPLP: no subscriber on %s, "
+                          "publishing nothing.", get_ppl_topic().c_str());
+      }
     } // end if (can_pixe2world)
     _last_time = timer.time();
     DEBUG_PRINT("Time for process_rgb_depth():%g m, %i users\n", _last_time, nusers);

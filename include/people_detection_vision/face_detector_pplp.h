@@ -70,7 +70,7 @@ It consists of two steps:
 #include <dynamic_reconfigure/server.h>
 #include <people_detection_vision/ViolaConfig.h>
 // AD
-#include "vision_utils/blob_segmenter.h"
+#include "vision_utils/accessible_to_string.h"
 #include "vision_utils/blob_segmenter.h"
 #include "vision_utils/color_utils.h"
 #include "vision_utils/depth_canny.h"
@@ -144,25 +144,30 @@ public:
          _small_img, _faces_not_filtered,
          _resize_max_width, _resize_max_height, _scale_factor,
          _min_neighbors, _min_width);
-    DEBUG_PRINT("time for detect_with_opencv(): %g ms, %i faces\n",
+    DEBUG_PRINT("time for detect_with_opencv(): %g ms, %li faces\n",
                 timer.time(), _faces_not_filtered.size());
 
     // remove including faces
     std::vector< cv::Rect > faces_not_filtered_orig = _faces_not_filtered;
     vision_utils::remove_including_rectangles
         (faces_not_filtered_orig, _faces_not_filtered);
-    DEBUG_PRINT("time for remove_including_rectangles(): %g ms, %i faces\n",
+    DEBUG_PRINT("time for remove_including_rectangles(): %g ms, %li faces\n",
                 timer.time(), _faces_not_filtered.size());
 
     filter_outliers_with_depth(depth);
     DEBUG_PRINT("Time for filter_outliers_with_depth(): %g ms, "
-                "after filtering, %i faces: %s\n",
+                "after filtering, %li faces: %s\n",
                 timer.time(), _faces_filtered.size(),
                 vision_utils::accessible_to_string(_faces_centers_3d).c_str());
     if (get_ppl_num_subscribers() > 0)
       build_ppl_message(rgb, depth);
+    else {
+      ROS_INFO_THROTTLE(1, "FaceDetectorPPLP: no subscriber on %s, "
+                        "publishing nothing.", get_ppl_topic().c_str());
+    }
     _last_time = timer.time();
-    DEBUG_PRINT("Time for process_rgb_depth():%g m, %i users\n", _last_time, nusers);
+    DEBUG_PRINT("Time for process_rgb_depth():%g m, %li users\n",
+                _last_time, _faces_centers_3d.size());
 
     if (_display)
       display(rgb, depth);

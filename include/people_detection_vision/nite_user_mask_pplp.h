@@ -73,9 +73,9 @@ in the user mask.
 #include "vision_utils/user_image_to_rgb.h"
 #include "vision_utils/map_values_to_container.h"
 
-#define DEBUG_PRINT(...)   {}
+//#define DEBUG_PRINT(...)   {}
 //#define DEBUG_PRINT(...)   ROS_INFO_THROTTLE(5, __VA_ARGS__)
-//#define DEBUG_PRINT(...)   ROS_WARN(__VA_ARGS__)
+#define DEBUG_PRINT(...)   ROS_WARN(__VA_ARGS__)
 //#define DEBUG_PRINT(...)   printf(__VA_ARGS__)
 
 class NiteUserMask2Ppl : public vision_utils::PPLPublisherTemplate {
@@ -109,6 +109,7 @@ public:
   //////////////////////////////////////////////////////////////////////////////
 
   void create_subscribers_and_publishers() {
+    DEBUG_PRINT("create_subscribers_and_publishers()\n");
     // get the image channel
     std::string _rgb_topic = "rgb";
     _nh_private.param("rgb_topic", _rgb_topic, _rgb_topic);
@@ -182,22 +183,31 @@ public:
 
   //////////////////////////////////////////////////////////////////////////////
 
-  inline void process_rgb_depth_user(const cv::Mat3b& rgb,
+  inline bool process_rgb_depth_user(const cv::Mat3b& rgb,
                                      const cv::Mat1f& depth,
                                      const cv::Mat1b& user_mask) {
+    DEBUG_PRINT("process_rgb_depth_user(%i, %i)\n", rgb.cols, rgb.rows);
     //Timer timer;
     // compte center of masses
     if (!_ppl_conv.convert(rgb, depth, user_mask, NULL, &_images_header)) {
-      return;
+      return false;
     }
-    if (get_ppl_num_subscribers() > 0) {
+    if (get_ppl_num_subscribers() == 0) {
+      ROS_INFO_THROTTLE(1, "NiteUserMask2Ppl: no subscriber on %s, "
+                        "publishing nothing.", get_ppl_topic().c_str());
+    }
+    else {
       PPL* ppl = &(_ppl_conv.get_ppl());
-      vision_utils::set_method(*ppl, "nite_user_mask_pplp");
-      publish_PPL(*ppl);
+      if (!vision_utils::set_method(*ppl, "nite_user_mask_pplp"))
+        return false;
+      if (!publish_PPL(*ppl))
+        return false;
     }
-    if (_display) display(rgb, depth, user_mask);
+    if (_display)
+      display(rgb, depth, user_mask);
     //  printf("NiteUserMask2Ppl::process(): %g ms, publishing a PPL of %i people\n",
     //                    timer.time(), _ppl_conv.nusers());
+    return true;
   } // end process();
 
   //////////////////////////////////////////////////////////////////////////////

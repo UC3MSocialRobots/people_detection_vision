@@ -87,6 +87,10 @@ public:
       DEBUG_PRINT("Time for PPL creation:%g ms, %i users\n", timer.time(), npeople);
       publish_PPL(_ppl);
     }
+    else {
+      ROS_INFO_THROTTLE(1, "Ppm: no subscriber on %s, "
+                        "publishing nothing.", get_ppl_topic().c_str());
+    }
     if (_display) display(rgb, depth);
   }
 
@@ -367,7 +371,7 @@ public:
 
 #endif// ///////////////////////////////////////////////////////////////////////
 
-    DEBUG_PRINT("Time for rois():%g ms, %i comps.\n", timer.time(), comps_bboxes.size());
+    DEBUG_PRINT("Time for rois():%g ms, %li comps.\n", timer.time(), comps_bboxes.size());
     return true;
   } // end rois()
 

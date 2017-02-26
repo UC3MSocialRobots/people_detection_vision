@@ -102,7 +102,7 @@ public:
            input_caminfo_topic.c_str());
     // wait for camera info
     CamInfo::ConstPtr caminfo_ptr = ros::topic::waitForMessage<CamInfo>
-                                    (input_caminfo_topic, _nh_public, ros::Duration(15));
+        (input_caminfo_topic, _nh_public, ros::Duration(15));
     // if not obtained, die!
     if (!caminfo_ptr) {
       ROS_FATAL("Could not get Kinect cam info on '%s', dying, argh!",
@@ -143,8 +143,11 @@ public:
   void markers_cb(const ar_pose::ARMarkers::ConstPtr & msg) {
     unsigned int nmarkers = msg->markers.size();
     ROS_INFO_THROTTLE(1, "markers_cb(%i markers)",nmarkers);
-    if (get_ppl_num_subscribers() == 0)
+    if (get_ppl_num_subscribers() == 0) {
+      ROS_INFO_THROTTLE(1, "ARToolkitPPLP: no subscriber on %s, "
+                        "publishing nothing.", get_ppl_topic().c_str());
       return;
+    }
     // convert to PPL
     // prepare the message
     people_msgs::People ppl_msg;
@@ -193,7 +196,7 @@ public:
 
     // kill the node
     std::string out = vision_utils::exec_system_get_output
-                      ("rosnode kill ar_pose");
+        ("rosnode kill ar_pose");
     // correct output:
     // killing /input_only/ar_pose
     // killed

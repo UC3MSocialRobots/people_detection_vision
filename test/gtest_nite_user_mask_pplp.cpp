@@ -43,7 +43,7 @@ void direct_test(NiteUserMask2Ppl & skill,
       (filename_prefix, &rgb, &depth, &user_mask);
   // cv::Mat3b user_illus;  user_image_to_rgb(user_mask, user_illus);  cv::imshow("NiteUserMask2Ppl", user_illus); cv::waitKey(0);
   // test the skill
-  skill.process_rgb_depth_user(rgb, depth, user_mask);
+  ASSERT_TRUE(skill.process_rgb_depth_user(rgb, depth, user_mask));
 #ifdef DISPLAY
   skill.display(rgb, depth, user_mask);
   cv::waitKey(0);
