@@ -200,8 +200,7 @@ public:
       PPL* ppl = &(_ppl_conv.get_ppl());
       if (!vision_utils::set_method(*ppl, "nite_user_mask_pplp"))
         return false;
-      if (!publish_PPL(*ppl))
-        return false;
+      publish_PPL(*ppl);
     }
     if (_display)
       display(rgb, depth, user_mask);

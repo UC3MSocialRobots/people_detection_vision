@@ -28,6 +28,7 @@
         these should be in the dependencies.rosinstall of the package -->
   <depend>ar_pose</depend>
   <!-- AD -->
+  <depend>vision_utils</depend>
 
   <export>
     <rosdoc config="rosdoc.yaml" />
